@@ -1,4 +1,5 @@
 #include <iostream>
+#include <vector>
 #include <unistd.h>
 #include <dirent.h>
 
@@ -34,7 +35,7 @@ void findAll(int *numFiles, const char *cwd) {
 	}
 }
 
-void getPaths(char **filePaths, const char *cwd, int *index) {
+void getPaths(std::vector<std::string> *filePaths, const char *cwd) {
 	DIR *dir;
 	struct dirent *ent;
 
@@ -49,10 +50,9 @@ void getPaths(char **filePaths, const char *cwd, int *index) {
 				// Check if file path is a directory.
 				if ((dir2 = opendir(filePath.c_str())) != NULL) {
 					closedir(dir2);
-					getPaths(filePaths, filePath.c_str(), index);
+					getPaths(filePaths, filePath.c_str());
 				} else {
-					filePaths[*index] = &filePath[0u];
-					*index += 1;
+					filePaths->push_back(filePath);
 				}
 			}
 		}
@@ -72,12 +72,13 @@ int main(int argc, char *argv[]) {
 	getcwd(cwd, PATH_MAX);
 	findAll(numFiles, cwd);
 
-	char **filePaths = (char**) malloc(sizeof(char*) * *numFiles);
-	delete(numFiles);
-	int *index = new int(0);
+	std::vector<std::string> *filePaths = new std::vector<std::string>();
 
-	getPaths(filePaths, cwd, index);
-	
-	free(filePaths);
+	getPaths(filePaths, cwd);
+	for (int i = 0; i < *numFiles; ++i) {
+		std::cout << filePaths->at(i) << std::endl;
+	}
+
+	delete(numFiles);
 	return 0;
 }
