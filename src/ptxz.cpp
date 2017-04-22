@@ -30,6 +30,7 @@ void findAll(int *numFiles, const char *cwd) {
 				}
 			}
 		}
+		closedir(dir)
 	}
 }
 
