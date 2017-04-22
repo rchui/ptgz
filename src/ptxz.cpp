@@ -1,7 +1,9 @@
+#include <stdlib.h>
 #include <iostream>
 #include <vector>
 #include <unistd.h>
 #include <dirent.h>
+#include <omp.h>
 
 void helpCheck(char *argv[]) {
 	if (argv[1] == std::string("-h") || argv[1] == std::string("--help")) {
@@ -75,9 +77,8 @@ int main(int argc, char *argv[]) {
 	std::vector<std::string> *filePaths = new std::vector<std::string>();
 
 	getPaths(filePaths, cwd);
-	for (int i = 0; i < *numFiles; ++i) {
-		std::cout << filePaths->at(i) << std::endl;
-	}
+
+	system("echo 'Hello World'");
 
 	delete(numFiles);
 	return 0;
