@@ -34,8 +34,30 @@ void findAll(int *numFiles, const char *cwd) {
 	}
 }
 
-void getPaths(char **filePaths, const char *cwd) {
-	std::cout << "getPaths entry" << std::endl;
+void getPaths(char **filePaths, const char *cwd, int *index) {
+	DIR *dir;
+	struct dirent *ent;
+
+	// Check if cwd is a directory
+	if ((dir = opendir(cwd)) != NULL) {
+		// Get all file paths within directory.
+		while ((ent = readdir (dir)) != NULL) {
+			std::string fileBuff = std::string(ent -> d_name);
+			if (fileBuff != "." && fileBuff != "..") {
+				DIR *dir2;
+				std::string filePath = std::string(cwd) + "/" + fileBuff;
+				// Check if file path is a directory.
+				if ((dir2 = opendir(filePath.c_str())) != NULL) {
+					closedir(dir2);
+					getPaths(filePaths, filePath.c_str(), index);
+				} else {
+					filePaths[*index] = &filePath[0u];
+					*index += 1;
+				}
+			}
+		}
+		closedir(dir);
+	}
 }
 
 char cwd [PATH_MAX];
@@ -52,8 +74,9 @@ int main(int argc, char *argv[]) {
 
 	char **filePaths = (char**) malloc(sizeof(char*) * *numFiles);
 	delete(numFiles);
+	int *index = new int(0);
 
-	getPaths(filePaths, cwd);
+	getPaths(filePaths, cwd, index);
 	
 	free(filePaths);
 	return 0;
