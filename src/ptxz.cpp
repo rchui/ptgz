@@ -30,7 +30,7 @@ void findAll(int *numFiles, const char *cwd) {
 				}
 			}
 		}
-		closedir(dir)
+		closedir(dir);
 	}
 }
 
@@ -42,10 +42,13 @@ int main(int argc, char *argv[]) {
 	if (argc > 1) {
 		helpCheck(argv);
 	}
+
 	getcwd(cwd, PATH_MAX);
-	std::cout << cwd << std::endl;
 	findAll(numFiles, cwd);
-	
+
+	char **filePaths = (char**) malloc(sizeof(char*) * *numFiles);
 	delete(numFiles);
+	
+	free(filePaths);
 	return 0;
 }
