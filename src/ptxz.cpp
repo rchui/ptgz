@@ -34,6 +34,10 @@ void findAll(int *numFiles, const char *cwd) {
 	}
 }
 
+void getPaths(char **filePaths, const char *cwd) {
+	std::cout << "getPaths entry" << std::endl;
+}
+
 char cwd [PATH_MAX];
 
 int main(int argc, char *argv[]) {
@@ -48,6 +52,8 @@ int main(int argc, char *argv[]) {
 
 	char **filePaths = (char**) malloc(sizeof(char*) * *numFiles);
 	delete(numFiles);
+
+	getPaths(filePaths, cwd);
 	
 	free(filePaths);
 	return 0;
