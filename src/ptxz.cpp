@@ -64,7 +64,8 @@ void getPaths(std::vector<std::string> *filePaths, const char *cwd) {
 
 void compress(std::vector<std::string> *filePaths) {
 	for (int i = 0; int i < filePaths->size(); ++int i) {
-		system("echo " + i);
+		std::string phrase = "echo " + i;
+		system(phrase);
 	}
 }
 
