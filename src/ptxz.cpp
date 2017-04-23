@@ -68,7 +68,7 @@ void compress(std::vector<std::string> *filePaths) {
 	unsigned long long int blockSize = (filePathSize / (omp_get_max_threads() * 100)) + 1;
 
 	for (int i = 0; i < filePathSize; ++i) {
-		std::cout << filePath->at(i) << std::endl;
+		std::cout << filePaths->at(i) << std::endl;
 	}
 
 	// #pragma omp parallel for schedule(dynamic)
