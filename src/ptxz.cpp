@@ -78,7 +78,7 @@ int main(int argc, char *argv[]) {
 
 	getPaths(filePaths, cwd);
 
-	system("echo 'Hello World'");
+	system("echo Hello World");
 
 	delete(numFiles);
 	return 0;
