@@ -78,8 +78,8 @@ int main(int argc, char *argv[]) {
 
 	getPaths(filePaths, cwd);
 
-	int numThreads = omp_get_max_threads();
-	std::cout << numThreads << std::endl;
+	std::string phrase = "Hello World";
+	system("echo " + phrase);
 
 	delete(numFiles);
 	return 0;
