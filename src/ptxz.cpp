@@ -65,11 +65,11 @@ void getPaths(std::vector<std::string> *filePaths, const char *cwd, std::string 
 
 void compress(std::vector<std::string> *filePaths) {
 	unsigned long long int filePathSize = filePaths->size();
-	unsigned long long int blockSize = (filePathSize / (omp_get_max_threads() * 100)) + 1;
+	unsigned long long int blockSize = (filePathSize / (omp_get_max_threads() * 10)) + 1;
 	std::vector<std::string> *tarNames = new std::vector<std::string>();
 
 	#pragma omp parallel for schedule(dynamic)
-	for (int i = 0; i < omp_get_max_threads() * 100; ++i) {
+	for (int i = 0; i < omp_get_max_threads() * 10; ++i) {
 		unsigned long long int start = blockSize * i;
 		if (start < filePathSize) {
 			std::string command = "XZ_OPT=-1 tar cJf test." + std::to_string(i) + ".tar.xz ";
