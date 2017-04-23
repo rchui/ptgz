@@ -5,5 +5,5 @@ clean:
 
 build:
 	mkdir bin/
-	g++ -o bin/ptxz src/ptxz.cpp
+	g++ -fopenmp -o bin/ptxz src/ptxz.cpp
 	chmod -R 751 bin/
