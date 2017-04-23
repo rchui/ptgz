@@ -3,7 +3,7 @@
 #include <vector>
 #include <unistd.h>
 #include <dirent.h>
-#include <omp.h>
+#include "omp.h"
 
 void helpCheck(char *argv[]) {
 	if (argv[1] == std::string("-h") || argv[1] == std::string("--help")) {
