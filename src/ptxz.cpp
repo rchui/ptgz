@@ -63,8 +63,9 @@ void getPaths(std::vector<std::string> *filePaths, const char *cwd) {
 }
 
 void compress(std::vector<std::string> *filePaths) {
+	// #pragma omp parallel for schedule(dynamic)
 	for (int i = 0; i < filePaths->size(); ++i) {
-		std::string phrase = "echo " + std::to_string(i);
+		std::string phrase = "tar cvf " + filePaths->at(i);
 		system(phrase.c_str());
 	}
 }
@@ -80,7 +81,7 @@ int main(int argc, char *argv[]) {
 
 	getcwd(cwd, PATH_MAX);
 	findAll(numFiles, cwd);
-	std::cout << *numFiles << std::endl;
+	// std::cout << *numFiles << std::endl;
 
 	std::vector<std::string> *filePaths = new std::vector<std::string>();
 
