@@ -84,10 +84,11 @@ void compress(std::vector<std::string> *filePaths) {
 			}
 		}
 	}
+	std::string command = "tar cvf ptxz.output.tar ";
 	for (int i = 0; i < tarNames->size(); ++i) {
-		std::cout << tarNames->at(i) << std::endl;
+		command += tarNames->at(i);
 	}
-
+	system(command.c_str());
 }
 
 char cwd [PATH_MAX];
