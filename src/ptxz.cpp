@@ -65,21 +65,18 @@ void getPaths(std::vector<std::string> *filePaths, const char *cwd, std::string 
 
 void compress(std::vector<std::string> *filePaths) {
 	unsigned long long int filePathSize = filePaths->size();
-	unsigned long long int blockSize = (filePathSize / (omp_get_max_threads() * 100)) + 1;
+	// unsigned long long int blockSize = (filePathSize / (omp_get_max_threads() * 100)) + 1;
+	unsigned long long int blockSize = 10;
 
-	for (int i = 0; i < filePathSize; ++i) {
-		std::cout << filePaths->at(i) << std::endl;
+	#pragma omp parallel for schedule(dynamic)
+	for (int i = 0; i < omp_get_max_threads() * 10000; ++i) {
+		unsigned long long int start = blockSize * i
+		std::string command = "XZ_OPT=-9 tar cJf test." + std::to_string(i) + ".tar.xz ";
+		for (unsigned long long int j = start; j < std::min(start + blockSize, filePathSize); ++j) {
+			command += filePaths->at(j);
+		}
+		system(command.c_str());
 	}
-
-	// #pragma omp parallel for schedule(dynamic)
-	// for (int i = 0; i < omp_get_max_threads() * 100; ++i) {
-		// std::string command = "XZ_OPT=-9 tar cJf test." + std::to_string(i) + ".tar.xz ";
-		// for (unsigned long long int j = blockSize * i; j < std::min(blockSize * i + blockSize, filePathSize); ++j) {
-			// command += filePaths->at(j);
-		// }
-		// system(command.c_str());
-		
-	// }
 
 }
 
