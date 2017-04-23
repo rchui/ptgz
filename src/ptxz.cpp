@@ -62,6 +62,12 @@ void getPaths(std::vector<std::string> *filePaths, const char *cwd) {
 	}
 }
 
+void compress(std::vector<std::string> *filePaths) {
+	for (int i = 0; int i < filePaths->size(); ++int i) {
+		system("echo " + i);
+	}
+}
+
 char cwd [PATH_MAX];
 
 int main(int argc, char *argv[]) {
@@ -77,9 +83,7 @@ int main(int argc, char *argv[]) {
 	std::vector<std::string> *filePaths = new std::vector<std::string>();
 
 	getPaths(filePaths, cwd);
-
-	std::string phrase = "echo Hello World";
-	system(phrase.c_str());
+	compress(filePaths);
 
 	delete(numFiles);
 	return 0;
