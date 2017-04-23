@@ -71,7 +71,7 @@ void compress(std::vector<std::string> *filePaths) {
 	for (int i = 0; i < omp_get_max_threads() * 100; ++i) {
 		unsigned long long int start = blockSize * i;
 		if (start < filePathSize) {
-			std::string command = "XZ_OPT=-9 tar cJf test." + std::to_string(i) + ".tar.xz ";
+			std::string command = "XZ_OPT=-1 tar cJf test." + std::to_string(i) + ".tar.xz ";
 			for (unsigned long long int j = start; j < std::min(start + blockSize, filePathSize); ++j) {
 				command += filePaths->at(j);
 			}
