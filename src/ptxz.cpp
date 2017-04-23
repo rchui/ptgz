@@ -80,6 +80,7 @@ int main(int argc, char *argv[]) {
 
 	getcwd(cwd, PATH_MAX);
 	findAll(numFiles, cwd);
+	std::cout << numFiles << std::endl;
 
 	std::vector<std::string> *filePaths = new std::vector<std::string>();
 
