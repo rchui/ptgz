@@ -78,7 +78,7 @@ int main(int argc, char *argv[]) {
 
 	getPaths(filePaths, cwd);
 
-	int numThreads = omp_get_num_threads();
+	int numThreads = omp_get_max_threads();
 	std::cout << numThreads << std::endl;
 
 	delete(numFiles);
