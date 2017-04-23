@@ -78,8 +78,8 @@ int main(int argc, char *argv[]) {
 
 	getPaths(filePaths, cwd);
 
-	std::string phrase = "Hello World";
-	system("echo " + phrase.c_str());
+	std::string phrase = "echo Hello World";
+	system(phrase.c_str());
 
 	delete(numFiles);
 	return 0;
