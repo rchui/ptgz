@@ -65,9 +65,8 @@ void getPaths(std::vector<std::string> *filePaths, const char *cwd) {
 void compress(std::vector<std::string> *filePaths) {
 	// #pragma omp parallel for schedule(dynamic)
 	for (int i = 0; i < filePaths->size(); ++i) {
-		std::string phrase = "tar cvf " + filePaths->at(i);
-		std::cout << phrase << std::endl;
-		// system(phrase.c_str());
+		std::string phrase = "tar cvf test." + std::to_string(i) + ".tar " + filePaths->at(i);
+		system(phrase.c_str());
 	}
 }
 
