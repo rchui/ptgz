@@ -37,7 +37,7 @@ void findAll(int *numFiles, const char *cwd) {
 	}
 }
 
-void getPaths(std::vector<std::string> *filePaths, const char *cwd) {
+void getPaths(std::vector<std::string> *filePaths, const char *cwd, std::string rootPath) {
 	DIR *dir;
 	struct dirent *ent;
 
@@ -52,9 +52,9 @@ void getPaths(std::vector<std::string> *filePaths, const char *cwd) {
 				// Check if file path is a directory.
 				if ((dir2 = opendir(filePath.c_str())) != NULL) {
 					closedir(dir2);
-					getPaths(filePaths, filePath.c_str());
+					getPaths(filePaths, filePath.c_str(), rootPath + "/" + fileBuff);
 				} else {
-					filePaths->push_back(fileBuff);
+					filePaths->push_back(rootPath + "/" + fileBuff);
 				}
 			}
 		}
@@ -65,8 +65,9 @@ void getPaths(std::vector<std::string> *filePaths, const char *cwd) {
 void compress(std::vector<std::string> *filePaths) {
 	// #pragma omp parallel for schedule(dynamic)
 	for (int i = 0; i < filePaths->size(); ++i) {
-		std::string phrase = "tar cvf test." + std::to_string(i) + ".tar " + filePaths->at(i);
-		system(phrase.c_str());
+		std::cout << filePaths->at(i) << std::endl;
+		// std::string phrase = "tar cvf test." + std::to_string(i) + ".tar " + filePaths->at(i);
+		// system(phrase.c_str());
 	}
 }
 
@@ -85,7 +86,7 @@ int main(int argc, char *argv[]) {
 
 	std::vector<std::string> *filePaths = new std::vector<std::string>();
 
-	getPaths(filePaths, cwd);
+	getPaths(filePaths, cwd, "");
 	compress(filePaths);
 
 	delete(numFiles);
