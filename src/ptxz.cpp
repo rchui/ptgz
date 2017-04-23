@@ -54,7 +54,7 @@ void getPaths(std::vector<std::string> *filePaths, const char *cwd) {
 					closedir(dir2);
 					getPaths(filePaths, filePath.c_str());
 				} else {
-					filePaths->push_back(filePath);
+					filePaths->push_back(fileBuff);
 				}
 			}
 		}
