@@ -77,10 +77,11 @@ void compress(std::vector<std::string> *filePaths) {
 				command += filePaths->at(j);
 			}
 			system(command.c_str());
-		}
-		#pragma omp crtical
-		{
-			tarNames->push_back("test." + std::to_string(i) + ".tar.xz");
+
+			#pragma omp crtical
+			{
+				tarNames->push_back("test." + std::to_string(i) + ".tar.xz");
+			}
 		}
 	}
 	for (int i = 0; i < tarNames->size(); ++i) {
