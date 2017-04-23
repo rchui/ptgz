@@ -89,6 +89,14 @@ void compress(std::vector<std::string> *filePaths) {
 		command += " " + tarNames->at(i);
 	}
 	system(command.c_str());
+
+	std::string command = "rm";
+	for (int i = 0; i < tarNames->size(); ++i) {
+		command += " " + tarNames->at(i);
+	}
+	system(command.c_str());
+
+	delete(tarNames);
 }
 
 char cwd [PATH_MAX];
@@ -110,5 +118,6 @@ int main(int argc, char *argv[]) {
 	compress(filePaths);
 
 	delete(numFiles);
+	delete(filePaths);
 	return 0;
 }
