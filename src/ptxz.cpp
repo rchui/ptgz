@@ -66,6 +66,7 @@ void getPaths(std::vector<std::string> *filePaths, const char *cwd, std::string 
 void compress(std::vector<std::string> *filePaths) {
 	unsigned long long int filePathSize = filePaths->size();
 	unsigned long long int blockSize = (filePathSize / (omp_get_max_threads() * 100)) + 1;
+	std::vector<std::string> *tarNames = new std::vector<std::string>();
 
 	#pragma omp parallel for schedule(dynamic)
 	for (int i = 0; i < omp_get_max_threads() * 100; ++i) {
@@ -77,6 +78,13 @@ void compress(std::vector<std::string> *filePaths) {
 			}
 			system(command.c_str());
 		}
+		#pragma omp crtical
+		{
+			tarNames->push_back("test." + std::to_string(i) + ".tar.xz");
+		}
+	}
+	for (int i = 0; i < tarNames->size(); ++i) {
+		std::cout << tarNames->at(i) << std::endl;
 	}
 
 }
