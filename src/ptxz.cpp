@@ -15,7 +15,7 @@ struct Settings {
 	bool extract;
 	bool compress;
 	bool verbose;
-}
+};
 
 void helpCheck(char *argv[]) {
 	if (argv[1] == std::string("-h") || argv[1] == std::string("--help")) {
