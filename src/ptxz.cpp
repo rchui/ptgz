@@ -24,6 +24,7 @@ void helpCheck(int argc, char *argv[]) {
 	std::cout << argc << std::endl;
 	if (argc == 1) {
 		std::cout << "ERROR: ptxz was passed no parameters. \"ptxz -h\" for help." << std::endl;
+		exit(0);
 	}
 
 	if (argv[1] == std::string("-h") || argv[1] == std::string("--help")) {
