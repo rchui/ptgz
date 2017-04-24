@@ -21,7 +21,6 @@ struct Settings {
 };
 
 void helpCheck(int argc, char *argv[]) {
-	std::cout << argc << std::endl;
 	if (argc == 1) {
 		std::cout << "ERROR: ptxz was passed no parameters. \"ptxz -h\" for help." << std::endl;
 		exit(0);
@@ -72,6 +71,7 @@ void getSettings(int argc, char *argv[], Settings *instance) {
 
 	if (!(*instance).output) {
 		std::cout << "ERROR: No output file name given. \"ptxz -h\" for help." << std::endl;
+		exit(0);
 	}
 }
 
