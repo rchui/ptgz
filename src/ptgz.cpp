@@ -138,9 +138,10 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 		if (start < filePathSize) {
 			std::ofstream tmp;
 			tmp.open(name + "." + std::to_string(i) + ".ptgz.tmp", std::ios_base::app);
-			std::string gzCommand = "GZIP=-1 tar -cz " + 
-									"-T " + name + "." + std::to_string(i) + ".ptgz.tmp " +
-									"-f " + name + "." + std::to_string(i) + ".tar.gz";
+			std::string gzCommand = "GZIP=-1 tar \
+									-cz \
+									-T " + name + "." + std::to_string(i) + ".ptgz.tmp \
+									-f " + name + "." + std::to_string(i) + ".tar.gz";
 			for (unsigned long long int j = start; j < std::min(start + blockSize, filePathSize); ++j) {
 				tmp << filePaths->at(j) + "\n";
 			}
