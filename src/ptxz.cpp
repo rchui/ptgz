@@ -50,7 +50,7 @@ void getSettings(int argc, char *argv[], Settings *instance) {
 			(*instance).compress = true;
 		} else if (arg == "-v"){
 			(*instance).verbose = true;
-		} else if (arg == "-o" {
+		} else if (arg == "-o") {
 			(*instance).output = true;
 		} else {
 			if (settings.size() > 1) {
