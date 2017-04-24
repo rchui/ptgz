@@ -132,7 +132,6 @@ void compression(std::vector<std::string> *filePaths) {
 
 	#pragma omp parallel for schedule(dynamic)
 	for (int i = 0; i < omp_get_max_threads() * 10; ++i) {
-		std::cout << i << std::endl;
 		unsigned long long int start = blockSize * i;
 		if (start < filePathSize) {
 			std::string xzCommand = "XZ_OPT=-1 tar cJf test." + std::to_string(i) + ".tar.xz";
@@ -143,6 +142,7 @@ void compression(std::vector<std::string> *filePaths) {
 
 			#pragma omp crtical
 			{
+				std::cout << std::to_string(i) << std::endl;
 				tarNames->push_back("test." + std::to_string(i) + ".tar.xz");
 			}
 		}
