@@ -21,6 +21,10 @@ struct Settings {
 };
 
 void helpCheck(char *argv[]) {
+	if (argc == 1) {
+		std::cout << "ERROR: ptxz was passed no parameters. \"ptxz -h\" for help." << std::endl;
+	}
+
 	if (argv[1] == std::string("-h") || argv[1] == std::string("--help")) {
 		std::cout << "\nptxv - Parallel Tar XZ by Ryan Chui (2017)\n" << std::endl;
 		exit(0);
@@ -29,9 +33,6 @@ void helpCheck(char *argv[]) {
 
 void getSettings(int argc, char *argv[], Settings *instance) {
 	std::queue<std::string> settings;
-	if (argc == 1) {
-		std::cout << "ERROR: ptxz was passed no parameters. \"ptxz -h\" for help." << std::endl;
-	}
 	for (int i = 1; i < argc; ++i) {
 		settings.push(argv[i]);
 	}
