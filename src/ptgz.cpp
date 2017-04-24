@@ -27,7 +27,7 @@ void helpCheck(int argc, char *argv[]) {
 	}
 
 	if (argv[1] == std::string("-h") || argv[1] == std::string("--help")) {
-		std::cout << "\nptxv - Parallel Tar XZ by Ryan Chui (2017)\n" << std::endl;
+		std::cout << "\nptgz - Parallel Tar GZ by Ryan Chui (2017)\n" << std::endl;
 		exit(0);
 	}
 }
@@ -134,13 +134,13 @@ void compression(std::vector<std::string> *filePaths, std::string name) {
 	for (int i = 0; i < omp_get_max_threads() * 10; ++i) {
 		unsigned long long int start = blockSize * i;
 		if (start < filePathSize) {
-			std::string xzCommand = "XZ_OPT=-1 tar cJf " + name +"." + std::to_string(i) + ".tar.xz";
+			std::string gzCommand = "GZIP=-9 tar czf " + name +"." + std::to_string(i) + ".tar.gz";
 			for (unsigned long long int j = start; j < std::min(start + blockSize, filePathSize); ++j) {
-				xzCommand += " " + filePaths->at(j);
+				gzCommand += " " + filePaths->at(j);
 			}
-			system(xzCommand.c_str());
+			system(gzCommand.c_str());
 
-			tarNames->at(i) = name + "." + std::to_string(i) + ".tar.xz";
+			tarNames->at(i) = name + "." + std::to_string(i) + ".tar.gz";
 		}
 	}
 
