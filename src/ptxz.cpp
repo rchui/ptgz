@@ -150,7 +150,7 @@ void compression(std::vector<std::string> *filePaths, std::string name) {
 	std::string tarCommand = "tar cf " + name + ".ptxz.tar";
 	for (int i = 0; i < tarNames->size(); ++i) {
 		tarCommand += " " + tarNames->at(i);
-		idx << tarNames->at(i);
+		idx << tarNames->at(i) + "\n";
 	}
 	system(tarCommand.c_str());
 
