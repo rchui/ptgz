@@ -157,17 +157,17 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 	}
 
 	// Combines gzipped blocks together
-	std::ofstream idx;
+	std::ofstream idx, tmp;
 	idx.open(name + ".ptgz.idx", std::ios_base::app);
-
 	std::cout << "3.2 Combining Blocks Together" << std::endl;
-	std::string tarCommand = "tar cf " + name + ".ptgz.tar";
+	std::string tarCommand = "tar -c \
+							 -T " + name + ".ptgz.idx \
+							 -f " + name + ".ptgz.tar";
 	for (int i = 0; i < tarNames->size(); ++i) {
-		tarCommand += " " + tarNames->at(i);
 		idx << tarNames->at(i) + "\n";
 	}
+	idx << name + ".ptgz.idx" + "\n";
 	idx.close();
-	tarCommand += " " + name + ".ptgz.idx";
 	
 	if (verbose) {
 		std::cout << tarCommand + "\n";
@@ -177,17 +177,15 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 
 	// Removes temporary blocks
 	std::cout << "3.3 Removing Temporary Blocks" << std::endl;
-	std::string rmCommand = "rm";
+	#pragma omp parallel for schedule(static)
 	for (int i = 0; i < tarNames->size(); ++i) {
-		rmCommand += " " + tarNames->at(i);
+		std::string rmCommand = "rm " + tarNames->at(i);
+		if (verbose) {
+			std::cout << rmCommand + "\n";
+		}
+		system(rmCommand.c_str());
 	}
-	rmCommand += " " + name + ".ptgz.idx";
-
-	if (verbose) {
-		std::cout << rmCommand + "\n";
-	}
-	
-	system(rmCommand.c_str());
+	system(("rm " + name + ".ptgz.idx").c_str());
 
 	tarNames->clear();
 	delete(tarNames);
@@ -213,7 +211,7 @@ int main(int argc, char *argv[]) {
 	getPaths(filePaths, cwd, "");
 
 	if ((*instance).compress) {
-		std::cout << "3. Starting File Compression" << std::endl;
+		std::cout << "3.  Starting File Compression" << std::endl;
 		compression(filePaths, (*instance).name, (*instance).verbose);
 	} else {
 		extraction();
