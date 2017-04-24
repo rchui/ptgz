@@ -136,17 +136,21 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 	for (int i = 0; i < omp_get_max_threads() * 100; ++i) {
 		unsigned long long int start = blockSize * i;
 		if (start < filePathSize) {
-			std::string gzCommand = "GZIP=-1 tar czvf " + name +"." + std::to_string(i) + ".tar.gz";
+			std::ofstream tmp;
+			tmp.open(name + "." + std::to_string(i) + ".ptgz.tmp", std::ios_base::app);
+			std::string gzCommand = "GZIP=-1 tar -cz " + 
+									"-T " + name + "." + std::to_string(i) + ".ptgz.tmp " +
+									"-f " + name + "." + std::to_string(i) + ".tar.gz";
 			for (unsigned long long int j = start; j < std::min(start + blockSize, filePathSize); ++j) {
-				gzCommand += " " + filePaths->at(j);
+				tmp << filePaths->at(j) + "\n";
 			}
 	
 			if (verbose) {
 				std::cout << gzCommand + "\n";
 			}
-	
-			system(gzCommand.c_str());
 
+			tmp.close();
+			system(gzCommand.c_str());
 			tarNames->at(i) = name + "." + std::to_string(i) + ".tar.gz";
 		}
 	}
@@ -156,7 +160,7 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 	idx.open(name + ".ptgz.idx", std::ios_base::app);
 
 	std::cout << "3.2 Combining Blocks Together" << std::endl;
-	std::string tarCommand = "tar cvf " + name + ".ptgz.tar";
+	std::string tarCommand = "tar cf " + name + ".ptgz.tar";
 	for (int i = 0; i < tarNames->size(); ++i) {
 		tarCommand += " " + tarNames->at(i);
 		idx << tarNames->at(i) + "\n";
