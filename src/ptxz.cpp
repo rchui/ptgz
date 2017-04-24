@@ -31,9 +31,10 @@ void getSettings(int argc, char *argv[], Settings *instance) {
 	}
 	
 	while (!settings.empty()) {
-		std::cout << settings.pop() << std::endl;
+		std::cout << settings.front() << std::endl;
 	}
 }
+
 void findAll(int *numFiles, const char *cwd) {
 	DIR *dir;
 	struct dirent *ent;
