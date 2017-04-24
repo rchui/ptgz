@@ -157,7 +157,9 @@ void compression(std::vector<std::string> *filePaths) {
 	for (int i = 0; i < tarNames->size(); ++i) {
 		rmCommand += " " + tarNames->at(i);
 	}
+	std::cout << rmCommand << std::endl;
 	system(rmCommand.c_str());
+
 	tarNames->clear();
 	delete(tarNames);
 }
@@ -167,15 +169,12 @@ char cwd [PATH_MAX];
 int main(int argc, char *argv[]) {
 	Settings *instance = new Settings;
 	int *numFiles = new int(0);
+	std::vector<std::string> *filePaths = new std::vector<std::string>();
 	
 	helpCheck(argc, argv);
 	getSettings(argc, argv, instance);
-
 	getcwd(cwd, PATH_MAX);
 	findAll(numFiles, cwd);
-
-	std::vector<std::string> *filePaths = new std::vector<std::string>();
-
 	getPaths(filePaths, cwd, "");
 	compression(filePaths);
 
