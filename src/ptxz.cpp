@@ -58,7 +58,7 @@ void getSettings(int argc, char *argv[], Settings *instance) {
 				exit(0);
 			}
 			(*instance).output = true;
-			(*instance).term = arg;
+			(*instance).name = arg;
 		}
 
 		settings.pop();
