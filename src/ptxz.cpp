@@ -143,7 +143,7 @@ void compression(std::vector<std::string> *filePaths) {
 			#pragma omp crtical
 			{
 				tarNames->push_back("test." + std::to_string(i) + ".tar.xz");
-				std::cout << tarNames->at(tarNames->size() - 1) << std::endl;
+				std::cout << tarNames->at(tarNames->size() - 1) + "\n";
 			}
 		}
 	}
