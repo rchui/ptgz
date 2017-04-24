@@ -11,10 +11,13 @@
 struct Settings {
 	Settings(): extract(),
 				compress(),
-   				verbose() {}
+   				verbose(),
+				output {}
 	bool extract;
 	bool compress;
 	bool verbose;
+	bool output;
+	std::string name;
 };
 
 void helpCheck(char *argv[]) {
@@ -26,13 +29,43 @@ void helpCheck(char *argv[]) {
 
 void getSettings(int argc, char *argv[], Settings *instance) {
 	std::queue<std::string> settings;
-	for (int i = 0; i < argc; ++i) {
+	for (int i = 1; i < argc; ++i) {
 		settings.push(argv[i]);
 	}
 	
 	while (!settings.empty()) {
-		std::cout << settings.front() << std::endl;
+		std::string arg = settings.front();
+
+		if (arg == "-x") {
+			if ((*instance).compress) {
+				std::cout << "ERROR: ptxz cannot both compress and extract. \"ptxz -h\" for help." << std::endl;
+				exit(0);
+			}
+			(*instance).extract = true;
+		} else if (arg == "-c") {
+			if ((*instance).extract) {
+				std::cout << "ERROR: ptxz cannot both compress and extract. \"ptxz -h\" for help." << std::endl;
+				exit(0);
+			}
+			(*instance).compress = true;
+		} else if (arg == "-v"){
+			(*instance).verbose = true;
+		} else if (arg == "-o" {
+			(*instance).output = true;
+		} else {
+			if (settings.size() > 1) {
+				std::cout << "ERROR: ptxz was called incorrectly. \"ptxz -h\" for help." << std::endl;
+				exit(0);
+			}
+			(*instance).output = true;
+			(*instance).term = arg;
+		}
+
 		settings.pop();
+	}
+
+	if (!(*instance).output) {
+		std::cout << "ERROR: No output file name given. \"ptxz -h\" for help." << std::endl;
 	}
 }
 
@@ -134,13 +167,13 @@ int main(int argc, char *argv[]) {
 
 	getcwd(cwd, PATH_MAX);
 	findAll(numFiles, cwd);
-	// std::cout << *numFiles << std::endl;
 
 	std::vector<std::string> *filePaths = new std::vector<std::string>();
 
 	getPaths(filePaths, cwd, "");
 	compression(filePaths);
 
+	delete(instance);
 	delete(numFiles);
 	delete(filePaths);
 	return 0;
