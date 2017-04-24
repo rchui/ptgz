@@ -141,13 +141,16 @@ void compression(std::vector<std::string> *filePaths, std::string name) {
 			system(xzCommand.c_str());
 
 			tarNames->at(i) = name + "." + std::to_string(i) + ".tar.xz";
-			std::cout << tarNames->at(i) + "\n";
 		}
 	}
+
+	std::ofstream idx;
+	idx.open(name + ".ptxz.idx", std::ios_base::appa);
 
 	std::string tarCommand = "tar cf " + name + ".ptxz.tar";
 	for (int i = 0; i < tarNames->size(); ++i) {
 		tarCommand += " " + tarNames->at(i);
+		idx << tarNames->at(i);
 	}
 	system(tarCommand.c_str());
 
