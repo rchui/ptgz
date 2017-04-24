@@ -145,7 +145,7 @@ void compression(std::vector<std::string> *filePaths, std::string name) {
 	}
 
 	std::ofstream idx;
-	idx.open(name + ".ptxz.idx", std::ios_base::appa);
+	idx.open(name + ".ptxz.idx", std::ios_base::app);
 
 	std::string tarCommand = "tar cf " + name + ".ptxz.tar";
 	for (int i = 0; i < tarNames->size(); ++i) {
