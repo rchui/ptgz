@@ -127,13 +127,13 @@ void getPaths(std::vector<std::string> *filePaths, const char *cwd, std::string 
 
 void compression(std::vector<std::string> *filePaths, std::string name, bool verbose) {
 	unsigned long long int filePathSize = filePaths->size();
-	unsigned long long int blockSize = (filePathSize / (omp_get_max_threads() * 100)) + 1;
+	unsigned long long int blockSize = (filePathSize / (omp_get_max_threads() * 10)) + 1;
 	std::vector<std::string> *tarNames = new std::vector<std::string>(filePaths->size());
 	
 	// Gzips the blocks of files
 	std::cout << "3.1 Gzipping Blocks" << std::endl;
 	#pragma omp parallel for schedule(dynamic)
-	for (int i = 0; i < omp_get_max_threads() * 100; ++i) {
+	for (int i = 0; i < omp_get_max_threads() * 10; ++i) {
 		unsigned long long int start = blockSize * i;
 		if (start < filePathSize) {
 			std::ofstream tmp;
@@ -186,6 +186,7 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 		system(rmCommand.c_str());
 	}
 	system(("rm " + name + ".ptgz.idx").c_str());
+	system(("rm *." + name + ".ptgz.tmp").c_str());
 
 	tarNames->clear();
 	delete(tarNames);
