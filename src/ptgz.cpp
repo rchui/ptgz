@@ -127,12 +127,13 @@ void getPaths(std::vector<std::string> *filePaths, const char *cwd, std::string 
 
 void compression(std::vector<std::string> *filePaths, std::string name) {
 	unsigned long long int filePathSize = filePaths->size();
-	unsigned long long int blockSize = (filePathSize / (omp_get_max_threads() * 10)) + 1;
+	unsigned long long int blockSize = (filePathSize / (omp_get_max_threads() * 100)) + 1;
 	std::vector<std::string> *tarNames = new std::vector<std::string>(filePaths->size());
 	
+	// Gzips the blocks of files
 	std::cout << "3.1 Gzipping Blocks" << std::endl;
 	#pragma omp parallel for schedule(dynamic)
-	for (int i = 0; i < omp_get_max_threads() * 10; ++i) {
+	for (int i = 0; i < omp_get_max_threads() * 100; ++i) {
 		unsigned long long int start = blockSize * i;
 		if (start < filePathSize) {
 			std::string gzCommand = "GZIP=-1 tar czvf " + name +"." + std::to_string(i) + ".tar.gz";
@@ -146,6 +147,7 @@ void compression(std::vector<std::string> *filePaths, std::string name) {
 		}
 	}
 
+	// Combines gzipped blocks together
 	std::ofstream idx;
 	idx.open(name + ".ptgz.idx", std::ios_base::app);
 
@@ -160,6 +162,7 @@ void compression(std::vector<std::string> *filePaths, std::string name) {
 	std::cout << tarCommand + "\n";
 	system(tarCommand.c_str());
 
+	// Removes temporary blocks
 	std::cout << "3.3 Removing Temporary Blocks" << std::endl;
 	std::string rmCommand = "rm";
 	for (int i = 0; i < tarNames->size(); ++i) {
