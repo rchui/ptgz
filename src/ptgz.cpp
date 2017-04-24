@@ -8,6 +8,7 @@
 #include <queue>
 #include "omp.h"
 
+// Contains the various options the user can pass ptgz.
 struct Settings {
 	Settings(): extract(),
 				compress(),
@@ -20,6 +21,10 @@ struct Settings {
 	std::string name;
 };
 
+// Checks if the user asks for help.
+// Provides usage information to the user.
+// Parameters: argc (int) number of cli arguments.
+// 			   argv (char *[]) user provided arguments.
 void helpCheck(int argc, char *argv[]) {
 	if (argc == 1) {
 		std::cout << "ERROR: ptgz was passed no parameters. \"ptgz -h\" for help." << std::endl;
@@ -32,12 +37,18 @@ void helpCheck(int argc, char *argv[]) {
 	}
 }
 
+// Gets the parameters passed by the user and stores them.
+// Parameters: argc (int) number of cli arguments.
+// 			   argv (char *[]) user provided arguments.
+// 			   instance (Settings *) user argument storage.
 void getSettings(int argc, char *argv[], Settings *instance) {
+	// Get all passed arguments
 	std::queue<std::string> settings;
 	for (int i = 1; i < argc; ++i) {
 		settings.push(argv[i]);
 	}
 	
+	// Continue to check until there are no more passed arguments.
 	while (!settings.empty()) {
 		std::string arg = settings.front();
 
@@ -75,6 +86,9 @@ void getSettings(int argc, char *argv[], Settings *instance) {
 	}
 }
 
+// Finds the number of files in the space to store.
+// Parameters: numFiles (int *) number of files.
+// 			   cwd (const char *) current working directory.
 void findAll(int *numFiles, const char *cwd) {
 	DIR *dir;
 	struct dirent *ent;
@@ -100,6 +114,10 @@ void findAll(int *numFiles, const char *cwd) {
 	}
 }
 
+// Gets the paths for all files in the space to store.
+// Parameters: filePaths (std::vector<std::string> *) holder for all file paths.
+// 			   cwd (const char *) current working directory.
+// 			   rootPath (std::string) path from the root of the directory to be stored.
 void getPaths(std::vector<std::string> *filePaths, const char *cwd, std::string rootPath) {
 	DIR *dir;
 	struct dirent *ent;
@@ -125,17 +143,26 @@ void getPaths(std::vector<std::string> *filePaths, const char *cwd, std::string 
 	}
 }
 
+// Divides files into blocks.
+// Compresses each block into a single file.
+// Combines all compressed blocks into a single file.
+// Removes temporary blocks and header files.
+// Parameters: filePaths (std::vector<std::string> *) holder for all file paths.
+// 			   name (std::string) user given name for storage file.
+// 			   verbose (bool) user option for verbose output.
 void compression(std::vector<std::string> *filePaths, std::string name, bool verbose) {
 	unsigned long long int filePathSize = filePaths->size();
 	unsigned long long int blockSize = (filePathSize / (omp_get_max_threads() * 10)) + 1;
 	std::vector<std::string> *tarNames = new std::vector<std::string>(filePaths->size());
 	
-	// Gzips the blocks of files
+	// Gzips the blocks of files into a single compressed file
 	std::cout << "3.1 Gzipping Blocks" << std::endl;
 	#pragma omp parallel for schedule(dynamic)
 	for (int i = 0; i < omp_get_max_threads() * 10; ++i) {
 		unsigned long long int start = blockSize * i;
 		if (start < filePathSize) {
+			// Store the name of each file for a block owned by each thread.
+			// Each thread will use the file to tar and gzip compress their block.
 			std::ofstream tmp;
 			tmp.open(std::to_string(i) + "." + name + ".ptgz.tmp", std::ios_base::app);
 			std::string gzCommand = "GZIP=-1 tar \
@@ -156,14 +183,15 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 		}
 	}
 
-	// Combines gzipped blocks together
+	// Combines gzipped blocks together into a single tarball.
+	// Write tarball names into an idx file for extraction.
 	std::ofstream idx, tmp;
 	idx.open(name + ".ptgz.idx", std::ios_base::app);
 	std::cout << "3.2 Combining Blocks Together" << std::endl;
 	std::string tarCommand = "tar -c \
 							 -T " + name + ".ptgz.idx \
 							 -f " + name + ".ptgz.tar";
-	for (int i = 0; i < tarNames->size(); ++i) {
+	for (unsigned long long int i = 0; i < tarNames->size(); ++i) {
 		idx << tarNames->at(i) + "\n";
 	}
 	idx << name + ".ptgz.idx" + "\n";
@@ -175,10 +203,10 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 	
 	system(tarCommand.c_str());
 
-	// Removes temporary blocks
+	// Removes all temporary blocks and idx file.
 	std::cout << "3.3 Removing Temporary Blocks" << std::endl;
 	#pragma omp parallel for schedule(static)
-	for (int i = 0; i < tarNames->size(); ++i) {
+	for (unsigned long long int i = 0; i < tarNames->size(); ++i) {
 		std::string rmCommand = "rm " + tarNames->at(i);
 		if (verbose) {
 			std::cout << rmCommand + "\n";
@@ -198,6 +226,11 @@ void extraction() {
 
 char cwd [PATH_MAX];
 
+// Checks to see if the user asks for help.
+// Gathers the user provided settings for ptgz.
+// Finds the number of files that need to be stored.
+// Gathers the file paths of all files to be stored.
+// Either compresses the files or extracts the ptgz.tar archive.
 int main(int argc, char *argv[]) {
 	Settings *instance = new Settings;
 	int *numFiles = new int(0);
