@@ -32,6 +32,7 @@ void getSettings(int argc, char *argv[], Settings *instance) {
 	
 	while (!settings.empty()) {
 		std::cout << settings.front() << std::endl;
+		settings.pop();
 	}
 }
 
