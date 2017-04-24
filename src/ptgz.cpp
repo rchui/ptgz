@@ -22,7 +22,7 @@ struct Settings {
 
 void helpCheck(int argc, char *argv[]) {
 	if (argc == 1) {
-		std::cout << "ERROR: ptxz was passed no parameters. \"ptxz -h\" for help." << std::endl;
+		std::cout << "ERROR: ptgz was passed no parameters. \"ptgz -h\" for help." << std::endl;
 		exit(0);
 	}
 
@@ -43,13 +43,13 @@ void getSettings(int argc, char *argv[], Settings *instance) {
 
 		if (arg == "-x") {
 			if ((*instance).compress) {
-				std::cout << "ERROR: ptxz cannot both compress and extract. \"ptxz -h\" for help." << std::endl;
+				std::cout << "ERROR: ptgz cannot both compress and extract. \"ptgz -h\" for help." << std::endl;
 				exit(0);
 			}
 			(*instance).extract = true;
 		} else if (arg == "-c") {
 			if ((*instance).extract) {
-				std::cout << "ERROR: ptxz cannot both compress and extract. \"ptxz -h\" for help." << std::endl;
+				std::cout << "ERROR: ptgz cannot both compress and extract. \"ptgz -h\" for help." << std::endl;
 				exit(0);
 			}
 			(*instance).compress = true;
@@ -59,7 +59,7 @@ void getSettings(int argc, char *argv[], Settings *instance) {
 			(*instance).output = true;
 		} else {
 			if (settings.size() > 1) {
-				std::cout << "ERROR: ptxz was called incorrectly. \"ptxz -h\" for help." << std::endl;
+				std::cout << "ERROR: ptgz was called incorrectly. \"ptgz -h\" for help." << std::endl;
 				exit(0);
 			}
 			(*instance).output = true;
@@ -70,7 +70,7 @@ void getSettings(int argc, char *argv[], Settings *instance) {
 	}
 
 	if (!(*instance).output) {
-		std::cout << "ERROR: No output file name given. \"ptxz -h\" for help." << std::endl;
+		std::cout << "ERROR: No output file name given. \"ptgz -h\" for help." << std::endl;
 		exit(0);
 	}
 }
@@ -145,22 +145,22 @@ void compression(std::vector<std::string> *filePaths, std::string name) {
 	}
 
 	std::ofstream idx;
-	idx.open(name + ".ptxz.idx", std::ios_base::app);
+	idx.open(name + ".ptgz.idx", std::ios_base::app);
 
-	std::string tarCommand = "tar cf " + name + ".ptxz.tar";
+	std::string tarCommand = "tar cf " + name + ".ptgz.tar";
 	for (int i = 0; i < tarNames->size(); ++i) {
 		tarCommand += " " + tarNames->at(i);
 		idx << tarNames->at(i) + "\n";
 	}
 	idx.close();
-	tarCommand += " " + name + ".ptxz.idx";
+	tarCommand += " " + name + ".ptgz.idx";
 	system(tarCommand.c_str());
 
 	std::string rmCommand = "rm";
 	for (int i = 0; i < tarNames->size(); ++i) {
 		rmCommand += " " + tarNames->at(i);
 	}
-	rmCommand += " " + name + ".ptxz.idx";
+	rmCommand += " " + name + ".ptgz.idx";
 	system(rmCommand.c_str());
 
 	tarNames->clear();
