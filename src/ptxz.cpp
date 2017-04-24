@@ -152,6 +152,7 @@ void compression(std::vector<std::string> *filePaths, std::string name) {
 		tarCommand += " " + tarNames->at(i);
 		idx << tarNames->at(i) + "\n";
 	}
+	tarCommand += " " + name + ".ptxz.idx";
 	system(tarCommand.c_str());
 
 	std::string rmCommand = "rm";
