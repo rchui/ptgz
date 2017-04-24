@@ -129,7 +129,8 @@ void compression(std::vector<std::string> *filePaths, std::string name) {
 	unsigned long long int filePathSize = filePaths->size();
 	unsigned long long int blockSize = (filePathSize / (omp_get_max_threads() * 10)) + 1;
 	std::vector<std::string> *tarNames = new std::vector<std::string>(filePaths->size());
-
+	
+	std::cout << "3.1 Gzipping Blocks" << std::endl;
 	#pragma omp parallel for schedule(dynamic)
 	for (int i = 0; i < omp_get_max_threads() * 10; ++i) {
 		unsigned long long int start = blockSize * i;
@@ -147,6 +148,7 @@ void compression(std::vector<std::string> *filePaths, std::string name) {
 	std::ofstream idx;
 	idx.open(name + ".ptgz.idx", std::ios_base::app);
 
+	std::cout << "3.2 Combining Blocks Together" << std::endl;
 	std::string tarCommand = "tar cf " + name + ".ptgz.tar";
 	for (int i = 0; i < tarNames->size(); ++i) {
 		tarCommand += " " + tarNames->at(i);
@@ -156,6 +158,7 @@ void compression(std::vector<std::string> *filePaths, std::string name) {
 	tarCommand += " " + name + ".ptgz.idx";
 	system(tarCommand.c_str());
 
+	std::cout << "3.3 Removing Temporary Blocks" << std::endl;
 	std::string rmCommand = "rm";
 	for (int i = 0; i < tarNames->size(); ++i) {
 		rmCommand += " " + tarNames->at(i);
@@ -181,15 +184,19 @@ int main(int argc, char *argv[]) {
 	helpCheck(argc, argv);
 	getSettings(argc, argv, instance);
 	getcwd(cwd, PATH_MAX);
+	std::cout << "1. Searching File Tree" << std::endl;
 	findAll(numFiles, cwd);
+	std::cout << "2. Gathering Files" << std::endl;
 	getPaths(filePaths, cwd, "");
 
 	if ((*instance).compress) {
+		std::cout << "3. Starting File Compression" << std::endl;
 		compression(filePaths, (*instance).name);
 	} else {
 		extraction();
 	}
 
+	std::cout << "4. Cleaning Up" << std::endl;
 	delete(instance);
 	delete(numFiles);
 	filePaths->clear();
