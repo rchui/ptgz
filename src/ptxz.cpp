@@ -12,7 +12,7 @@ struct Settings {
 	Settings(): extract(),
 				compress(),
    				verbose(),
-				output {}
+				output() {}
 	bool extract;
 	bool compress;
 	bool verbose;
