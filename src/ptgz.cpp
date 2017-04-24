@@ -137,11 +137,11 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 		unsigned long long int start = blockSize * i;
 		if (start < filePathSize) {
 			std::ofstream tmp;
-			tmp.open(name + "." + std::to_string(i) + ".ptgz.tmp", std::ios_base::app);
+			tmp.open(std::to_string(i) + "." + name + ".ptgz.tmp", std::ios_base::app);
 			std::string gzCommand = "GZIP=-1 tar \
 									-cz \
-									-T " + name + "." + std::to_string(i) + ".ptgz.tmp \
-									-f " + name + "." + std::to_string(i) + ".tar.gz";
+									-T " + std::to_string(i) + "." + name + ".ptgz.tmp \
+									-f " + std::to_string(i) + "." + name + ".tar.gz";
 			for (unsigned long long int j = start; j < std::min(start + blockSize, filePathSize); ++j) {
 				tmp << filePaths->at(j) + "\n";
 			}
@@ -152,7 +152,7 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 
 			tmp.close();
 			system(gzCommand.c_str());
-			tarNames->at(i) = name + "." + std::to_string(i) + ".tar.gz";
+			tarNames->at(i) = std::to_string(i) + "." + name + ".tar.gz";
 		}
 	}
 
@@ -207,9 +207,9 @@ int main(int argc, char *argv[]) {
 	helpCheck(argc, argv);
 	getSettings(argc, argv, instance);
 	getcwd(cwd, PATH_MAX);
-	std::cout << "1. Searching File Tree" << std::endl;
+	std::cout << "1.  Searching File Tree" << std::endl;
 	findAll(numFiles, cwd);
-	std::cout << "2. Gathering Files" << std::endl;
+	std::cout << "2.  Gathering Files" << std::endl;
 	getPaths(filePaths, cwd, "");
 
 	if ((*instance).compress) {
@@ -219,7 +219,7 @@ int main(int argc, char *argv[]) {
 		extraction();
 	}
 
-	std::cout << "4. Cleaning Up" << std::endl;
+	std::cout << "4.  Cleaning Up" << std::endl;
 	delete(instance);
 	delete(numFiles);
 	filePaths->clear();
