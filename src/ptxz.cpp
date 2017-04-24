@@ -4,7 +4,18 @@
 #include <vector>
 #include <unistd.h>
 #include <dirent.h>
+#include <fstream>
+#include <queue>
 #include "omp.h"
+
+struct Settings {
+	Settings(): extract(),
+				compress(),
+   				verbose() {}
+	bool extract;
+	bool compress;
+	bool verbose;
+}
 
 void helpCheck(char *argv[]) {
 	if (argv[1] == std::string("-h") || argv[1] == std::string("--help")) {
@@ -13,6 +24,16 @@ void helpCheck(char *argv[]) {
 	}
 }
 
+void getSettings(int argc, char *argv[], Settings *instance) {
+	std::queue<std::string> settings;
+	for (int i = 0; i < argc; ++i) {
+		settings.push(argv[i]);
+	}
+	
+	while (!settings.empty()) {
+		std::cout << settings.pop() << std::endl;
+	}
+}
 void findAll(int *numFiles, const char *cwd) {
 	DIR *dir;
 	struct dirent *ent;
@@ -63,7 +84,7 @@ void getPaths(std::vector<std::string> *filePaths, const char *cwd, std::string 
 	}
 }
 
-void compress(std::vector<std::string> *filePaths) {
+void compression(std::vector<std::string> *filePaths) {
 	unsigned long long int filePathSize = filePaths->size();
 	unsigned long long int blockSize = (filePathSize / (omp_get_max_threads() * 10)) + 1;
 	std::vector<std::string> *tarNames = new std::vector<std::string>();
@@ -103,11 +124,11 @@ void compress(std::vector<std::string> *filePaths) {
 char cwd [PATH_MAX];
 
 int main(int argc, char *argv[]) {
+	Settings *instance = new Settings;
 	int *numFiles = new int(0);
 	
-	if (argc > 1) {
-		helpCheck(argv);
-	}
+	helpCheck(argv);
+	getSettings(argc, argv, instance);
 
 	getcwd(cwd, PATH_MAX);
 	findAll(numFiles, cwd);
@@ -116,7 +137,7 @@ int main(int argc, char *argv[]) {
 	std::vector<std::string> *filePaths = new std::vector<std::string>();
 
 	getPaths(filePaths, cwd, "");
-	compress(filePaths);
+	compression(filePaths);
 
 	delete(numFiles);
 	delete(filePaths);
