@@ -158,7 +158,7 @@ void compression(std::vector<std::string> *filePaths) {
 		rmCommand += " " + tarNames->at(i);
 	}
 	system(rmCommand.c_str());
-
+	tarNames.clear();
 	delete(tarNames);
 }
 
@@ -181,6 +181,7 @@ int main(int argc, char *argv[]) {
 
 	delete(instance);
 	delete(numFiles);
+	filePaths.clear();
 	delete(filePaths);
 	return 0;
 }
