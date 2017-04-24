@@ -21,6 +21,7 @@ struct Settings {
 };
 
 void helpCheck(int argc, char *argv[]) {
+	std::cout << argc << std::endl;
 	if (argc == 1) {
 		std::cout << "ERROR: ptxz was passed no parameters. \"ptxz -h\" for help." << std::endl;
 	}
