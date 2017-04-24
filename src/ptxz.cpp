@@ -125,7 +125,7 @@ void getPaths(std::vector<std::string> *filePaths, const char *cwd, std::string 
 	}
 }
 
-void compression(std::vector<std::string> *filePaths) {
+void compression(std::vector<std::string> *filePaths, std::string name) {
 	unsigned long long int filePathSize = filePaths->size();
 	unsigned long long int blockSize = (filePathSize / (omp_get_max_threads() * 10)) + 1;
 	std::vector<std::string> *tarNames = new std::vector<std::string>(filePaths->size());
@@ -140,12 +140,12 @@ void compression(std::vector<std::string> *filePaths) {
 			}
 			system(xzCommand.c_str());
 
-			tarNames->at(i) = "test." + std::to_string(i) + ".tar.xz";
+			tarNames->at(i) = name + "." + std::to_string(i) + ".tar.xz";
 			std::cout << tarNames->at(i) + "\n";
 		}
 	}
 
-	std::string tarCommand = "tar cf ptxz.output.tar";
+	std::string tarCommand = "tar cf " + name + ".ptxz.tar";
 	for (int i = 0; i < tarNames->size(); ++i) {
 		tarCommand += " " + tarNames->at(i);
 	}
@@ -161,6 +161,10 @@ void compression(std::vector<std::string> *filePaths) {
 	delete(tarNames);
 }
 
+void extraction() {
+
+}
+
 char cwd [PATH_MAX];
 
 int main(int argc, char *argv[]) {
@@ -173,7 +177,12 @@ int main(int argc, char *argv[]) {
 	getcwd(cwd, PATH_MAX);
 	findAll(numFiles, cwd);
 	getPaths(filePaths, cwd, "");
-	compression(filePaths);
+
+	if ((*instance).compress) {
+		compression(filePaths, (*instance).name);
+	} else {
+		extraction();
+	}
 
 	delete(instance);
 	delete(numFiles);
