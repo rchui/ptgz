@@ -20,7 +20,7 @@ struct Settings {
 	std::string name;
 };
 
-void helpCheck(char *argv[]) {
+void helpCheck(int argc, char *argv[]) {
 	if (argc == 1) {
 		std::cout << "ERROR: ptxz was passed no parameters. \"ptxz -h\" for help." << std::endl;
 	}
@@ -166,7 +166,7 @@ int main(int argc, char *argv[]) {
 	Settings *instance = new Settings;
 	int *numFiles = new int(0);
 	
-	helpCheck(argv);
+	helpCheck(argc, argv);
 	getSettings(argc, argv, instance);
 
 	getcwd(cwd, PATH_MAX);
