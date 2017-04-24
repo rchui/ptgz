@@ -125,7 +125,7 @@ void getPaths(std::vector<std::string> *filePaths, const char *cwd, std::string 
 	}
 }
 
-void compression(std::vector<std::string> *filePaths, std::string name) {
+void compression(std::vector<std::string> *filePaths, std::string name, bool verbose) {
 	unsigned long long int filePathSize = filePaths->size();
 	unsigned long long int blockSize = (filePathSize / (omp_get_max_threads() * 100)) + 1;
 	std::vector<std::string> *tarNames = new std::vector<std::string>(filePaths->size());
@@ -140,7 +140,11 @@ void compression(std::vector<std::string> *filePaths, std::string name) {
 			for (unsigned long long int j = start; j < std::min(start + blockSize, filePathSize); ++j) {
 				gzCommand += " " + filePaths->at(j);
 			}
-			std::cout << gzCommand + "\n";
+	
+			if (verbose) {
+				std::cout << gzCommand + "\n";
+			}
+	
 			system(gzCommand.c_str());
 
 			tarNames->at(i) = name + "." + std::to_string(i) + ".tar.gz";
@@ -159,7 +163,11 @@ void compression(std::vector<std::string> *filePaths, std::string name) {
 	}
 	idx.close();
 	tarCommand += " " + name + ".ptgz.idx";
-	std::cout << tarCommand + "\n";
+	
+	if (verbose) {
+		std::cout << tarCommand + "\n";
+	}
+	
 	system(tarCommand.c_str());
 
 	// Removes temporary blocks
@@ -169,6 +177,11 @@ void compression(std::vector<std::string> *filePaths, std::string name) {
 		rmCommand += " " + tarNames->at(i);
 	}
 	rmCommand += " " + name + ".ptgz.idx";
+
+	if (verbose) {
+		std::cout << rmCommand + "\n";
+	}
+	
 	system(rmCommand.c_str());
 
 	tarNames->clear();
@@ -196,7 +209,7 @@ int main(int argc, char *argv[]) {
 
 	if ((*instance).compress) {
 		std::cout << "3. Starting File Compression" << std::endl;
-		compression(filePaths, (*instance).name);
+		compression(filePaths, (*instance).name, (*instance).verbose);
 	} else {
 		extraction();
 	}
