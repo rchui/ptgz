@@ -29,6 +29,9 @@ void helpCheck(char *argv[]) {
 
 void getSettings(int argc, char *argv[], Settings *instance) {
 	std::queue<std::string> settings;
+	if (argc == 1) {
+		std::cout << "ERROR: ptxz was passed no parameters. \"ptxz -h\" for help." << std::endl;
+	}
 	for (int i = 1; i < argc; ++i) {
 		settings.push(argv[i]);
 	}
