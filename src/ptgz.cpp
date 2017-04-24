@@ -139,6 +139,7 @@ void compression(std::vector<std::string> *filePaths, std::string name) {
 			for (unsigned long long int j = start; j < std::min(start + blockSize, filePathSize); ++j) {
 				gzCommand += " " + filePaths->at(j);
 			}
+			std::cout << gzCommand + "\n";
 			system(gzCommand.c_str());
 
 			tarNames->at(i) = name + "." + std::to_string(i) + ".tar.gz";
@@ -156,6 +157,7 @@ void compression(std::vector<std::string> *filePaths, std::string name) {
 	}
 	idx.close();
 	tarCommand += " " + name + ".ptgz.idx";
+	std::cout << tarCommand + "\n";
 	system(tarCommand.c_str());
 
 	std::cout << "3.3 Removing Temporary Blocks" << std::endl;
