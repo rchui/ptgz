@@ -278,6 +278,9 @@ void extraction(std::vector<std::string> *filePaths, std::string name, bool verb
 	#pragma omp parallel for schedule(static)
 	for (int i = 0; i < filePaths->size(); ++i) {
 		std::string gzRmCommand = filePaths->at(i);
+		if (verbose) {
+			std::cout << "remove(" + gzRmCommand + ")\n";
+		}
 		remove(gzRmCommand.c_str());
 	}
 	
@@ -285,6 +288,9 @@ void extraction(std::vector<std::string> *filePaths, std::string name, bool verb
 	if (!keep) {
 		std::string tarRmCommand = name + ".ptgz.tar";
 		remove(tarRmCommand);
+		if (verbose) {
+			std::cout << "remove(" + tarRmCommand + ")\n";
+		}
 	}
 }
 
