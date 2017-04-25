@@ -1,18 +1,25 @@
-# ptgz
+# ptgz - Parallel Tar Gzip
+The tar command line utility was first introduced in 1979 as a method of collecting many files into one archive file for distrbution and backup purposes. With the penetration of big data into every facet of the computing space datasets have grown exponentially in size. The single-threaded tar implementation is too slow to effectively archive terrabyte sized directories with millions of files. We introduce ptgz, a custom multi-threaded C++ file archiving utility to quickly compress, bundle files into an archive file, developed at the National Center for Supercomputing Applications.
 
-ptgz - Parallel Tar GZ by Ryan Chui (2017)
+## Requirements
+Need at least GNU C Compiler (4.9) with OpenMP.
 
-    ptgz is a custom multi-threaded C++ file archiving utility to quickly bundle millions of files in 
-    terrabyte sized directories into a single file. ptgz was developed at the National Center for 
-    Supercomputing Applications.
+## Installation
+### GNU C Compiler
+    g++ -std=c++11 -fopenmp -o bin/ptgz src/ptgz.cpp
 
-    Usage:
+### Makefile
+    make
+
+## Usage
     If you are compressing, your current working directory should be parent directory of all directories you
     want to archive. If you are extracting, your current working directory should be the same as your archive.
 
+### Command Syntax:
     ptgz [-c|-k|-v|-x] <archive>
 
-    Modes:
+### Modes:
+
     -c    Compression           ptgz will perform file compression. The current directory and all of it's
                                 children will be archived and added to a single tarball. <archive> will be 
                                 prefix of the ptgz archive created.
