@@ -208,7 +208,7 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 			std::cout << "remove(" + rmCommand + ")\n";
 		}
 		if (!remove(rmCommand.c_str())) {
-			std::cout << "ERROR: " + rmCommand + " could not be removed."
+			std::cout << "ERROR: " + rmCommand + " could not be removed.";
 		}
 		
 
@@ -217,7 +217,7 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 			std::cout << "remove(" + rmCommand + ")\n";
 		}
 		if (!remove(rmCommand.c_str())) {
-			std::cout << "ERROR: " + rmCommand + " coudl not be removed."
+			std::cout << "ERROR: " + rmCommand + " coudl not be removed.";
 		}
 	}
 
@@ -227,7 +227,7 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 	}
 	rmCommand = name + ".ptgz.idx";
 	if (remove(rmCommand.c_str())) {
-		std::cout << "ERROR: " + rmCommand + " coudl not be removed."
+		std::cout << "ERROR: " + rmCommand + " coudl not be removed.";
 	}
 
 	tarNames->clear();
