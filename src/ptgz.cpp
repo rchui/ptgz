@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include <dirent.h>
 #include <fstream>
+#include <sstream>
 #include <queue>
 #include "omp.h"
 
@@ -237,13 +238,24 @@ void extraction(std::vector<std::string> *filePaths, std::string name, bool verb
 	if (verbose) {
 		std::cout << exCommand + "\n";
 	}
-	// system(exCommand.c_str());
+	system(exCommand.c_str());
 
 	// Get the name from the name of the 1st layer tarball
 	for (int i = 0; i < 9; ++i) {
 		name.pop_back();
 	}
-	std::cout << name << std::endl;
+
+	std::ifstream idx;
+	std::string line;
+	idx.open(name + ".ptgz.idx", std::ios_base::in);
+	while (std::getline(idx, line)) {
+		filePaths->push_back(line);
+	}
+	idx.close();
+
+	for (int i = 0; i < filePaths->size(); ++i) {
+		std::cout << filePaths->at(i) << std::endl;
+	}
 }
 
 char cwd [PATH_MAX];
