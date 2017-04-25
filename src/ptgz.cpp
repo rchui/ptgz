@@ -257,7 +257,7 @@ int main(int argc, char *argv[]) {
 	if ((*instance).compress) {
 		std::cout << "1.  Searching File Tree" << std::endl;
 		findAll(numFiles, cwd);
-		std::cout << "2.  Gathering Files" << std::endl;
+		std::cout << "2.  Gathering File Paths" << std::endl;
 		getPaths(filePaths, cwd, "");
 		std::cout << "3.  Starting File Compression" << std::endl;
 		compression(filePaths, (*instance).name, (*instance).verbose);
