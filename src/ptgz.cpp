@@ -14,10 +14,12 @@ struct Settings {
 	Settings(): extract(),
 				compress(),
    				verbose(),
+				keep(),
 				output() {}
 	bool extract;
 	bool compress;
 	bool verbose;
+	bool keep;
 	bool output;
 	std::string name;
 };
@@ -69,6 +71,8 @@ void getSettings(int argc, char *argv[], Settings *instance) {
 			(*instance).verbose = true;
 		} else if (arg == "-o") {
 			(*instance).output = true;
+		} else if (arg == "-k") {
+			(*instance).keep = true;
 		} else {
 			if (settings.size() > 1) {
 				std::cout << "ERROR: ptgz was called incorrectly. \"ptgz -h\" for help." << std::endl;
@@ -84,6 +88,8 @@ void getSettings(int argc, char *argv[], Settings *instance) {
 	if (!(*instance).output) {
 		std::cout << "ERROR: No output file name given. \"ptgz -h\" for help." << std::endl;
 		exit(0);
+	} else if (((*instance).keep && !(*instance).extract) {
+		std::cout << "ERROR: Can't use keep option without extract. \"ptgz -h\" for help." << std::endl;
 	}
 }
 
@@ -232,7 +238,7 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 	delete(tarNames);
 }
 
-void extraction(std::vector<std::string> *filePaths, std::string name, bool verbose) {
+void extraction(std::vector<std::string> *filePaths, std::string name, bool verbose, bool keep) {
 	// Unpack the 1st layer tarball
 	std::string exCommand = "tar xf " + name;
 	if (verbose) {
@@ -245,6 +251,8 @@ void extraction(std::vector<std::string> *filePaths, std::string name, bool verb
 		name.pop_back();
 	}
 
+	// Read in all tar.gz files form the ptgz.idx file
+	// Delete the ptgz.idx file
 	std::ifstream idx;
 	std::string line;
 	idx.open(name + ".ptgz.idx", std::ios_base::in);
@@ -252,10 +260,31 @@ void extraction(std::vector<std::string> *filePaths, std::string name, bool verb
 		filePaths->push_back(line);
 	}
 	idx.close();
+	std::string idxRmCommand = filePaths->back();
+	remove(idxRmCommand.c_str());
 	filePaths->pop_back();
 
+	// Unpack each tar.gz file
+	#pragma omp parallel for schedule(dynamic)
 	for (int i = 0; i < filePaths->size(); ++i) {
-		std::cout << filePaths->at(i) << std::endl;
+		std::string gzCommand = "tar xzf " + filePaths->at(i);
+		if (verbose) {
+			std::cout << gzCommand + "\n";
+		}
+		system(gzCommand.c_str());
+	}
+
+	// Delete each tar.gz file
+	#pragma omp parallel for schedule(static)
+	for (int i = 0; i < filePaths->size(); ++i) {
+		std::string gzRmCommand = filePaths->at(i);
+		remove(gzRmCommand.c_str());
+	}
+	
+	// Decided whether or not to keep the ptgz.tar archive
+	if (!keep) {
+		std::string tarRmCommand = name + ".ptgz.tar";
+		remove(tarRmCommand);
 	}
 }
 
@@ -280,7 +309,7 @@ int main(int argc, char *argv[]) {
 		getPaths(filePaths, cwd, "");
 		compression(filePaths, (*instance).name, (*instance).verbose);
 	} else {
-		extraction(filePaths, (*instance).name, (*instance).verbose);
+		extraction(filePaths, (*instance).name, (*instance).verbose, (*instance).keep);
 	}
 
 	delete(instance);
