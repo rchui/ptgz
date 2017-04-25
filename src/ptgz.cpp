@@ -205,13 +205,13 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 	for (unsigned long long int i = 0; i < tarNames->size(); ++i) {
 		std::string rmCommand = tarNames->at(i);
 		if (verbose) {
-			std::cout << "remove("rmCommand + ")\n";
+			std::cout << "remove(" + rmCommand + ")\n";
 		}
 		remove(rmCommand.c_str());
 
 		rmCommand = std::to_string(i) + "." + name + ".ptgz.tmp";
 		if (verbose) {
-			std::cout << "remove("rmCommand + ")\n";
+			std::cout << "remove(" + rmCommand + ")\n";
 		}
 		remove(rmCommand.c_str());
 	}
