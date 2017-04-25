@@ -215,6 +215,7 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 		}
 		system(rmCommand.c_str());
 	}
+
 	std::string rmCommand;
 	if (verbose) {
 		std::cout << "rm " + name + ".ptgz.idx\n";
