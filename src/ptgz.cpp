@@ -232,11 +232,18 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 }
 
 void extraction(std::vector<std::string> *filePaths, std::string name, bool verbose) {
+	// Unpack the 1st layer tarball
 	std::string exCommand = "tar xf " + name;
 	if (verbose) {
 		std::cout << exCommand + "\n";
 	}
-	system(exCommand.c_str());
+	// system(exCommand.c_str());
+
+	// Get the name from the name of the 1st layer tarball
+	for (int i = 0; i < 8; ++i) {
+		name.pop_back();
+	}
+	std::cout << name << std::endl;
 }
 
 char cwd [PATH_MAX];
