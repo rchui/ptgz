@@ -287,10 +287,10 @@ void extraction(std::vector<std::string> *filePaths, std::string name, bool verb
 	// Decided whether or not to keep the ptgz.tar archive
 	if (!keep) {
 		std::string tarRmCommand = name + ".ptgz.tar";
-		remove(tarRmCommand);
 		if (verbose) {
 			std::cout << "remove(" + tarRmCommand + ")\n";
 		}
+		remove(tarRmCommand.c_str());
 	}
 }
 
