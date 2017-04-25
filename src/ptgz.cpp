@@ -233,6 +233,9 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 
 void extraction(std::vector<std::string> *filePaths, std::string name, bool verbose) {
 	std::string exCommand = "tar xf " + name;
+	if (verbose) {
+		std::cout << exCommand + "\n";
+	}
 	system(exCommand.c_str());
 }
 
