@@ -40,15 +40,19 @@ void helpCheck(int argc, char *argv[]) {
 		std::cout << "    terrabyte sized directories into a single file. ptgz was developed at the National Center for \n";
 		std::cout << "    Supercomputing Applications.\n" << std::endl;
 		std::cout << "    Usage:\n";
-		std::cout << "    ptgz [-c|-k|-v|-x] <archive name>\n" << std::endl;
+		std::cout << "    If you are compressing your current working directory should be parent directory of all directories you\n";
+		std::cout << "    want to archive. If you are extracting your current working directory should be the same as your archive.\n" << std::endl;
+		std::cout << "    ptgz [-c|-k|-v|-x] <archive>\n" << std::endl;
 		std::cout << "    Modes:\n";
 		std::cout << "    -c    Compression           ptgz will perform file compression. The current directory and all of it's\n";
-		std::cout << "                                children will be archived and added to a single tarball.\n" << std::endl;
+		std::cout << "                                children will be archived and added to a single tarball. <archive> will be \n";
+		std::cout << "                                prefix of the ptgz archive created.\n" << std::endl;
 		std::cout << "    -k    Keep Archive          ptgz will not delete the ptgz archive it has been passed to extract. This \n";
-		std::cout << "                                option must be used with \"-x\"." << std::endl;
+		std::cout << "                                option must be used with \"-x\".\n" << std::endl;
 		std::cout << "    -v    Enable Verbose        ptgz will print the commands as they are called to STDOUT\n" << std::endl;
 		std::cout << "    -x    Extraction            ptgz will perform file extraction from an archive. The passed ptgz archive\n";
-		std::cout << "                                will be unpacked and split into its component files.\n" << std::endl;
+		std::cout << "                                will be unpacked and split into its component files. <archive> should be the\n";
+		std::cout << "                                the name of the archive to extract." << std::endl;
 		exit(0);
 	}
 }
