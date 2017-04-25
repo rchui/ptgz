@@ -203,25 +203,25 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 	std::cout << "3.3 Removing Temporary Blocks" << std::endl;
 	#pragma omp parallel for schedule(static)
 	for (unsigned long long int i = 0; i < tarNames->size(); ++i) {
-		std::string rmCommand = "rm " + tarNames->at(i);
+		std::string rmCommand = tarNames->at(i);
 		if (verbose) {
-			std::cout << rmCommand + "\n";
+			std::cout << "remove("rmCommand + ")\n";
 		}
-		system(rmCommand.c_str());
+		remove(rmCommand.c_str());
 
-		rmCommand = "rm " + std::to_string(i) + "." + name + ".ptgz.tmp";
+		rmCommand = std::to_string(i) + "." + name + ".ptgz.tmp";
 		if (verbose) {
-			std::cout << rmCommand + "\n";
+			std::cout << "remove("rmCommand + ")\n";
 		}
-		system(rmCommand.c_str());
+		remove(rmCommand.c_str());
 	}
 
 	std::string rmCommand;
 	if (verbose) {
-		std::cout << "rm " + name + ".ptgz.idx\n";
+		std::cout << "remove(" + name + ".ptgz.idx)\n";
 	}
-	rmCommand = "rm " + name + ".ptgz.idx";
-	system(rmCommand.c_str());
+	rmCommand = name + ".ptgz.idx";
+	remove(rmCommand.c_str());
 
 	tarNames->clear();
 	delete(tarNames);
