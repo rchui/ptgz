@@ -166,10 +166,7 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 			// Each thread will use the file to tar and gzip compress their block.
 			std::ofstream tmp;
 			tmp.open(std::to_string(i) + "." + name + ".ptgz.tmp", std::ios_base::app);
-			std::string gzCommand = "GZIP=-1 tar \
-									-cz \
-									-T " + std::to_string(i) + "." + name + ".ptgz.tmp \
-									-f " + std::to_string(i) + "." + name + ".tar.gz";
+			std::string gzCommand = "GZIP=-1 tar -cz -T " + std::to_string(i) + "." + name + ".ptgz.tmp -f " + std::to_string(i) + "." + name + ".tar.gz";
 			for (unsigned long long int j = start; j < std::min(start + blockSize, filePathSize); ++j) {
 				tmp << filePaths->at(j) + "\n";
 			}
@@ -189,9 +186,7 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 	std::ofstream idx, tmp;
 	idx.open(name + ".ptgz.idx", std::ios_base::app);
 	std::cout << "3.2 Combining Blocks Together" << std::endl;
-	std::string tarCommand = "tar -c \
-							 -T " + name + ".ptgz.idx \
-							 -f " + name + ".ptgz.tar";
+	std::string tarCommand = "tar -c -T " + name + ".ptgz.idx -f " + name + ".ptgz.tar";
 	for (unsigned long long int i = 0; i < tarNames->size(); ++i) {
 		idx << tarNames->at(i) + "\n";
 	}
