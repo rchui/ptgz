@@ -234,8 +234,8 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 	delete(tarNames);
 }
 
-void extraction() {
-
+void extraction(std::vector<std::string> *filePaths, std::string name, bool verbose) {
+	std::cout << name << std::endl;
 }
 
 char cwd [PATH_MAX];
@@ -262,7 +262,7 @@ int main(int argc, char *argv[]) {
 		std::cout << "3.  Starting File Compression" << std::endl;
 		compression(filePaths, (*instance).name, (*instance).verbose);
 	} else {
-		extraction();
+		extraction(filePaths, (*instance).name, (*instance).verbose);
 	}
 
 	std::cout << "4.  Cleaning Up" << std::endl;
