@@ -40,8 +40,8 @@ void helpCheck(int argc, char *argv[]) {
 		std::cout << "    terrabyte sized directories into a single file. ptgz was developed at the National Center for \n";
 		std::cout << "    Supercomputing Applications.\n" << std::endl;
 		std::cout << "    Usage:\n";
-		std::cout << "    If you are compressing your current working directory should be parent directory of all directories you\n";
-		std::cout << "    want to archive. If you are extracting your current working directory should be the same as your archive.\n" << std::endl;
+		std::cout << "    If you are compressing, your current working directory should be parent directory of all directories you\n";
+		std::cout << "    want to archive. If you are extracting, your current working directory should be the same as your archive.\n" << std::endl;
 		std::cout << "    ptgz [-c|-k|-v|-x] <archive>\n" << std::endl;
 		std::cout << "    Modes:\n";
 		std::cout << "    -c    Compression           ptgz will perform file compression. The current directory and all of it's\n";
