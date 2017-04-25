@@ -43,7 +43,7 @@ void helpCheck(int argc, char *argv[]) {
 		std::cout << "    ptgz [-c|-k|-v|-x] <archive name>\n" << std::endl;
 		std::cout << "    Modes:\n";
 		std::cout << "    -c    Compression           ptgz will perform file compression. The current directory and all of it's\n";
-		std::cout << "                                children will be archived and added to a single tarball.\n" << std::cout;
+		std::cout << "                                children will be archived and added to a single tarball.\n" << std::endl;
 		std::cout << "    -k    Keep Archive          ptgz will not delete the ptgz archive it has been passed to extract. This \n";
 		std::cout << "                                option must be used with \"-x\"." << std::endl;
 		std::cout << "    -v    Enable Verbose        ptgz will print the commands as they are called to STDOUT\n" << std::endl;
