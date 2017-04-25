@@ -286,7 +286,9 @@ void extraction(std::vector<std::string> *filePaths, std::string name, bool verb
 	}
 	idx.close();
 	std::string idxRmCommand = filePaths->back();
-	remove(idxRmCommand.c_str());
+	if (remove(idxRmCommand.c_str())) {
+		std::cout << "ERROR: " + idxRmCommand + " could not be removed.\n";	
+	}
 	filePaths->pop_back();
 
 	// Unpack each tar.gz file
@@ -306,7 +308,9 @@ void extraction(std::vector<std::string> *filePaths, std::string name, bool verb
 		if (verbose) {
 			std::cout << "remove(" + gzRmCommand + ")\n";
 		}
-		remove(gzRmCommand.c_str());
+		if (remove(gzRmCommand.c_str())) {
+			std::cout << "ERROR: " + gzRmCommand + " could not be removed.\n";
+		}
 	}
 	
 	// Decided whether or not to keep the ptgz.tar archive
@@ -315,7 +319,9 @@ void extraction(std::vector<std::string> *filePaths, std::string name, bool verb
 		if (verbose) {
 			std::cout << "remove(" + tarRmCommand + ")\n";
 		}
-		remove(tarRmCommand.c_str());
+		if (remove(tarRmCommand.c_str())) {
+			std::cout << "ERROR: " + tarRmCommand + " could not be removed.\n";
+		}
 	}
 }
 
