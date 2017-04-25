@@ -151,6 +151,7 @@ void getPaths(std::vector<std::string> *filePaths, const char *cwd, std::string 
 // 			   name (std::string) user given name for storage file.
 // 			   verbose (bool) user option for verbose output.
 void compression(std::vector<std::string> *filePaths, std::string name, bool verbose) {
+	std::random_shuffle(filePaths->begin(), filePaths->end());
 	unsigned long long int filePathSize = filePaths->size();
 	unsigned long long int blockSize = (filePathSize / (omp_get_max_threads() * 10)) + 1;
 	std::vector<std::string> *tarNames = new std::vector<std::string>(filePaths->size());
@@ -214,7 +215,7 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 		system(rmCommand.c_str());
 	}
 	system(("rm " + name + ".ptgz.idx").c_str());
-	system(("rm *." + name + ".ptgz.tmp").c_str());
+	system(("rm *" + name + ".ptgz.tmp").c_str());
 
 	tarNames->clear();
 	delete(tarNames);
@@ -239,12 +240,12 @@ int main(int argc, char *argv[]) {
 	helpCheck(argc, argv);
 	getSettings(argc, argv, instance);
 	getcwd(cwd, PATH_MAX);
-	std::cout << "1.  Searching File Tree" << std::endl;
-	findAll(numFiles, cwd);
-	std::cout << "2.  Gathering Files" << std::endl;
-	getPaths(filePaths, cwd, "");
 
 	if ((*instance).compress) {
+		std::cout << "1.  Searching File Tree" << std::endl;
+		findAll(numFiles, cwd);
+		std::cout << "2.  Gathering Files" << std::endl;
+		getPaths(filePaths, cwd, "");
 		std::cout << "3.  Starting File Compression" << std::endl;
 		compression(filePaths, (*instance).name, (*instance).verbose);
 	} else {
