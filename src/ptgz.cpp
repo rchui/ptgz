@@ -157,7 +157,6 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 	std::vector<std::string> *tarNames = new std::vector<std::string>(filePathSize / blockSize + 1);
 	
 	// Gzips the blocks of files into a single compressed file
-	std::cout << "3.1 Gzipping Blocks" << std::endl;
 	#pragma omp parallel for schedule(dynamic)
 	for (int i = 0; i < omp_get_max_threads() * 10; ++i) {
 		unsigned long long int start = blockSize * i;
@@ -185,7 +184,6 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 	// Write tarball names into an idx file for extraction.
 	std::ofstream idx, tmp;
 	idx.open(name + ".ptgz.idx", std::ios_base::app);
-	std::cout << "3.2 Combining Blocks Together" << std::endl;
 	std::string tarCommand = "tar -c -T " + name + ".ptgz.idx -f " + name + ".ptgz.tar";
 	for (unsigned long long int i = 0; i < tarNames->size(); ++i) {
 		idx << tarNames->at(i) + "\n";
@@ -200,7 +198,6 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 	system(tarCommand.c_str());
 
 	// Removes all temporary blocks and idx file.
-	std::cout << "3.3 Removing Temporary Blocks" << std::endl;
 	#pragma omp parallel for schedule(static)
 	for (unsigned long long int i = 0; i < tarNames->size(); ++i) {
 		std::string rmCommand = tarNames->at(i);
@@ -217,7 +214,7 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 			std::cout << "remove(" + rmCommand + ")\n";
 		}
 		if (remove(rmCommand.c_str())) {
-			std::cout << "ERROR: " + rmCommand + " coudl not be removed.\n";
+			std::cout << "ERROR: " + rmCommand + " could not be removed.\n";
 		}
 	}
 
@@ -227,7 +224,7 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 	}
 	rmCommand = name + ".ptgz.idx";
 	if (remove(rmCommand.c_str())) {
-		std::cout << "ERROR: " + rmCommand + " coudl not be removed.\n";
+		std::cout << "ERROR: " + rmCommand + " could not be removed.\n";
 	}
 
 	tarNames->clear();
@@ -235,7 +232,8 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 }
 
 void extraction(std::vector<std::string> *filePaths, std::string name, bool verbose) {
-	std::cout << name << std::endl;
+	exCommand = "tar xf " + name;
+	system(exCommand.c_str());
 }
 
 char cwd [PATH_MAX];
@@ -255,17 +253,13 @@ int main(int argc, char *argv[]) {
 	getcwd(cwd, PATH_MAX);
 
 	if ((*instance).compress) {
-		std::cout << "1.  Searching File Tree" << std::endl;
 		findAll(numFiles, cwd);
-		std::cout << "2.  Gathering File Paths" << std::endl;
 		getPaths(filePaths, cwd, "");
-		std::cout << "3.  Starting File Compression" << std::endl;
 		compression(filePaths, (*instance).name, (*instance).verbose);
 	} else {
 		extraction(filePaths, (*instance).name, (*instance).verbose);
 	}
 
-	std::cout << "4.  Cleaning Up" << std::endl;
 	delete(instance);
 	delete(numFiles);
 	filePaths->clear();
