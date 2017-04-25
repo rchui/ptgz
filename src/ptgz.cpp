@@ -237,9 +237,9 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 		if (verbose) {
 			std::cout << "remove(" + rmCommand + ")\n";
 		}
-		if (remove(rmCommand.c_str())) {
-			std::cout << "ERROR: " + rmCommand + " could not be removed.\n";
-		}
+		// if (remove(rmCommand.c_str())) {
+			// std::cout << "ERROR: " + rmCommand + " could not be removed.\n";
+		// }
 	}
 
 	std::string rmCommand;
