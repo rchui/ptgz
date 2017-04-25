@@ -240,7 +240,7 @@ void extraction(std::vector<std::string> *filePaths, std::string name, bool verb
 	// system(exCommand.c_str());
 
 	// Get the name from the name of the 1st layer tarball
-	for (int i = 0; i < 8; ++i) {
+	for (int i = 0; i < 9; ++i) {
 		name.pop_back();
 	}
 	std::cout << name << std::endl;
