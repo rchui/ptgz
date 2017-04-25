@@ -209,14 +209,17 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 		}
 		system(rmCommand.c_str());
 	}
+	std::string rmCommand;
 	if (verbose) {
 		std::cout << "rm " + name + ".ptgz.idx\n";
 	}
-	system(("rm " + name + ".ptgz.idx").c_str());
+	rmCommand = "rm " + name + ".ptgz.idx";
+	system(rmCommand.c_str());
 	if (verbose) {
 		std::cout << "rm *" + name + ".ptgz.tmp\n";
 	}
-	system(("rm *" + name + ".ptgz.tmp").c_str());
+	rmCommand = "rm *" + name + ".ptgz.tmp";
+	system(rmCommand.c_str());
 
 	tarNames->clear();
 	delete(tarNames);
