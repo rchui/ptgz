@@ -308,9 +308,9 @@ void extraction(std::vector<std::string> *filePaths, std::string name, bool verb
 		if (verbose) {
 			std::cout << "remove(" + gzRmCommand + ")\n";
 		}
-		if (remove(gzRmCommand.c_str())) {
-			std::cout << "ERROR: " + gzRmCommand + " could not be removed.\n";
-		}
+		// if (remove(gzRmCommand.c_str())) {
+			// std::cout << "ERROR: " + gzRmCommand + " could not be removed.\n";
+		// }
 	}
 	
 	// Decided whether or not to keep the ptgz.tar archive
