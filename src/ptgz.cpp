@@ -88,7 +88,7 @@ void getSettings(int argc, char *argv[], Settings *instance) {
 	if (!(*instance).output) {
 		std::cout << "ERROR: No output file name given. \"ptgz -h\" for help." << std::endl;
 		exit(0);
-	} else if (((*instance).keep && !(*instance).extract) {
+	} else if ((*instance).keep && !(*instance).extract) {
 		std::cout << "ERROR: Can't use keep option without extract. \"ptgz -h\" for help." << std::endl;
 	}
 }
