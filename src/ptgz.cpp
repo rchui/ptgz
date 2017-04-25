@@ -36,6 +36,19 @@ void helpCheck(int argc, char *argv[]) {
 
 	if (argv[1] == std::string("-h") || argv[1] == std::string("--help")) {
 		std::cout << "\nptgz - Parallel Tar GZ by Ryan Chui (2017)\n" << std::endl;
+		std::cout << "    ptgz is a custom multi-threaded C++ file archiving utility to quickly bundle millions of files in \n";
+		std::cout << "    terrabyte sized directories into a single file. ptgz was developed at the National Center for \n";
+		std::cout << "    Supercomputing Applications.\n" << std::endl;
+		std::cout << "    Usage:\n";
+		std::cout << "    ptgz [-c|-k|-v|-x] <archive name>\n" << std::endl;
+		std::cout << "    Modes:\n";
+		std::cout << "    -c    Compression           ptgz will perform file compression. The current directory and all of it's\n";
+		std::cout << "                                children will be archived and added to a single tarball.\n" << std::cout;
+		std::cout << "    -k    Keep Archive          ptgz will not delete the ptgz archive it has been passed to extract. This \n";
+		std::cout << "                                option must be used with \"-x\"." << std::endl;
+		std::cout << "    -v    Enable Verbose        ptgz will print the commands as they are called to STDOUT\n" << std::endl;
+		std::cout << "    -x    Extraction            ptgz will perform file extraction from an archive. The passed ptgz archive\n";
+		std::cout << "                                will be unpacked and split into its component files.\n" << std::endl;
 		exit(0);
 	}
 }
@@ -238,6 +251,14 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 	delete(tarNames);
 }
 
+// Unpacks the archive.
+// Reads in all the files from the index file.
+// Unpacks each file.
+// Deletes all temporary file blocks and header files.
+// Parameters: filePaths (std::vector<std::string> *) holder for all file paths.
+// 			   name (std::string) name of ptgz archive file.
+// 			   verbose (bool) user option for verbose output.
+// 			   keep (bool) user option for keeping ptgz archive.
 void extraction(std::vector<std::string> *filePaths, std::string name, bool verbose, bool keep) {
 	// Unpack the 1st layer tarball
 	std::string exCommand = "tar xf " + name;
