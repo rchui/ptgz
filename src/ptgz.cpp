@@ -238,7 +238,7 @@ void extraction(std::vector<std::string> *filePaths, std::string name, bool verb
 	if (verbose) {
 		std::cout << exCommand + "\n";
 	}
-	system(exCommand.c_str());
+	// system(exCommand.c_str());
 
 	// Get the name from the name of the 1st layer tarball
 	for (int i = 0; i < 9; ++i) {
@@ -252,6 +252,7 @@ void extraction(std::vector<std::string> *filePaths, std::string name, bool verb
 		filePaths->push_back(line);
 	}
 	idx.close();
+	filePaths->pop_back();
 
 	for (int i = 0; i < filePaths->size(); ++i) {
 		std::cout << filePaths->at(i) << std::endl;
