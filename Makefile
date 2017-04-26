@@ -1,9 +1,14 @@
-all: clean build
+all: clean gcc
 
 clean:
 	rm -rf bin/
 
-build:
+icc:
 	mkdir bin/
-	g++ -std=c++11 -fopenmp -o bin/ptgz src/ptgz.cpp
+	icc -std=c++11 -openmp -O3 -o bin/ptgz src/ptgz.cpp
+	chmod -R 751 bin/
+
+gcc:
+	mkdir bin/
+	g++ -std=c++11 -fopenmp -O3 -o bin/ptgz src/ptgz.cpp
 	chmod -R 751 bin/
