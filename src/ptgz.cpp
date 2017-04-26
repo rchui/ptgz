@@ -181,21 +181,21 @@ void getPaths(std::vector<std::string> *filePaths, const char *cwd, std::string 
 // 			   verbose (bool) user option for verbose output.
 void compression(std::vector<std::string> *filePaths, std::string name, bool verbose) {
 	std::random_shuffle(filePaths->begin(), filePaths->end());
-	unsigned long long int filePathSize = filePaths->size();
-	unsigned long long int blockSize = (filePathSize / (omp_get_max_threads() * 10)) + 1;
+	unsigned long long filePathSize = filePaths->size();
+	unsigned long long blockSize = (filePathSize / (omp_get_max_threads() * 10)) + 1;
 	std::vector<std::string> *tarNames = new std::vector<std::string>(filePathSize / blockSize + 1);
 	
 	// Gzips the blocks of files into a single compressed file
 	#pragma omp parallel for schedule(dynamic)
 	for (int i = 0; i < omp_get_max_threads() * 10; ++i) {
-		unsigned long long int start = blockSize * i;
+		unsigned long long start = blockSize * i;
 		if (start < filePathSize) {
 			// Store the name of each file for a block owned by each thread.
 			// Each thread will use the file to tar and gzip compress their block.
 			std::ofstream tmp;
 			tmp.open(std::to_string(i) + "." + name + ".ptgz.tmp", std::ios_base::app);
 			std::string gzCommand = "GZIP=-1 tar -cz -T " + std::to_string(i) + "." + name + ".ptgz.tmp -f " + std::to_string(i) + "." + name + ".tar.gz";
-			for (unsigned long long int j = start; j < std::min(start + blockSize, filePathSize); ++j) {
+			for (unsigned long long j = start; j < std::min(start + blockSize, filePathSize); ++j) {
 				tmp << filePaths->at(j) + "\n";
 			}
 	
@@ -214,7 +214,7 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 	std::ofstream idx, tmp;
 	idx.open(name + ".ptgz.idx", std::ios_base::app);
 	std::string tarCommand = "tar -c -T " + name + ".ptgz.idx -f " + name + ".ptgz.tar";
-	for (unsigned long long int i = 0; i < tarNames->size(); ++i) {
+	for (unsigned long long i = 0; i < tarNames->size(); ++i) {
 		idx << tarNames->at(i) + "\n";
 	}
 	idx << name + ".ptgz.idx" + "\n";
@@ -228,7 +228,7 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 
 	// Removes all temporary blocks and idx file.
 	#pragma omp parallel for schedule(static)
-	for (unsigned long long int i = 0; i < tarNames->size(); ++i) {
+	for (unsigned long long i = 0; i < tarNames->size(); ++i) {
 		std::string rmCommand = tarNames->at(i);
 		if (verbose) {
 			std::cout << "remove(" + rmCommand + ")\n";
