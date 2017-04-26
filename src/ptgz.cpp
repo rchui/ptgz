@@ -7,7 +7,7 @@
 #include <fstream>
 #include <sstream>
 #include <queue>
-#include <cerrno>
+#include <errno.h>
 #include "omp.h"
 
 // Contains the various options the user can pass ptgz.
