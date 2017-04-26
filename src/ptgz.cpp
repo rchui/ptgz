@@ -7,6 +7,7 @@
 #include <fstream>
 #include <sstream>
 #include <queue>
+#include <errno>
 #include "omp.h"
 
 // Contains the various options the user can pass ptgz.
@@ -299,6 +300,7 @@ void extraction(std::vector<std::string> *filePaths, std::string name, bool verb
 			std::cout << gzCommand + "\n";
 		}
 		system(gzCommand.c_str());
+		std::cout << std::errno(errno) << std::endl;
 	}
 
 	// Delete each tar.gz file
