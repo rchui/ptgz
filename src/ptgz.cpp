@@ -300,7 +300,7 @@ void extraction(std::vector<std::string> *filePaths, std::string name, bool verb
 			std::cout << gzCommand + "\n";
 		}
 		system(gzCommand.c_str());
-		std::cout << std::strerror(errno) << std::endl;
+		std::cout << strerror(errno) << std::endl;
 	}
 
 	// Delete each tar.gz file
