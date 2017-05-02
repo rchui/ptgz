@@ -297,7 +297,7 @@ void extraction(std::vector<std::string> *filePaths, std::string name, bool verb
 	filePaths->pop_back();
 
 	// Unpack each tar.gz file
-	#pragma omp parallel for schedule(dynamic) num_threads(7)
+	#pragma omp parallel for schedule(dynamic) num_threads(6)
 	for (int i = 0; i < filePaths->size(); ++i) {
 		std::string gzCommand = "tar xzf " + filePaths->at(i);
 		if (verbose) {
