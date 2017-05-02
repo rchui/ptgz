@@ -2,7 +2,7 @@
 The tar command line utility was first introduced in 1979 as a method of collecting many files into one archive file for distrbution and backup purposes. With the penetration of big data into every facet of the computing space datasets have grown exponentially in size. The single-threaded tar implementation is too slow to effectively archive terrabyte sized directories with millions of files. We introduce ptgz, a custom multi-threaded C++ file archiving utility to quickly compress, bundle files into an archive file, developed at the National Center for Supercomputing Applications.
 
 ## Requirements
-Need at least either GNU C Compiler (4.9) with OpenMP or Intel C Compiler with OpenMP
+Need at least either GNU C Compiler (4.9+) with OpenMP or Intel C Compiler with OpenMP
 
 Compiler must have C++11 support.
 
@@ -10,13 +10,13 @@ Compiler must have C++11 support.
 ### GNU C Compiler
     g++ -std=c++11 -fopenmp -o bin/ptgz src/ptgz.cpp
 
-### GCC Makefile
+#### GCC Makefile
     make
 
 ### Intel C Compiler
     icc -std=c++11 -openmp -O3 -o bin/ptgz src/ptgz.cpp
 
-### ICC Makefile
+#### ICC Makefile
     make clean
     make icc
 
