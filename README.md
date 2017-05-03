@@ -17,7 +17,6 @@ Compiler must have C++11 support.
     icc -std=c++11 -openmp -O3 -o bin/ptgz src/ptgz.cpp
 
 #### ICC Makefile
-    make clean
     make icc
 
 ## Usage
