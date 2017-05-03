@@ -20,12 +20,14 @@ struct Settings {
 				compress(),
    				verbose(),
 				keep(),
+				verify(),
 				output() {}
 	bool extract;
 	bool compress;
 	bool verbose;
 	bool keep;
 	bool output;
+	bool verify;
 	std::string name;
 };
 
@@ -58,6 +60,7 @@ void helpCheck(int argc, char *argv[]) {
 		std::cout << "    -x    Extraction            ptgz will perform file extraction from an archive. The passed ptgz archive\n";
 		std::cout << "                                will be unpacked and split into its component files. <archive> should be the\n";
 		std::cout << "                                the name of the archive to extract." << std::endl;
+		std::cout << "    -W    Verify Archive        Attempts to verify the archive after writing it." << std::endl;
 		exit(0);
 	}
 }
@@ -95,6 +98,8 @@ void getSettings(int argc, char *argv[], Settings *instance) {
 			(*instance).output = true;
 		} else if (arg == "-k") {
 			(*instance).keep = true;
+		} else if (arg == "-W") {
+			(*instance).verify = true;
 		} else {
 			if (settings.size() > 1) {
 				std::cout << "ERROR: ptgz was called incorrectly. \"ptgz -h\" for help." << std::endl;
@@ -179,7 +184,7 @@ void getPaths(std::vector<std::string> *filePaths, const char *cwd, std::string 
 // Parameters: filePaths (std::vector<std::string> *) holder for all file paths.
 // 			   name (std::string) user given name for storage file.
 // 			   verbose (bool) user option for verbose output.
-void compression(std::vector<std::string> *filePaths, std::string name, bool verbose) {
+void compression(std::vector<std::string> *filePaths, std::string name, bool verbose, bool verify) {
 	std::random_shuffle(filePaths->begin(), filePaths->end());
 	unsigned long long filePathSize = filePaths->size();
 	unsigned long long blockSize = (filePathSize / (omp_get_max_threads() * 10)) + 1;
@@ -213,7 +218,11 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 	// Write tarball names into an idx file for extraction.
 	std::ofstream idx, tmp;
 	idx.open(name + ".ptgz.idx", std::ios_base::app);
-	std::string tarCommand = "tar -c -T " + name + ".ptgz.idx -f " + name + ".ptgz.tar";
+	if (!verify) {
+		std::string tarCommand = "tar -c -T " + name + ".ptgz.idx -f " + name + ".ptgz.tar";	
+	} else {
+		std::string tarCommand = "tar -c -W -T " + name + ".ptgz.idx -f " + name + ".ptgz.tar";
+	}
 	for (unsigned long long i = 0; i < tarNames->size(); ++i) {
 		idx << tarNames->at(i) + "\n";
 	}
@@ -296,10 +305,20 @@ void extraction(std::vector<std::string> *filePaths, std::string name, bool verb
 	}
 	filePaths->pop_back();
 
-	// Unpack each tar.gz file
-	#pragma omp parallel for schedule(dynamic) num_threads(4)
+	// Unpack each tar.gz file.
+	#pragma omp parallel for schedule(dynamic)
 	for (int i = 0; i < filePaths->size(); ++i) {
 		std::string gzCommand = "tar xzf " + filePaths->at(i);
+		if (verbose) {
+			std::cout << gzCommand + "\n";
+		}
+		system(gzCommand.c_str());
+	}
+
+	// Double check unpacking.
+	#pragma omp parallel for schedule(dynamic)
+	for (int i = 0; i < filePaths->size(); ++i) {
+		std::string gzCommand = "tar xzf " + filePaths->at(i) + " --skip-old-files";
 		if (verbose) {
 			std::cout << gzCommand + "\n";
 		}
@@ -349,7 +368,7 @@ int main(int argc, char *argv[]) {
 	if ((*instance).compress) {
 		findAll(numFiles, cwd);
 		getPaths(filePaths, cwd, "");
-		compression(filePaths, (*instance).name, (*instance).verbose);
+		compression(filePaths, (*instance).name, (*instance).verbose, (*instance).verify);
 	} else {
 		extraction(filePaths, (*instance).name, (*instance).verbose, (*instance).keep);
 	}
