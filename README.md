@@ -41,7 +41,7 @@ Compiler must have C++11 support.
     -v    Enable Verbose        Will print the archive and removal commands as they are called to STDOUT.
 
     -x    Extraction            Signals for file extraction from an archive. The passed ptgz archive will be
-                                unpacked and split into its component files. <archive> should be the the name
-                                of the archive to extract.
+                                unpacked and split into its component files. <archive> should be the name of
+                                the archive to extract.
 
     -W    Verify Archive        Attempts to verify the archive after writing it.
