@@ -27,21 +27,21 @@ Compiler must have C++11 support.
     files/directory will be replaced by copies of the symlinked file/directory.
 
 ### Command Syntax:
-    ptgz [-c|-k|-v|-x|-W] <archive>
+    ptgz [-c | -k | -v | -x | -W] <archive>
 
 ### Modes:
 
-    -c    Compression           ptgz will perform file compression. The current directory and all of it's
+    -c    Compression           Will perform file compression. The current directory and all of it's
                                 children will be archived and added to a single tarball. <archive> will be 
                                 prefix of the ptgz archive created.
 
-    -k    Keep Archive          ptgz will not delete the ptgz archive it has been passed to extract. This 
-                                option must be used with "-x".
+    -k    Keep Archive          Does not delete the ptgz archive it has been passed to extract. This option 
+                                must be used with "-x".
 
-    -v    Enable Verbose        ptgz will print the commands as they are called to STDOUT.
+    -v    Enable Verbose        Will print the archive and removal commands as they are called to STDOUT.
 
-    -x    Extraction            ptgz will perform file extraction from an archive. The passed ptgz archive
-                                will be unpacked and split into its component files. <archive> should be the
-                                the name of the archive to extract.
+    -x    Extraction            Signals for file extraction from an archive. The passed ptgz archive will be
+                                unpacked and split into its component files. <archive> should be the the name
+                                of the archive to extract.
 
     -W    Verify Archive        Attempts to verify the archive after writing it.
