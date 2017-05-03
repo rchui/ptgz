@@ -21,8 +21,11 @@ Compiler must have C++11 support.
     make icc
 
 ## Usage
-    If you are compressing, your current working directory should be parent directory of all directories you
+    If you are compressing, your current working directory should be the parent directory of all directories you
     want to archive. If you are extracting, your current working directory should be the same as your archive.
+
+    ptgz will not preserve symlinks or store empty directories in the ptgz.tar archive. Instead, all symlinked
+    files/directory will be replaced by copies of the symlinked file/directory.
 
 ### Command Syntax:
     ptgz [-c|-k|-v|-x|-W] <archive>
@@ -36,7 +39,7 @@ Compiler must have C++11 support.
     -k    Keep Archive          ptgz will not delete the ptgz archive it has been passed to extract. This 
                                 option must be used with "-x".
 
-    -v    Enable Verbose        ptgz will print the commands as they are called to STDOUT
+    -v    Enable Verbose        ptgz will print the commands as they are called to STDOUT.
 
     -x    Extraction            ptgz will perform file extraction from an archive. The passed ptgz archive
                                 will be unpacked and split into its component files. <archive> should be the
