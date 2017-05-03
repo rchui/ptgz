@@ -59,8 +59,8 @@ void helpCheck(int argc, char *argv[]) {
 		std::cout << "    -v    Enable Verbose        ptgz will print the commands as they are called to STDOUT\n" << std::endl;
 		std::cout << "    -x    Extraction            ptgz will perform file extraction from an archive. The passed ptgz archive\n";
 		std::cout << "                                will be unpacked and split into its component files. <archive> should be the\n";
-		std::cout << "                                the name of the archive to extract." << std::endl;
-		std::cout << "    -W    Verify Archive        Attempts to verify the archive after writing it." << std::endl;
+		std::cout << "                                the name of the archive to extract.\n" << std::endl;
+		std::cout << "    -W    Verify Archive        Attempts to verify the archive after writing it.\n" << std::endl;
 		exit(0);
 	}
 }
