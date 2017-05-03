@@ -235,7 +235,7 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 	
 	system(tarCommand.c_str());
 
-	// Removes all temporary blocks and idx file.
+	// Removes all temporary blocks.
 	#pragma omp parallel for schedule(static)
 	for (unsigned long long i = 0; i < tarNames->size(); ++i) {
 		std::string rmCommand = tarNames->at(i);
@@ -251,11 +251,12 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 		if (verbose) {
 			std::cout << "remove(" + rmCommand + ")\n";
 		}
-		// if (remove(rmCommand.c_str())) {
-			// std::cout << "ERROR: " + rmCommand + " could not be removed.\n";
-		// }
+		if (remove(rmCommand.c_str())) {
+			std::cout << "ERROR: " + rmCommand + " could not be removed.\n";
+		}
 	}
 
+	// Removes idx file.
 	std::string rmCommand;
 	if (verbose) {
 		std::cout << "remove(" + name + ".ptgz.idx)\n";
@@ -332,9 +333,9 @@ void extraction(std::vector<std::string> *filePaths, std::string name, bool verb
 		if (verbose) {
 			std::cout << "remove(" + gzRmCommand + ")\n";
 		}
-		// if (remove(gzRmCommand.c_str())) {
-			// std::cout << "ERROR: " + gzRmCommand + " could not be removed.\n";
-		// }
+		if (remove(gzRmCommand.c_str())) {
+			std::cout << "ERROR: " + gzRmCommand + " could not be removed.\n";
+		}
 	}
 	
 	// Decided whether or not to keep the ptgz.tar archive
