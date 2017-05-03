@@ -8,7 +8,7 @@ Compiler must have C++11 support.
 
 ## Installation
 ### GNU C Compiler
-    g++ -std=c++11 -fopenmp -o bin/ptgz src/ptgz.cpp
+    g++ -std=c++11 -fopenmp -O3 -o bin/ptgz src/ptgz.cpp
 
 #### GCC Makefile
     make
@@ -25,7 +25,7 @@ Compiler must have C++11 support.
     want to archive. If you are extracting, your current working directory should be the same as your archive.
 
 ### Command Syntax:
-    ptgz [-c|-k|-v|-x] <archive>
+    ptgz [-c|-k|-v|-x|-W] <archive>
 
 ### Modes:
 
@@ -41,3 +41,5 @@ Compiler must have C++11 support.
     -x    Extraction            ptgz will perform file extraction from an archive. The passed ptgz archive
                                 will be unpacked and split into its component files. <archive> should be the
                                 the name of the archive to extract.
+
+    -W    Verify Archive        Attempts to verify the archive after writing it.

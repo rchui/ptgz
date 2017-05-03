@@ -49,7 +49,7 @@ void helpCheck(int argc, char *argv[]) {
 		std::cout << "    Usage:\n";
 		std::cout << "    If you are compressing, your current working directory should be parent directory of all directories you\n";
 		std::cout << "    want to archive. If you are extracting, your current working directory should be the same as your archive.\n" << std::endl;
-		std::cout << "    ptgz [-c|-k|-v|-x] <archive>\n" << std::endl;
+		std::cout << "    ptgz [-c|-k|-v|-x|-W] <archive>\n" << std::endl;
 		std::cout << "    Modes:\n";
 		std::cout << "    -c    Compression           ptgz will perform file compression. The current directory and all of it's\n";
 		std::cout << "                                children will be archived and added to a single tarball. <archive> will be \n";
