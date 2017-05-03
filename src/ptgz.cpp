@@ -218,10 +218,11 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 	// Write tarball names into an idx file for extraction.
 	std::ofstream idx, tmp;
 	idx.open(name + ".ptgz.idx", std::ios_base::app);
+	std::string tarCommand;
 	if (!verify) {
-		std::string tarCommand = "tar -c -T " + name + ".ptgz.idx -f " + name + ".ptgz.tar";	
+		tarCommand = "tar -c -T " + name + ".ptgz.idx -f " + name + ".ptgz.tar";	
 	} else {
-		std::string tarCommand = "tar -c -W -T " + name + ".ptgz.idx -f " + name + ".ptgz.tar";
+		tarCommand = "tar -c -W -T " + name + ".ptgz.idx -f " + name + ".ptgz.tar";
 	}
 	for (unsigned long long i = 0; i < tarNames->size(); ++i) {
 		idx << tarNames->at(i) + "\n";
