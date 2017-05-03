@@ -46,15 +46,15 @@ void helpCheck(int argc, char *argv[]) {
 		std::cout << "    want to archive. If you are extracting, your current working directory should be the same as your archive.\n" << std::endl;
 		std::cout << "    ptgz [-c|-k|-v|-x|-W] <archive>\n" << std::endl;
 		std::cout << "    Modes:\n";
-		std::cout << "    -c    Compression           ptgz will perform file compression. The current directory and all of it's\n";
+		std::cout << "    -c    Compression           Will perform file compression. The current directory and all of it's\n";
 		std::cout << "                                children will be archived and added to a single tarball. <archive> will be \n";
 		std::cout << "                                prefix of the ptgz archive created.\n" << std::endl;
-		std::cout << "    -k    Keep Archive          ptgz will not delete the ptgz archive it has been passed to extract. \"-x\" \n";
-		std::cout << "                                must also be used to use this option.\n" << std::endl;
-		std::cout << "    -v    Enable Verbose        ptgz will print the commands as they are called to STDOUT\n" << std::endl;
-		std::cout << "    -x    Extraction            ptgz will perform file extraction from an archive. The passed ptgz archive\n";
-		std::cout << "                                will be unpacked and split into its component files. <archive> should be the\n";
-		std::cout << "                                the name of the archive to extract.\n" << std::endl;
+		std::cout << "    -k    Keep Archive          Dooes not delete the ptgz archive it has been passed to extract. \"-x\" must\n";
+		std::cout << "                                also be used to use this option.\n" << std::endl;
+		std::cout << "    -v    Enable Verbose        Will print the commands as they are called to STDOUT\n" << std::endl;
+		std::cout << "    -x    Extraction            Signals for file extraction from an archive. The passed ptgz archive will be\n";
+		std::cout << "                                unpacked and split into its component files. <archive> should be the name of\n";
+		std::cout << "                                the archive to extract.\n" << std::endl;
 		std::cout << "    -W    Verify Archive        Attempts to verify the archive after writing it.\n" << std::endl;
 		exit(0);
 	}
