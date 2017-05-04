@@ -221,11 +221,12 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 	} else {
 		tarCommand = "tar -c -W -T " + name + ".ptgz.idx -f " + name + ".ptgz.tar";
 	}
-	for (unsigned long long i = 0; i < tarNames->size(); ++i) {
-		idx << tarNames->at(i) + "\n";
+	idx <<tarNames->at(0);
+	for (unsigned long long i = 1; i < tarNames->size(); ++i) {
+		idx << "\n" + tarNames->at(i);
 		std::cout << tarNames->at(i) << std::endl;
 	}
-	idx << name + ".ptgz.idx" + "\n";
+	idx << "\n" + name + ".ptgz.idx";
 	idx.close();
 	
 	if (verbose) {
