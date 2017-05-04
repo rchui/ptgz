@@ -319,7 +319,7 @@ void extraction(std::vector<std::string> *filePaths, std::string name, bool verb
 	for (unsigned long long i = 0; i < filePaths->size(); ++i) {
 		weights->at(i) = std::make_pair(GetFileSize(filePaths->at(i)), filePaths->at(i));
 	}
-	std::sort(weights->begin(), weights->end(), std::greater<unsigned long long>());
+	std::sort(weights->rbegin(), weights->rend());
 	for (int i = 0; i < weights->size(); ++i) {
 		std::cout << weights->at(i).first << std::endl;
 		std::cout << weights->at(i).second << std::endl;
