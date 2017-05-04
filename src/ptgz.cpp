@@ -223,6 +223,7 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 	}
 	for (unsigned long long i = 0; i < tarNames->size(); ++i) {
 		idx << tarNames->at(i) + "\n";
+		std::cout << tarNames->at(i) << std::endl;
 	}
 	idx << name + ".ptgz.idx" + "\n";
 	idx.close();
@@ -319,7 +320,6 @@ void extraction(std::vector<std::string> *filePaths, std::string name, bool verb
 	std::cout << filePaths->size() << std::endl;
 	for (unsigned long long i = 0; i < filePaths->size(); ++i) {
 		weights->push_back(std::make_pair(GetFileSize(filePaths->at(i)), filePaths->at(i)));
-		std::cout << filePaths->at(i) << std::endl;
 	}
 	for (int i = 0; i < weights->size(); ++i) {
 		std::cout << weights->at(i).first << std::endl;
