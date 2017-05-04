@@ -208,6 +208,7 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 			tmp.close();
 			system(gzCommand.c_str());
 			tarNames->at(i) = std::to_string(i) + "." + name + ".tar.gz";
+			std::cout << name + " *\n";
 		}
 	}
 
@@ -221,12 +222,10 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 	} else {
 		tarCommand = "tar -c -W -T " + name + ".ptgz.idx -f " + name + ".ptgz.tar";
 	}
-	idx <<tarNames->at(0);
-	for (unsigned long long i = 1; i < tarNames->size(); ++i) {
-		idx << "\n" + tarNames->at(i);
-		std::cout << tarNames->at(i) + " *" << std::endl;
+	for (unsigned long long i = 0; i < tarNames->size(); ++i) {
+		idx << tarNames->at(i) + "\n";
 	}
-	idx << "\n" + name + ".ptgz.idx";
+	idx << name + ".ptgz.idx\n";
 	idx.close();
 	
 	if (verbose) {
