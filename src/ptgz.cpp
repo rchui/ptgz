@@ -304,6 +304,7 @@ void extraction(std::vector<std::string> *filePaths, std::string name, bool verb
 	std::string line;
 	idx.open(name + ".ptgz.idx", std::ios_base::in);
 	while (std::getline(idx, line)) {
+		std::cout << line << std::endl;
 		filePaths->push_back(line);
 	}
 	idx.close();
