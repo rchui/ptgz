@@ -185,7 +185,12 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 	std::random_shuffle(filePaths->begin(), filePaths->end());
 	unsigned long long filePathSize = filePaths->size();
 	unsigned long long blockSize = (filePathSize / (omp_get_max_threads() * 10)) + 1;
-	std::vector<std::string> *tarNames = new std::vector<std::string>(filePathSize / blockSize);
+	std::vector<std::string> *tarNames;
+	if (filePathSize % blockSize == 0) {
+		tarNames = new std::vector<std::string>(filePathSize / blockSize);
+	} else {
+		tarNames = new std::vector<std::string>(filePathSize / blockSize + 1);
+	}
 	
 	// Gzips the blocks of files into a single compressed file
 	#pragma omp parallel for schedule(dynamic)
