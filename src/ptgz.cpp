@@ -320,6 +320,7 @@ void extraction(std::vector<std::string> *filePaths, std::string name, bool verb
 	}
 	for (int i = 0; i < weights->size(); ++i) {
 		std::cout << weights->at(i).first << std::endl;
+		std::cout << weights->at(i).second << std::endl;
 	}
 
 	// Unpack each tar.gz file.
