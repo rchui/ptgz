@@ -185,7 +185,8 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 	std::random_shuffle(filePaths->begin(), filePaths->end());
 	unsigned long long filePathSize = filePaths->size();
 	unsigned long long blockSize = (filePathSize / (omp_get_max_threads() * 10)) + 1;
-	std::vector<std::string> *tarNames = new std::vector<std::string>(filePathSize / blockSize + 1);
+	// std::vector<std::string> *tarNames = new std::vector<std::string>(filePathSize / blockSize + 1);
+	std::vector<std::string> *tarNames = new std::vector<std::string>(filePathSize / blockSize);
 	
 	// Gzips the blocks of files into a single compressed file
 	#pragma omp parallel for schedule(dynamic)
@@ -208,7 +209,6 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 			tmp.close();
 			system(gzCommand.c_str());
 			tarNames->at(i) = std::to_string(i) + "." + name + ".tar.gz";
-			std::cout << name + " *\n";
 		}
 	}
 
