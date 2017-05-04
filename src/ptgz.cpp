@@ -185,7 +185,6 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 	std::random_shuffle(filePaths->begin(), filePaths->end());
 	unsigned long long filePathSize = filePaths->size();
 	unsigned long long blockSize = (filePathSize / (omp_get_max_threads() * 10)) + 1;
-	// std::vector<std::string> *tarNames = new std::vector<std::string>(filePathSize / blockSize + 1);
 	std::vector<std::string> *tarNames = new std::vector<std::string>(filePathSize / blockSize);
 	
 	// Gzips the blocks of files into a single compressed file
@@ -224,7 +223,6 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 	}
 	for (unsigned long long i = 0; i < tarNames->size(); ++i) {
 		idx << tarNames->at(i) + "\n";
-		std::cout << tarNames->at(i) << std::endl;
 	}
 	idx << name + ".ptgz.idx\n";
 	idx.close();
@@ -306,7 +304,6 @@ void extraction(std::vector<std::string> *filePaths, std::string name, bool verb
 	std::string line;
 	idx.open(name + ".ptgz.idx", std::ios_base::in);
 	while (std::getline(idx, line)) {
-		std::cout << line << std::endl;
 		filePaths->push_back(line);
 	}
 	idx.close();
@@ -318,7 +315,7 @@ void extraction(std::vector<std::string> *filePaths, std::string name, bool verb
 
 	std::vector<std::pair<unsigned long long, std::string>> *weights = new std::vector<std::pair<unsigned long long, std::string>>();
 
-	std::cout << filePaths->size() << std::endl;
+	#pragma omp parallel for schedule(static)
 	for (unsigned long long i = 0; i < filePaths->size(); ++i) {
 		weights->push_back(std::make_pair(GetFileSize(filePaths->at(i)), filePaths->at(i)));
 	}
