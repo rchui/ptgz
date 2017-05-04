@@ -316,6 +316,7 @@ void extraction(std::vector<std::string> *filePaths, std::string name, bool verb
 
 	std::vector<std::pair<unsigned long long, std::string>> *weights = new std::vector<std::pair<unsigned long long, std::string>>();
 
+	std::cout << filePaths->size() << std::endl;
 	for (unsigned long long i = 0; i < filePaths->size(); ++i) {
 		weights->push_back(std::make_pair(GetFileSize(filePaths->at(i)), filePaths->at(i)));
 	}
