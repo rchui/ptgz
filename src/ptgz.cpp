@@ -270,6 +270,8 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 	delete(filePaths);
 }
 
+// Gets and returns the size of a file
+// Parameters: filename (std::string) name of the file whose size to find.
 unsigned long long GetFileSize(std::string filename)
 	{
 		struct stat stat_buf;
@@ -313,6 +315,7 @@ void extraction(std::vector<std::string> *filePaths, std::string name, bool verb
 	}
 	filePaths->pop_back();
 
+	// Sort tarballs by size descending
 	std::vector<std::pair<unsigned long long, std::string>> *weights = new std::vector<std::pair<unsigned long long, std::string>>(filePaths->size());
 
 	#pragma omp parallel for schedule(static)
@@ -335,14 +338,14 @@ void extraction(std::vector<std::string> *filePaths, std::string name, bool verb
 	}
 
 	// Double check unpacking.
-	#pragma omp parallel for schedule(dynamic)
-	for (unsigned long long i = 0; i < weights->size(); ++i) {
-		std::string gzCommand = "tar xzf " + weights->at(i).second + " --skip-old-files";
-		if (verbose) {
-			std::cout << gzCommand + "\n";
-		}
-		system(gzCommand.c_str());
-	}
+	// #pragma omp parallel for schedule(dynamic)
+	// for (unsigned long long i = 0; i < weights->size(); ++i) {
+		// std::string gzCommand = "tar xzf " + weights->at(i).second + " --skip-old-files";
+		// if (verbose) {
+			// std::cout << gzCommand + "\n";
+		// }
+		// system(gzCommand.c_str());
+	// }
 
 	// Delete each tar.gz file
 	#pragma omp parallel for schedule(static)
