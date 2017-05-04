@@ -320,15 +320,14 @@ void extraction(std::vector<std::string> *filePaths, std::string name, bool verb
 		weights->at(i) = std::make_pair(GetFileSize(filePaths->at(i)), filePaths->at(i));
 	}
 	std::sort(weights->rbegin(), weights->rend());
-	for (int i = 0; i < weights->size(); ++i) {
-		std::cout << weights->at(i).first << std::endl;
-		std::cout << weights->at(i).second << std::endl;
-	}
+
+	filePaths->clear();
+	delete(filePaths);
 
 	// Unpack each tar.gz file.
 	#pragma omp parallel for schedule(dynamic)
-	for (unsigned long long i = 0; i < filePaths->size(); ++i) {
-		std::string gzCommand = "tar xzf " + filePaths->at(i);
+	for (unsigned long long i = 0; i < weights->size(); ++i) {
+		std::string gzCommand = "tar xzf " + weights->at(i).second;
 		if (verbose) {
 			std::cout << gzCommand + "\n";
 		}
@@ -337,8 +336,8 @@ void extraction(std::vector<std::string> *filePaths, std::string name, bool verb
 
 	// Double check unpacking.
 	#pragma omp parallel for schedule(dynamic)
-	for (unsigned long long i = 0; i < filePaths->size(); ++i) {
-		std::string gzCommand = "tar xzf " + filePaths->at(i) + " --skip-old-files";
+	for (unsigned long long i = 0; i < weights->size(); ++i) {
+		std::string gzCommand = "tar xzf " + weights->at(i).second + " --skip-old-files";
 		if (verbose) {
 			std::cout << gzCommand + "\n";
 		}
@@ -347,8 +346,8 @@ void extraction(std::vector<std::string> *filePaths, std::string name, bool verb
 
 	// Delete each tar.gz file
 	#pragma omp parallel for schedule(static)
-	for (unsigned long long i = 0; i < filePaths->size(); ++i) {
-		std::string gzRmCommand = filePaths->at(i);
+	for (unsigned long long i = 0; i < weights->size(); ++i) {
+		std::string gzRmCommand = weights->at(i).second;
 		if (verbose) {
 			std::cout << "remove(" + gzRmCommand + ")\n";
 		}
@@ -370,8 +369,6 @@ void extraction(std::vector<std::string> *filePaths, std::string name, bool verb
 
 	weights->clear();
 	delete(weights);
-	filePaths->clear();
-	delete(filePaths);
 }
 
 char cwd [PATH_MAX];
