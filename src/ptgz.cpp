@@ -224,6 +224,7 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 	}
 	for (unsigned long long i = 0; i < tarNames->size(); ++i) {
 		idx << tarNames->at(i) + "\n";
+		std::cout << tarNames->at(i) << std::endl;
 	}
 	idx << name + ".ptgz.idx\n";
 	idx.close();
