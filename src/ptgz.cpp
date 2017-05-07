@@ -124,9 +124,9 @@ void getSettings(int argc, char *argv[], Settings *instance) {
 }
 
 // Finds the number of files in the space to store.
-// Parameters: numFiles (int *) number of files.
+// Parameters: numFiles (unsigned long long *) number of files.
 // 			   cwd (const char *) current working directory.
-void findAll(int *numFiles, const char *cwd) {
+void findAll(unsigned long long *numFiles, const char *cwd) {
 	DIR *dir;
 	struct dirent *ent;
 
@@ -395,7 +395,7 @@ char cwd [PATH_MAX];
 // Either compresses the files or extracts the ptgz.tar archive.
 int main(int argc, char *argv[]) {
 	Settings *instance = new Settings;
-	int *numFiles = new int(0);
+	unsigned long long *numFiles = new unsigned long long(0);
 	std::vector<std::string> *filePaths = new std::vector<std::string>();
 	
 	helpCheck(argc, argv);
