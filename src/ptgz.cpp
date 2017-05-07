@@ -12,6 +12,12 @@
 #include "omp.h"
 
 // Contains the various options the user can pass ptgz.
+// Members: extract (bool) whether ptgz should be extracting.
+//	    compress (bool) whether ptgz should be compressing.
+//	    verbose (bool) whether ptgz should output commands.
+//	    keep (bool) whether ptgz should keep the extracted arvhive.
+//	    verify (bool) whether ptgz should verify the compressed archive.
+//	    name (std::string) name of archive to make or extract.
 struct Settings {
 	Settings(): extract(),
 				compress(),
@@ -181,6 +187,7 @@ void getPaths(std::vector<std::string> *filePaths, const char *cwd, std::string 
 // Parameters: filePaths (std::vector<std::string> *) holder for all file paths.
 // 			   name (std::string) user given name for storage file.
 // 			   verbose (bool) user option for verbose output.
+//			   verify (bool) user option for tar archive verification.
 void compression(std::vector<std::string> *filePaths, std::string name, bool verbose, bool verify) {
 	std::random_shuffle(filePaths->begin(), filePaths->end());
 	unsigned long long filePathSize = filePaths->size();
