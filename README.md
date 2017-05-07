@@ -12,12 +12,14 @@ Compiler must have C++11 support.
 
 #### GCC Makefile
     make
+    make install
 
 ### Intel C Compiler
     icc -std=c++11 -openmp -O3 -o bin/ptgz src/ptgz.cpp
 
 #### ICC Makefile
     make icc
+    make install
 
 ## Usage
     If you are compressing, your current working directory should be the parent directory of all directories you
