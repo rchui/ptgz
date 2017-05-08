@@ -125,34 +125,6 @@ void getSettings(int argc, char *argv[], Settings *instance) {
 	}
 }
 
-// Finds the number of files in the space to store.
-// Parameters: numFiles (uint64_t *) number of files.
-// 			   cwd (const char *) current working directory.
-void findAll(uint64_t *numFiles, const char *cwd) {
-	DIR *dir;
-	struct dirent *ent;
-
-	// Check if cwd is a directory
-	if ((dir = opendir(cwd)) != NULL) {
-		// Get all file paths within directory.
-		while ((ent = readdir (dir)) != NULL) {
-			std::string fileBuff = std::string(ent -> d_name);
-			if (fileBuff != "." && fileBuff != "..") {
-				DIR *dir2;
-				std::string filePath = std::string(cwd) + "/" + fileBuff;
-				// Check if file path is a directory.
-				if ((dir2 = opendir(filePath.c_str())) != NULL) {
-					closedir(dir2);
-					findAll(numFiles, filePath.c_str());
-				} else {
-					*numFiles += 1;
-				}
-			}
-		}
-		closedir(dir);
-	}
-}
-
 // Gets the paths for all files in the space to store.
 // Parameters: filePaths (std::vector<std::string> *) holder for all file paths.
 // 			   cwd (const char *) current working directory.
@@ -441,6 +413,7 @@ void extraction(std::string name, bool verbose, bool keep) {
 		system(gzCommand.c_str());
 	}
 
+	// End message passing and clean up
 	MPI_Finalize();
 	delete(sendBlocks);
 	delete(localBlock);
@@ -524,7 +497,6 @@ char cwd [PATH_MAX];
 // Either compresses the files or extracts the ptgz.tar archive.
 int main(int argc, char *argv[]) {
 	Settings *instance = new Settings;
-	uint64_t *numFiles = new uint64_t(0);
 	
 	helpCheck(argc, argv);
 	getSettings(argc, argv, instance);
@@ -532,7 +504,6 @@ int main(int argc, char *argv[]) {
 
 	if ((*instance).compress) {
 		std::vector<std::string> *filePaths = new std::vector<std::string>();
-		findAll(numFiles, cwd);
 		getPaths(filePaths, cwd, "");
 		compression(filePaths, (*instance).name, (*instance).verbose, (*instance).verify);
 	} else {
@@ -540,6 +511,5 @@ int main(int argc, char *argv[]) {
 	}
 
 	delete(instance);
-	delete(numFiles);
 	return 0;
 }
