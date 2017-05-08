@@ -377,7 +377,30 @@ void extraction(std::vector<std::string> *filePaths, std::string name, bool verb
 	if (remove(idxRmCommand.c_str())) {
 		std::cout << "ERROR: " + idxRmCommand + " could not be removed.\n";
 	}
+	
+	int root = 0;
+	int globalRank, globalSize;
+	MPI_Init(NULL, NULL);
+	MPI_Comm_rank(MPI_COMM_WORLD, &globalRank);
+	MPI_Comm_size(MPI_COMM_WORLD, &globalSize);
 
+	if (globalRank == 0) {
+		int64_t blockSize;
+		if (numArchives % globalSize == 0) {
+			blockSize = numArchives / globalSize;
+		} else {
+			blockSize = numArchives / globalSize + 1;
+		}
+
+		int64_t reserved = 0;
+		int64_t *sendBlocks = new int64_t[globalSize * 2];
+		int64_t *localBlock = new int64_t[2];
+	}
+
+	MPI_Finalize();
+	delete(sendBlocks);
+	delete(localBlock);
+	exit(0);
 	// Read in all tar.gz files form the ptgz.idx file
 	// Delete the ptgz.idx file
 	// std::ifstream idx;
