@@ -275,39 +275,6 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 	MPI_Finalize();
 
 	if (globalRank == 0) {
-	// uint64_t filePathSize = filePaths->size();
-	// uint64_t blockSize = (filePathSize / (omp_get_max_threads() * 10)) + 1;
-	// std::vector<std::string> *tarNames;
-	// if (filePathSize % blockSize == 0) {
-		// tarNames = new std::vector<std::string>(filePathSize / blockSize);
-	// } else {
-		// tarNames = new std::vector<std::string>(filePathSize / blockSize + 1);
-	// }
-	
-	// Gzips the blocks of files int64_to a single compressed file
-	// #pragma omp parallel for schedule(dynamic)
-	// for (int64_t i = 0; i < omp_get_max_threads() * 10; ++i) {
-		// uint64_t start = blockSize * i;
-		// if (start < filePathSize) {
-			// Store the name of each file for a block owned by each thread.
-			// Each thread will use the file to tar and gzip compress their block.
-			// std::ofstream tmp;
-			// tmp.open(std::to_string(i) + "." + name + ".ptgz.tmp", std::ios_base::app);
-			// std::string gzCommand = "GZIP=-1 tar -cz -T " + std::to_string(i) + "." + name + ".ptgz.tmp -f " + std::to_string(i) + "." + name + ".tar.gz";
-			// for (uint64_t j = start; j < std::min(start + blockSize, filePathSize); ++j) {
-				// tmp << filePaths->at(j) + "\n";
-			// }
-	
-			// if (verbose) {
-				// std::cout << gzCommand + "\n";
-			// }
-
-			// tmp.close();
-			// system(gzCommand.c_str());
-			// tarNames->at(i) = std::to_string(i) + "." + name + ".tar.gz";
-		// }
-	// }
-
 		// Combines gzipped blocks together int64_to a single tarball.
 		// Write tarball names int64_to an idx file for extraction.
 		std::ofstream idx, tmp;
