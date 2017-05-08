@@ -383,9 +383,11 @@ void extraction(std::vector<std::string> *filePaths, std::string name, bool verb
 	MPI_Init(NULL, NULL);
 	MPI_Comm_rank(MPI_COMM_WORLD, &globalRank);
 	MPI_Comm_size(MPI_COMM_WORLD, &globalSize);
+	int64_t blockSize;
+	int64_t *sendBlocks = new int64_t[globalSize * 2];
+	int64_t *localBlock = new int64_t[2];
 
 	if (globalRank == 0) {
-		int64_t blockSize;
 		if (numArchives % globalSize == 0) {
 			blockSize = numArchives / globalSize;
 		} else {
@@ -393,8 +395,15 @@ void extraction(std::vector<std::string> *filePaths, std::string name, bool verb
 		}
 
 		int64_t reserved = 0;
-		int64_t *sendBlocks = new int64_t[globalSize * 2];
-		int64_t *localBlock = new int64_t[2];
+		for (int64_t i = 0; i < globalSize; ++i) {
+			sendBlocks[i] = reserved;
+			reserved += blockSize;
+			if (reserved <= numArchives) {
+				sendBlocks[i + 1] = reserved;
+			} else {
+				sendBlocks[i + 1] = reserved - (reserved - numArchives);
+			}
+		}
 	}
 
 	MPI_Finalize();
