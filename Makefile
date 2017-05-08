@@ -13,5 +13,15 @@ icc: clean
 	icc -std=c++11 -openmp -O3 -o bin/ptgz src/ptgz.cpp
 	chmod -R 751 bin/
 
+mpi: clean
+	mkdir bin/
+	mpic++ -std=c++11 -openmp -O3 -o bin/ptgz src/ptgz-mpi.cpp
+	chmod -R 751 bin/
+
+icc-mpi: clean
+	mkdir bin/
+	mpic++ -std=c++11 -openmp -O3 -o bin/ptgz src/ptgz-mpi.cpp
+	chmod -R 751 bin/
+
 install:
 	cp bin/ptgz /usr/bin/ptgz
