@@ -238,6 +238,8 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 				tarNames->at(i) = std::to_string(i) + "." + name + ".tar.gz";
 			}
 		}
+		filePaths->clear();
+		delete(filePaths);
 
 		// Get tar archive block size.
 		if (tarNames->size() % globalSize == 0) {
@@ -260,7 +262,8 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 
 	// Send blocks to all ranks then build tar archives.
 	MPI_Scatter(sendSizes, 2, MPI_INT64_T, localSize, 2, MPI_INT64_T, root, MPI_COMM_WORLD);
-	
+
+	// Build tar archives for each block
 	#pragma omp parallel for schedule(dynamic)
 	for (int64_t i = localSize[0]; i < localSize[0] + localSize[1]; ++i) {
 		std::string gzCommand = "GZIP=-1 tar -cz -T " + std::to_string(i) + "." + name + ".ptgz.tmp -f " + std::to_string(i) + "." + name + ".tar.gz";
@@ -329,8 +332,6 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 
 		tarNames->clear();
 		delete(tarNames);
-		filePaths->clear();
-		delete(filePaths);
 	}
 }
 
@@ -347,11 +348,10 @@ uint64_t GetFileSize(std::string filename)
 // Reads in all the files from the index file.
 // Unpacks each file.
 // Deletes all temporary file blocks and header files.
-// Parameters: filePaths (std::vector<std::string> *) holder for all file paths.
-// 			   name (std::string) name of ptgz archive file.
+// Parameters: name (std::string) name of ptgz archive file.
 // 			   verbose (bool) user option for verbose output.
 // 			   keep (bool) user option for keeping ptgz archive.
-void extraction(std::vector<std::string> *filePaths, std::string name, bool verbose, bool keep) {
+void extraction(std::string name, bool verbose, bool keep) {
 	// Unpack the 1st layer tar archive
 	std::string exCommand = "tar xf " + name;
 	if (verbose) {
@@ -364,6 +364,7 @@ void extraction(std::vector<std::string> *filePaths, std::string name, bool verb
 		name.pop_back();
 	}
 
+	// Get number of archives and delete index.
 	std::ifstream idx;
 	std::string line;
 	int64_t numArchives = 0;
@@ -378,6 +379,7 @@ void extraction(std::vector<std::string> *filePaths, std::string name, bool verb
 		std::cout << "ERROR: " + idxRmCommand + " could not be removed.\n";
 	}
 	
+	// Start message passsing
 	int root = 0;
 	int globalRank, globalSize;
 	MPI_Init(NULL, NULL);
@@ -388,12 +390,14 @@ void extraction(std::vector<std::string> *filePaths, std::string name, bool verb
 	int64_t *localBlock = new int64_t[2];
 
 	if (globalRank == 0) {
+		// Define block size
 		if (numArchives % globalSize == 0) {
 			blockSize = numArchives / globalSize;
 		} else {
 			blockSize = numArchives / globalSize + 1;
 		}
 
+		// Define blocks for each node.
 		int64_t reserved = 0;
 		for (int64_t i = 0; i < globalSize; ++i) {
 			sendBlocks[i] = reserved;
@@ -406,46 +410,26 @@ void extraction(std::vector<std::string> *filePaths, std::string name, bool verb
 		}
 	}
 
-	MPI_Finalize();
-	delete(sendBlocks);
-	delete(localBlock);
-	exit(0);
-	// Read in all tar.gz files form the ptgz.idx file
-	// Delete the ptgz.idx file
-	// std::ifstream idx;
-	// std::string line;
-	// idx.open(name + ".ptgz.idx", std::ios_base::in);
-	// while (std::getline(idx, line)) {
-		// filePaths->push_back(line);
-	// }
-	// idx.close();
-	// std::string idxRmCommand = filePaths->back();
-	// if (remove(idxRmCommand.c_str())) {
-		// std::cout << "ERROR: " + idxRmCommand + " could not be removed.\n";	
-	// }
-	// filePaths->pop_back();
+	// Send each node their block
+	MPI_Scatter(sendBlocks, 2, MPI_INT64_T, localBlock, 2, MPI_INT64_T, root, MPI_COMM_WORLD);
 
-	// Sort tarballs by size descending
-	// std::vector<std::pair<uint64_t, std::string>> *weights = new std::vector<std::pair<uint64_t, std::string>>(filePaths->size());
-
-	// #pragma omp parallel for schedule(static)
-	// for (uint64_t i = 0; i < filePaths->size(); ++i) {
-		// weights->at(i) = std::make_pair(GetFileSize(filePaths->at(i)), filePaths->at(i));
-	// }
-	// std::sort(weights->rbegin(), weights->rend());
-
-	// filePaths->clear();
-	// delete(filePaths);
+	// Fill weights vector and sort by file size descending
+	std::vector<std::pair<uint64_t, std::string>> *weights = new std::vector<std::pair<uint64_t, std::string>>(localBlock[1]);
+	for (uint64_t i = localBlock[0]; i < localBlock[0] + localBlock[1]; ++i) {
+		std::string archiveName = std::to_string(i) + "." + name + ".tar.gz";
+		weights->at(i) = std::make_pair(GetFileSize(archiveName), archiveName);
+	}
+	std::sort(weights->rbegin(), weights->rend());
 
 	// Unpack each tar.gz file.
-	// #pragma omp parallel for schedule(dynamic)
-	// for (uint64_t i = 0; i < weights->size(); ++i) {
-		// std::string gzCommand = "tar xzf " + weights->at(i).second;
-		// if (verbose) {
-			// std::cout << gzCommand + "\n";
-		// }
-		// system(gzCommand.c_str());
-	// }
+	#pragma omp parallel for schedule(dynamic)
+	for (uint64_t i = 0; i < weights->size(); ++i) {
+		std::string gzCommand = "tar xzf " + weights->at(i).second;
+		if (verbose) {
+			std::cout << gzCommand + "\n";
+		}
+		system(gzCommand.c_str());
+	}
 
 	// Double check unpacking.
 	#pragma omp parallel for schedule(dynamic)
@@ -457,26 +441,73 @@ void extraction(std::vector<std::string> *filePaths, std::string name, bool verb
 		system(gzCommand.c_str());
 	}
 
-	// Delete each tar.gz file
-	#pragma omp parallel for schedule(static)
-	for (uint64_t i = 0; i < weights->size(); ++i) {
-		std::string gzRmCommand = weights->at(i).second;
-		if (verbose) {
-			std::cout << "remove(" + gzRmCommand + ")\n";
-		}
-		if (remove(gzRmCommand.c_str())) {
-			std::cout << "ERROR: " + gzRmCommand + " could not be removed.\n";
-		}
-	}
+	MPI_Finalize();
+	delete(sendBlocks);
+	delete(localBlock);
+	exit(0);
+
+	if (globalRank == 0) {
 	
-	// Decided whether or not to keep the ptgz.tar archive
-	if (!keep) {
-		std::string tarRmCommand = name + ".ptgz.tar";
-		if (verbose) {
-			std::cout << "remove(" + tarRmCommand + ")\n";
+		// std::to_string(i) + "." + name + ".tar.gz"
+
+		// Read in all tar.gz files form the ptgz.idx file
+		// Delete the ptgz.idx file
+		// std::ifstream idx;
+		// std::string line;
+		// idx.open(name + ".ptgz.idx", std::ios_base::in);
+		// while (std::getline(idx, line)) {
+			// filePaths->push_back(line);
+		// }
+		// idx.close();
+		// std::string idxRmCommand = filePaths->back();
+		// if (remove(idxRmCommand.c_str())) {
+			// std::cout << "ERROR: " + idxRmCommand + " could not be removed.\n";	
+		// }
+		// filePaths->pop_back();
+
+		// Sort tarballs by size descending
+		// std::vector<std::pair<uint64_t, std::string>> *weights = new std::vector<std::pair<uint64_t, std::string>>(filePaths->size());
+
+		// #pragma omp parallel for schedule(static)
+		// for (uint64_t i = 0; i < filePaths->size(); ++i) {
+			// weights->at(i) = std::make_pair(GetFileSize(filePaths->at(i)), filePaths->at(i));
+		// }
+		// std::sort(weights->rbegin(), weights->rend());
+
+		// filePaths->clear();
+		// delete(filePaths);
+
+		// Unpack each tar.gz file.
+		// #pragma omp parallel for schedule(dynamic)
+		// for (uint64_t i = 0; i < weights->size(); ++i) {
+			// std::string gzCommand = "tar xzf " + weights->at(i).second;
+			// if (verbose) {
+				// std::cout << gzCommand + "\n";
+			// }
+			// system(gzCommand.c_str());
+		// }
+
+		// Delete each tar.gz file
+		#pragma omp parallel for schedule(static)
+		for (uint64_t i = 0; i < weights->size(); ++i) {
+			std::string gzRmCommand = weights->at(i).second;
+			if (verbose) {
+				std::cout << "remove(" + gzRmCommand + ")\n";
+			}
+			if (remove(gzRmCommand.c_str())) {
+				std::cout << "ERROR: " + gzRmCommand + " could not be removed.\n";
+			}
 		}
-		if (remove(tarRmCommand.c_str())) {
-			std::cout << "ERROR: " + tarRmCommand + " could not be removed.\n";
+	
+		// Decided whether or not to keep the ptgz.tar archive
+		if (!keep) {
+			std::string tarRmCommand = name + ".ptgz.tar";
+			if (verbose) {
+				std::cout << "remove(" + tarRmCommand + ")\n";
+			}
+			if (remove(tarRmCommand.c_str())) {
+				std::cout << "ERROR: " + tarRmCommand + " could not be removed.\n";
+			}
 		}
 	}
 
@@ -494,18 +525,18 @@ char cwd [PATH_MAX];
 int main(int argc, char *argv[]) {
 	Settings *instance = new Settings;
 	uint64_t *numFiles = new uint64_t(0);
-	std::vector<std::string> *filePaths = new std::vector<std::string>();
 	
 	helpCheck(argc, argv);
 	getSettings(argc, argv, instance);
 	getcwd(cwd, PATH_MAX);
 
 	if ((*instance).compress) {
+		std::vector<std::string> *filePaths = new std::vector<std::string>();
 		findAll(numFiles, cwd);
 		getPaths(filePaths, cwd, "");
 		compression(filePaths, (*instance).name, (*instance).verbose, (*instance).verify);
 	} else {
-		extraction(filePaths, (*instance).name, (*instance).verbose, (*instance).keep);
+		extraction((*instance).name, (*instance).verbose, (*instance).keep);
 	}
 
 	delete(instance);
