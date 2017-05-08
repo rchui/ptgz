@@ -352,7 +352,7 @@ uint64_t GetFileSize(std::string filename)
 // 			   verbose (bool) user option for verbose output.
 // 			   keep (bool) user option for keeping ptgz archive.
 void extraction(std::vector<std::string> *filePaths, std::string name, bool verbose, bool keep) {
-	// Unpack the 1st layer tarball
+	// Unpack the 1st layer tar archive
 	std::string exCommand = "tar xf " + name;
 	if (verbose) {
 		std::cout << exCommand + "\n";
@@ -364,42 +364,56 @@ void extraction(std::vector<std::string> *filePaths, std::string name, bool verb
 		name.pop_back();
 	}
 
-	// Read in all tar.gz files form the ptgz.idx file
-	// Delete the ptgz.idx file
 	std::ifstream idx;
 	std::string line;
+	int64_t numArchives = 0;
 	idx.open(name + ".ptgz.idx", std::ios_base::in);
 	while (std::getline(idx, line)) {
-		filePaths->push_back(line);
+		++numArchives;
 	}
+	--numArchives;
 	idx.close();
-	std::string idxRmCommand = filePaths->back();
+	std::string idxRmCommand = name + ".ptgz.idx";
 	if (remove(idxRmCommand.c_str())) {
-		std::cout << "ERROR: " + idxRmCommand + " could not be removed.\n";	
+		std::cout << "ERROR: " + idxRmCommand + " could not be removed.\n";
 	}
-	filePaths->pop_back();
+
+	// Read in all tar.gz files form the ptgz.idx file
+	// Delete the ptgz.idx file
+	// std::ifstream idx;
+	// std::string line;
+	// idx.open(name + ".ptgz.idx", std::ios_base::in);
+	// while (std::getline(idx, line)) {
+		// filePaths->push_back(line);
+	// }
+	// idx.close();
+	// std::string idxRmCommand = filePaths->back();
+	// if (remove(idxRmCommand.c_str())) {
+		// std::cout << "ERROR: " + idxRmCommand + " could not be removed.\n";	
+	// }
+	// filePaths->pop_back();
 
 	// Sort tarballs by size descending
-	std::vector<std::pair<uint64_t, std::string>> *weights = new std::vector<std::pair<uint64_t, std::string>>(filePaths->size());
+	// std::vector<std::pair<uint64_t, std::string>> *weights = new std::vector<std::pair<uint64_t, std::string>>(filePaths->size());
 
-	#pragma omp parallel for schedule(static)
-	for (uint64_t i = 0; i < filePaths->size(); ++i) {
-		weights->at(i) = std::make_pair(GetFileSize(filePaths->at(i)), filePaths->at(i));
-	}
-	std::sort(weights->rbegin(), weights->rend());
+	// #pragma omp parallel for schedule(static)
+	// for (uint64_t i = 0; i < filePaths->size(); ++i) {
+		// weights->at(i) = std::make_pair(GetFileSize(filePaths->at(i)), filePaths->at(i));
+	// }
+	// std::sort(weights->rbegin(), weights->rend());
 
-	filePaths->clear();
-	delete(filePaths);
+	// filePaths->clear();
+	// delete(filePaths);
 
 	// Unpack each tar.gz file.
-	#pragma omp parallel for schedule(dynamic)
-	for (uint64_t i = 0; i < weights->size(); ++i) {
-		std::string gzCommand = "tar xzf " + weights->at(i).second;
-		if (verbose) {
-			std::cout << gzCommand + "\n";
-		}
-		system(gzCommand.c_str());
-	}
+	// #pragma omp parallel for schedule(dynamic)
+	// for (uint64_t i = 0; i < weights->size(); ++i) {
+		// std::string gzCommand = "tar xzf " + weights->at(i).second;
+		// if (verbose) {
+			// std::cout << gzCommand + "\n";
+		// }
+		// system(gzCommand.c_str());
+	// }
 
 	// Double check unpacking.
 	#pragma omp parallel for schedule(dynamic)
