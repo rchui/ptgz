@@ -339,7 +339,6 @@ void extraction(std::string name, bool verbose, bool keep) {
 		std::cout << exCommand + "\n";
 	}
 	system(exCommand.c_str());
-	exit(0);
 
 	// Get number of archives and delete index.
 	std::ifstream idx;
@@ -389,9 +388,15 @@ void extraction(std::string name, bool verbose, bool keep) {
 			}
 		}
 	}
+	MPI_Barrier(MPI_COMM_WORLD);
+
+	#pragma omp parallel for schedule(dynamic)
+	for (uint64_t i = localSize[0]; i < localSize[0] + localSize[1]; ++i) {
+		std::string tarCommand = "tar xf " + name + ".ptgz.tar " + std::to_string(i + localBlock[0]) + "." + name + "tar.gz";
+	}
+	exit(0);
 
 	// Send each node their block
-	MPI_Barrier(MPI_COMM_WORLD);
 	MPI_Scatter(sendBlocks, 2, MPI_INT64_T, localBlock, 2, MPI_INT64_T, root, MPI_COMM_WORLD);
 	printf("Process %d, %d, %d\n", globalRank, localBlock[0], localBlock[1]);
 
