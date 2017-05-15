@@ -247,7 +247,26 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 
 	delete(sendSizes);
 	delete(localSize);
-	MPI_Finalize();
+
+	// Removes all temporary blocks.
+	#pragma omp parallel for schedule(static)
+	for (uint64_t i = localSize[0]; i < localSize[0] + localSize[1]; ++i) {
+		std::string rmCommand = std::to_string(i) + "." + name + ".tar.gz";
+		if (verbose) {
+			std::cout << "remove(" + rmCommand + ")\n";
+		}
+		if (remove(rmCommand.c_str())) {
+			std::cout << "ERROR: " + rmCommand + " could not be removed.\n";
+		}
+
+		rmCommand = std::to_string(i) + "." + name + ".ptgz.tmp";
+		if (verbose) {
+			std::cout << "remove(" + rmCommand + ")\n";
+		}
+		if (remove(rmCommand.c_str())) {
+			std::cout << "ERROR: " + rmCommand + " could not be removed.\n";
+		}
+	}
 
 	if (globalRank == 0) {
 		// Combines gzipped blocks together int64_to a single tarball.
@@ -272,26 +291,6 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 	
 		system(tarCommand.c_str());
 
-		// Removes all temporary blocks.
-		#pragma omp parallel for schedule(static)
-		for (uint64_t i = 0; i < tarNames->size(); ++i) {
-			std::string rmCommand = tarNames->at(i);
-			if (verbose) {
-				std::cout << "remove(" + rmCommand + ")\n";
-			}
-			// if (remove(rmCommand.c_str())) {
-				// std::cout << "ERROR: " + rmCommand + " could not be removed.\n";
-			// }
-
-			rmCommand = std::to_string(i) + "." + name + ".ptgz.tmp";
-			if (verbose) {
-				std::cout << "remove(" + rmCommand + ")\n";
-			}
-			if (remove(rmCommand.c_str())) {
-				std::cout << "ERROR: " + rmCommand + " could not be removed.\n";
-			}
-		}
-
 		// Removes idx file.
 		std::string rmCommand;
 		if (verbose) {
@@ -305,6 +304,7 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 		tarNames->clear();
 		delete(tarNames);
 	}
+	MPI_Finalize();
 }
 
 // Gets and returns the size of a file
@@ -414,65 +414,22 @@ void extraction(std::string name, bool verbose, bool keep) {
 		system(gzCommand.c_str());
 	}
 
-	// End message passing and clean up
-	MPI_Finalize();
 	delete(sendBlocks);
 	delete(localBlock);
-	exit(0);
 
-	if (globalRank == 0) {
-	
-		// std::to_string(i) + "." + name + ".tar.gz"
-
-		// Read in all tar.gz files form the ptgz.idx file
-		// Delete the ptgz.idx file
-		// std::ifstream idx;
-		// std::string line;
-		// idx.open(name + ".ptgz.idx", std::ios_base::in);
-		// while (std::getline(idx, line)) {
-			// filePaths->push_back(line);
-		// }
-		// idx.close();
-		// std::string idxRmCommand = filePaths->back();
-		// if (remove(idxRmCommand.c_str())) {
-			// std::cout << "ERROR: " + idxRmCommand + " could not be removed.\n";	
-		// }
-		// filePaths->pop_back();
-
-		// Sort tarballs by size descending
-		// std::vector<std::pair<uint64_t, std::string>> *weights = new std::vector<std::pair<uint64_t, std::string>>(filePaths->size());
-
-		// #pragma omp parallel for schedule(static)
-		// for (uint64_t i = 0; i < filePaths->size(); ++i) {
-			// weights->at(i) = std::make_pair(GetFileSize(filePaths->at(i)), filePaths->at(i));
-		// }
-		// std::sort(weights->rbegin(), weights->rend());
-
-		// filePaths->clear();
-		// delete(filePaths);
-
-		// Unpack each tar.gz file.
-		// #pragma omp parallel for schedule(dynamic)
-		// for (uint64_t i = 0; i < weights->size(); ++i) {
-			// std::string gzCommand = "tar xzf " + weights->at(i).second;
-			// if (verbose) {
-				// std::cout << gzCommand + "\n";
-			// }
-			// system(gzCommand.c_str());
-		// }
-
-		// Delete each tar.gz file
-		#pragma omp parallel for schedule(static)
-		for (uint64_t i = 0; i < weights->size(); ++i) {
-			std::string gzRmCommand = weights->at(i).second;
-			if (verbose) {
-				std::cout << "remove(" + gzRmCommand + ")\n";
-			}
-			if (remove(gzRmCommand.c_str())) {
-				std::cout << "ERROR: " + gzRmCommand + " could not be removed.\n";
-			}
+	// Delete each tar.gz file
+	#pragma omp parallel for schedule(static)
+	for (uint64_t i = 0; i < weights->size(); ++i) {
+		std::string gzRmCommand = weights->at(i).second;
+		if (verbose) {
+			std::cout << "remove(" + gzRmCommand + ")\n";
 		}
+		if (remove(gzRmCommand.c_str())) {
+			std::cout << "ERROR: " + gzRmCommand + " could not be removed.\n";
+		}
+	}
 	
+	if (globalRank == 0) {
 		// Decided whether or not to keep the ptgz.tar archive
 		if (!keep) {
 			std::string tarRmCommand = name + ".ptgz.tar";
@@ -485,6 +442,8 @@ void extraction(std::string name, bool verbose, bool keep) {
 		}
 	}
 
+	// End message passing and clean up
+	MPI_Finalize();
 	weights->clear();
 	delete(weights);
 }
