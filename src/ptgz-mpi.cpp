@@ -397,6 +397,7 @@ void extraction(std::string name, bool verbose, bool keep) {
 	for (uint64_t i = localBlock[0]; i < localBlock[0] + localBlock[1]; ++i) {
 		std::string tarCommand = "tar xf " + name + ".ptgz.tar " + std::to_string(i + localBlock[0]) + "." + name + "tar.gz";
 	}
+	MPI_Finalize();
 	exit(0);
 
 	// Fill weights vector and sort by file size descending
