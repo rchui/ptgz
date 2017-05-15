@@ -245,6 +245,30 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 		system(gzCommand.c_str());
 	}
 
+	if (globalRank == 0) {
+		// Combines gzipped blocks together int64_to a single tarball.
+		// Write tarball names int64_to an idx file for extraction.
+		std::ofstream idx, tmp;
+		idx.open(name + ".ptgz.idx", std::ios_base::app);
+		std::string tarCommand;
+		if (!verify) {
+			tarCommand = "tar -c -T " + name + ".ptgz.idx -f " + name + ".ptgz.tar";	
+		} else {
+			tarCommand = "tar -c -W -T " + name + ".ptgz.idx -f " + name + ".ptgz.tar";
+		}
+		for (uint64_t i = 0; i < tarNames->size(); ++i) {
+			idx << tarNames->at(i) + "\n";
+		}
+		idx << name + ".ptgz.idx\n";
+		idx.close();
+		
+		if (verbose) {
+			std::cout << tarCommand + "\n";
+		}
+	
+		system(tarCommand.c_str());
+	}
+
 	// Removes all temporary blocks.
 	#pragma omp parallel for schedule(static)
 	for (uint64_t i = localSize[0]; i < localSize[0] + localSize[1]; ++i) {
@@ -269,28 +293,6 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 	delete(localSize);
 
 	if (globalRank == 0) {
-		// Combines gzipped blocks together int64_to a single tarball.
-		// Write tarball names int64_to an idx file for extraction.
-		std::ofstream idx, tmp;
-		idx.open(name + ".ptgz.idx", std::ios_base::app);
-		std::string tarCommand;
-		if (!verify) {
-			tarCommand = "tar -c -T " + name + ".ptgz.idx -f " + name + ".ptgz.tar";	
-		} else {
-			tarCommand = "tar -c -W -T " + name + ".ptgz.idx -f " + name + ".ptgz.tar";
-		}
-		for (uint64_t i = 0; i < tarNames->size(); ++i) {
-			idx << tarNames->at(i) + "\n";
-		}
-		idx << name + ".ptgz.idx\n";
-		idx.close();
-		
-		if (verbose) {
-			std::cout << tarCommand + "\n";
-		}
-	
-		system(tarCommand.c_str());
-
 		// Removes idx file.
 		std::string rmCommand;
 		if (verbose) {
