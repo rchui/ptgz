@@ -354,9 +354,9 @@ void extraction(std::string name, bool verbose, bool keep) {
 	if (verbose) {
 		std::cout << "remove(" + idxRmCommand + ")\n";
 	}
-	// if (remove(idxRmCommand.c_str())) {
-		// std::cout << "ERROR: " + idxRmCommand + " could not be removed.\n";
-	// }
+	if (remove(idxRmCommand.c_str())) {
+		std::cout << "ERROR: " + idxRmCommand + " could not be removed.\n";
+	}
 	
 	// Start message passsing
 	int root = 0;
