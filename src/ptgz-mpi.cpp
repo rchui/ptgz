@@ -234,7 +234,6 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 
 	// Send blocks to all ranks then build tar archives.
 	MPI_Scatter(sendSizes, 2, MPI_INT64_T, localSize, 2, MPI_INT64_T, root, MPI_COMM_WORLD);
-	printf("Process %d, %d, %d\n", globalRank, localSize[0], localSize[1]);
 
 	// Build tar archives for each block
 	#pragma omp parallel for schedule(dynamic)
@@ -385,6 +384,7 @@ void extraction(std::string name, bool verbose, bool keep) {
 
 	// Send each node their block
 	MPI_Scatter(sendBlocks, 2, MPI_INT64_T, localBlock, 2, MPI_INT64_T, root, MPI_COMM_WORLD);
+	printf("Process %d, %d, %d\n", globalRank, localBlock[0], localBlock[1]);
 
 	// Fill weights vector and sort by file size descending
 	std::vector<std::pair<uint64_t, std::string>> *weights = new std::vector<std::pair<uint64_t, std::string>>(localBlock[1]);
