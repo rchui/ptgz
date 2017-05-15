@@ -334,7 +334,7 @@ void extraction(std::string name, bool verbose, bool keep) {
 	}
 
 	// Unpack the 1st layer tar archive
-	std::string exCommand = "tar xf " + name + "ptgz.tar " + name + ".ptgz.idx";
+	std::string exCommand = "tar xf " + name + ".ptgz.tar " + name + ".ptgz.idx";
 	if (verbose) {
 		std::cout << exCommand + "\n";
 	}
