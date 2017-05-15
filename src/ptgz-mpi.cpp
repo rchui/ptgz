@@ -391,15 +391,13 @@ void extraction(std::string name, bool verbose, bool keep) {
 
 	// Send each node their block
 	MPI_Scatter(sendBlocks, 2, MPI_INT64_T, localBlock, 2, MPI_INT64_T, root, MPI_COMM_WORLD);
-	printf("Process %d, %d, %d\n", globalRank, localBlock[0], localBlock[1]);
+	// printf("Process %d, %d, %d\n", globalRank, localBlock[0], localBlock[1]);
 
 	#pragma omp parallel for schedule(dynamic)
 	for (uint64_t i = localBlock[0]; i < localBlock[0] + localBlock[1]; ++i) {
 		std::string tarCommand = "tar xf " + name + ".ptgz.tar " + std::to_string(i) + "." + name + ".tar.gz";
 		system(tarCommand.c_str());
 	}
-	MPI_Finalize();
-	exit(0);
 
 	// Fill weights vector and sort by file size descending
 	std::vector<std::pair<uint64_t, std::string>> *weights = new std::vector<std::pair<uint64_t, std::string>>(localBlock[1]);
