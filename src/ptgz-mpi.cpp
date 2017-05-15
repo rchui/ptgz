@@ -328,17 +328,18 @@ uint64_t GetFileSize(std::string filename)
 // 			   verbose (bool) user option for verbose output.
 // 			   keep (bool) user option for keeping ptgz archive.
 void extraction(std::string name, bool verbose, bool keep) {
-	// Unpack the 1st layer tar archive
-	std::string exCommand = "tar xf " + name;
-	if (verbose) {
-		std::cout << exCommand + "\n";
-	}
-	system(exCommand.c_str());
-
 	// Get the name from the name of the 1st layer tarball
 	for (int64_t i = 0; i < 9; ++i) {
 		name.pop_back();
 	}
+
+	// Unpack the 1st layer tar archive
+	std::string exCommand = "tar xf " + name + "ptgz.tar " + name + ".ptgz.idx";
+	if (verbose) {
+		std::cout << exCommand + "\n";
+	}
+	system(exCommand.c_str());
+	exit(0);
 
 	// Get number of archives and delete index.
 	std::ifstream idx;
@@ -390,6 +391,7 @@ void extraction(std::string name, bool verbose, bool keep) {
 	}
 
 	// Send each node their block
+	MPI_Barrier(MPI_COMM_WORLD);
 	MPI_Scatter(sendBlocks, 2, MPI_INT64_T, localBlock, 2, MPI_INT64_T, root, MPI_COMM_WORLD);
 	printf("Process %d, %d, %d\n", globalRank, localBlock[0], localBlock[1]);
 
