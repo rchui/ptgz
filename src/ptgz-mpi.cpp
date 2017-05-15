@@ -371,13 +371,13 @@ void extraction(std::string name, bool verbose, bool keep) {
 
 		// Define blocks for each node.
 		int64_t reserved = 0;
-		for (int64_t i = 0; i < globalSize; ++i) {
+		for (int64_t i = 0; i < globalSize * 2; i += 2) {
 			sendBlocks[i] = reserved;
 			reserved += blockSize;
 			if (reserved <= numArchives) {
-				sendBlocks[i + 1] = reserved;
+				sendBlocks[i + 1] = blockSize;
 			} else {
-				sendBlocks[i + 1] = reserved - (reserved - numArchives);
+				sendBlocks[i + 1] = blockSize - (reserved - numArchives);
 			}
 		}
 	}
