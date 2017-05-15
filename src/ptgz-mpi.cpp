@@ -390,7 +390,7 @@ void extraction(std::string name, bool verbose, bool keep) {
 	std::vector<std::pair<uint64_t, std::string>> *weights = new std::vector<std::pair<uint64_t, std::string>>(localBlock[1]);
 	for (uint64_t i = 0; i < localBlock[1]; ++i) {
 		std::string archiveName = std::to_string(i + localBlock[0]) + "." + name + ".tar.gz";
-		weights->at(i + localBlock[0]) = std::make_pair(GetFileSize(archiveName), archiveName);
+		weights->at(i) = std::make_pair(GetFileSize(archiveName), archiveName);
 	}
 	std::sort(weights->rbegin(), weights->rend());
 
