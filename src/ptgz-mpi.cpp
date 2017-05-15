@@ -351,6 +351,9 @@ void extraction(std::string name, bool verbose, bool keep) {
 	--numArchives;
 	idx.close();
 	std::string idxRmCommand = name + ".ptgz.idx";
+	if (verbose) {
+		std::cout << "remove(" + idxRmCommand + ")\n";
+	}
 	if (remove(idxRmCommand.c_str())) {
 		std::cout << "ERROR: " + idxRmCommand + " could not be removed.\n";
 	}
@@ -392,6 +395,7 @@ void extraction(std::string name, bool verbose, bool keep) {
 
 	// Fill weights vector and sort by file size descending
 	std::vector<std::pair<uint64_t, std::string>> *weights = new std::vector<std::pair<uint64_t, std::string>>(localBlock[1]);
+	#pragma omp parallel for schedule(static)
 	for (uint64_t i = 0; i < localBlock[1]; ++i) {
 		std::string archiveName = std::to_string(i + localBlock[0]) + "." + name + ".tar.gz";
 		weights->at(i) = std::make_pair(GetFileSize(archiveName), archiveName);
