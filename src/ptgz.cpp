@@ -24,7 +24,8 @@ struct Settings {
    				verbose(),
 				keep(),
 				verify(),
-				output() {}
+				output(),
+				name() {}
 	bool extract;
 	bool compress;
 	bool verbose;
@@ -216,7 +217,6 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 			if (verbose) {
 				std::cout << gzCommand + "\n";
 			}
-
 			tmp.close();
 			system(gzCommand.c_str());
 			tarNames->at(i) = std::to_string(i) + "." + name + ".tar.gz";
