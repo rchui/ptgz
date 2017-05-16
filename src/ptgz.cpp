@@ -47,7 +47,7 @@ void helpCheck(int argc, char *argv[]) {
 	if (argv[1] == std::string("-h") || argv[1] == std::string("--help")) {
 		std::cout << "\nptgz - Parallel Tar GZ by Ryan Chui (2017)\n" << std::endl;
 		std::cout << "    ptgz is a custom multi-threaded C++ file archiving utility to quickly bundle millions of files in \n";
-		std::cout << "    terrabyte sized directories into a single file. ptgz was developed at the National Center for \n";
+		std::cout << "    terrabyte sized directories int64_to a single file. ptgz was developed at the National Center for \n";
 		std::cout << "    Supercomputing Applications.\n" << std::endl;
 		std::cout << "    Usage:\n";
 		std::cout << "    If you are compressing, your current working directory should be parent directory of all directories you\n";
@@ -61,7 +61,7 @@ void helpCheck(int argc, char *argv[]) {
 		std::cout << "                                also be used to use this option.\n" << std::endl;
 		std::cout << "    -v    Enable Verbose        Will print the commands as they are called to STDOUT\n" << std::endl;
 		std::cout << "    -x    Extraction            Signals for file extraction from an archive. The passed ptgz archive will be\n";
-		std::cout << "                                unpacked and split into its component files. <archive> should be the name of\n";
+		std::cout << "                                unpacked and split int64_to its component files. <archive> should be the name of\n";
 		std::cout << "                                the archive to extract.\n" << std::endl;
 		std::cout << "    -W    Verify Archive        Attempts to verify the archive after writing it.\n" << std::endl;
 		exit(0);
@@ -75,7 +75,7 @@ void helpCheck(int argc, char *argv[]) {
 void getSettings(int argc, char *argv[], Settings *instance) {
 	// Get all passed arguments
 	std::queue<std::string> settings;
-	for (int i = 1; i < argc; ++i) {
+	for (int64_t i = 1; i < argc; ++i) {
 		settings.push(argv[i]);
 	}
 	
@@ -124,9 +124,9 @@ void getSettings(int argc, char *argv[], Settings *instance) {
 }
 
 // Finds the number of files in the space to store.
-// Parameters: numFiles (unsigned long long *) number of files.
+// Parameters: numFiles (uint64_t *) number of files.
 // 			   cwd (const char *) current working directory.
-void findAll(unsigned long long *numFiles, const char *cwd) {
+void findAll(uint64_t *numFiles, const char *cwd) {
 	DIR *dir;
 	struct dirent *ent;
 
@@ -180,9 +180,9 @@ void getPaths(std::vector<std::string> *filePaths, const char *cwd, std::string 
 	}
 }
 
-// Divides files into blocks.
-// Compresses each block into a single file.
-// Combines all compressed blocks into a single file.
+// Divides files int64_to blocks.
+// Compresses each block int64_to a single file.
+// Combines all compressed blocks int64_to a single file.
 // Removes temporary blocks and header files.
 // Parameters: filePaths (std::vector<std::string> *) holder for all file paths.
 // 			   name (std::string) user given name for storage file.
@@ -190,8 +190,8 @@ void getPaths(std::vector<std::string> *filePaths, const char *cwd, std::string 
 //			   verify (bool) user option for tar archive verification.
 void compression(std::vector<std::string> *filePaths, std::string name, bool verbose, bool verify) {
 	std::random_shuffle(filePaths->begin(), filePaths->end());
-	unsigned long long filePathSize = filePaths->size();
-	unsigned long long blockSize = (filePathSize / (omp_get_max_threads() * 10)) + 1;
+	uint64_t filePathSize = filePaths->size();
+	uint64_t blockSize = (filePathSize / (omp_get_max_threads() * 10)) + 1;
 	std::vector<std::string> *tarNames;
 	if (filePathSize % blockSize == 0) {
 		tarNames = new std::vector<std::string>(filePathSize / blockSize);
@@ -199,17 +199,17 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 		tarNames = new std::vector<std::string>(filePathSize / blockSize + 1);
 	}
 	
-	// Gzips the blocks of files into a single compressed file
+	// Gzips the blocks of files int64_to a single compressed file
 	#pragma omp parallel for schedule(dynamic)
-	for (int i = 0; i < omp_get_max_threads() * 10; ++i) {
-		unsigned long long start = blockSize * i;
+	for (int64_t i = 0; i < omp_get_max_threads() * 10; ++i) {
+		uint64_t start = blockSize * i;
 		if (start < filePathSize) {
 			// Store the name of each file for a block owned by each thread.
 			// Each thread will use the file to tar and gzip compress their block.
 			std::ofstream tmp;
 			tmp.open(std::to_string(i) + "." + name + ".ptgz.tmp", std::ios_base::app);
 			std::string gzCommand = "GZIP=-1 tar -cz -T " + std::to_string(i) + "." + name + ".ptgz.tmp -f " + std::to_string(i) + "." + name + ".tar.gz";
-			for (unsigned long long j = start; j < std::min(start + blockSize, filePathSize); ++j) {
+			for (uint64_t j = start; j < std::min(start + blockSize, filePathSize); ++j) {
 				tmp << filePaths->at(j) + "\n";
 			}
 	
@@ -223,8 +223,8 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 		}
 	}
 
-	// Combines gzipped blocks together into a single tarball.
-	// Write tarball names into an idx file for extraction.
+	// Combines gzipped blocks together int64_to a single tarball.
+	// Write tarball names int64_to an idx file for extraction.
 	std::ofstream idx, tmp;
 	idx.open(name + ".ptgz.idx", std::ios_base::app);
 	std::string tarCommand;
@@ -233,7 +233,7 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 	} else {
 		tarCommand = "tar -c -W -T " + name + ".ptgz.idx -f " + name + ".ptgz.tar";
 	}
-	for (unsigned long long i = 0; i < tarNames->size(); ++i) {
+	for (uint64_t i = 0; i < tarNames->size(); ++i) {
 		idx << tarNames->at(i) + "\n";
 	}
 	idx << name + ".ptgz.idx\n";
@@ -247,7 +247,7 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 
 	// Removes all temporary blocks.
 	#pragma omp parallel for schedule(static)
-	for (unsigned long long i = 0; i < tarNames->size(); ++i) {
+	for (uint64_t i = 0; i < tarNames->size(); ++i) {
 		std::string rmCommand = tarNames->at(i);
 		if (verbose) {
 			std::cout << "remove(" + rmCommand + ")\n";
@@ -284,10 +284,10 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 
 // Gets and returns the size of a file
 // Parameters: filename (std::string) name of the file whose size to find.
-unsigned long long GetFileSize(std::string filename)
+uint64_t GetFileSize(std::string filename)
 	{
 		struct stat stat_buf;
-		unsigned long long rc = stat(filename.c_str(), &stat_buf);
+		uint64_t rc = stat(filename.c_str(), &stat_buf);
 		return rc == 0 ? stat_buf.st_size : -1;
 	}
 
@@ -308,7 +308,7 @@ void extraction(std::vector<std::string> *filePaths, std::string name, bool verb
 	system(exCommand.c_str());
 
 	// Get the name from the name of the 1st layer tarball
-	for (int i = 0; i < 9; ++i) {
+	for (int64_t i = 0; i < 9; ++i) {
 		name.pop_back();
 	}
 
@@ -328,10 +328,10 @@ void extraction(std::vector<std::string> *filePaths, std::string name, bool verb
 	filePaths->pop_back();
 
 	// Sort tarballs by size descending
-	std::vector<std::pair<unsigned long long, std::string>> *weights = new std::vector<std::pair<unsigned long long, std::string>>(filePaths->size());
+	std::vector<std::pair<uint64_t, std::string>> *weights = new std::vector<std::pair<uint64_t, std::string>>(filePaths->size());
 
 	#pragma omp parallel for schedule(static)
-	for (unsigned long long i = 0; i < filePaths->size(); ++i) {
+	for (uint64_t i = 0; i < filePaths->size(); ++i) {
 		weights->at(i) = std::make_pair(GetFileSize(filePaths->at(i)), filePaths->at(i));
 	}
 	std::sort(weights->rbegin(), weights->rend());
@@ -341,7 +341,7 @@ void extraction(std::vector<std::string> *filePaths, std::string name, bool verb
 
 	// Unpack each tar.gz file.
 	#pragma omp parallel for schedule(dynamic)
-	for (unsigned long long i = 0; i < weights->size(); ++i) {
+	for (uint64_t i = 0; i < weights->size(); ++i) {
 		std::string gzCommand = "tar xzf " + weights->at(i).second;
 		if (verbose) {
 			std::cout << gzCommand + "\n";
@@ -351,7 +351,7 @@ void extraction(std::vector<std::string> *filePaths, std::string name, bool verb
 
 	// Double check unpacking.
 	#pragma omp parallel for schedule(dynamic)
-	for (unsigned long long i = 0; i < weights->size(); ++i) {
+	for (uint64_t i = 0; i < weights->size(); ++i) {
 		std::string gzCommand = "tar xzf " + weights->at(i).second + " --skip-old-files";
 		if (verbose) {
 			std::cout << gzCommand + "\n";
@@ -361,7 +361,7 @@ void extraction(std::vector<std::string> *filePaths, std::string name, bool verb
 
 	// Delete each tar.gz file
 	#pragma omp parallel for schedule(static)
-	for (unsigned long long i = 0; i < weights->size(); ++i) {
+	for (uint64_t i = 0; i < weights->size(); ++i) {
 		std::string gzRmCommand = weights->at(i).second;
 		if (verbose) {
 			std::cout << "remove(" + gzRmCommand + ")\n";
@@ -395,7 +395,7 @@ char cwd [PATH_MAX];
 // Either compresses the files or extracts the ptgz.tar archive.
 int main(int argc, char *argv[]) {
 	Settings *instance = new Settings;
-	unsigned long long *numFiles = new unsigned long long(0);
+	uint64_t *numFiles = new uint64_t(0);
 	std::vector<std::string> *filePaths = new std::vector<std::string>();
 	
 	helpCheck(argc, argv);
