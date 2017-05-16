@@ -8,7 +8,7 @@ Compiler must have C++11 support.
 
 Requires MPI if desired but can be compiled without.
 
-## Installation OpenMP
+## Installation - OpenMP
 Specific compilation commands can be found in the Makefile.
 
 ### GNU C Compiler
@@ -19,7 +19,7 @@ Specific compilation commands can be found in the Makefile.
     make icc
     make install
 
-## Installation OpenMP + MPI
+## Installation - OpenMP + MPI
 ### GNU C Compiler
     make mpi
     make install
