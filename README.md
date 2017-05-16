@@ -6,27 +6,32 @@ Need at least either GNU C Compiler (4.9+) with OpenMP or Intel C Compiler with 
 
 Compiler must have C++11 support.
 
-## Installation
-### GNU C Compiler
-    g++ -std=c++11 -fopenmp -O3 -o bin/ptgz src/ptgz.cpp
+Requires MPI if desired but can be compiled without.
 
-#### GCC Makefile
+## Installation OpenMP
+Specific compilation commands can be found in the Makefile.
+
+### GNU C Compiler
     make
     make install
 
 ### Intel C Compiler
-    icc -std=c++11 -openmp -O3 -o bin/ptgz src/ptgz.cpp
-
-#### ICC Makefile
     make icc
     make install
 
-## Usage
-    If you are compressing, your current working directory should be the parent directory of all directories you
-    want to archive. If you are extracting, your current working directory should be the same as your archive.
+## Installation OpenMP + MPI
+### GNU C Compiler
+    make mpi
+    make install
 
-    ptgz will not preserve symlinks or store empty directories in the ptgz.tar archive. Instead, all symlinked
-    files/directory will be replaced by copies of the symlinked file/directory.
+### Intel C Compiler
+    make icc-mpi
+    make install
+
+## Usage
+If you are compressing, your current working directory should be the parent directory of all directories you want to archive. If you are extracting, your current working directory should be the same as your archive.
+
+ptgz will not preserve symlinks or store empty directories in the ptgz.tar archive. Instead, all symlinked files/directory will be replaced by copies of the symlinked file/directory. Archives for directories with a lot of symlinks can turn out to be a lot bigger than expected.
 
 ### Command Syntax:
     ptgz [-c | -k | -v | -x | -W] <archive>
