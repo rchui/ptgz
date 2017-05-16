@@ -300,17 +300,17 @@ uint64_t GetFileSize(std::string filename)
 // 			   verbose (bool) user option for verbose output.
 // 			   keep (bool) user option for keeping ptgz archive.
 void extraction(std::vector<std::string> *filePaths, std::string name, bool verbose, bool keep) {
-	// Unpack the 1st layer tarball
-	std::string exCommand = "tar xf " + name;
-	if (verbose) {
-		std::cout << exCommand + "\n";
-	}
-	system(exCommand.c_str());
-
 	// Get the name from the name of the 1st layer tarball
 	for (int64_t i = 0; i < 9; ++i) {
 		name.pop_back();
 	}
+
+	// Unpack the 1st layer tarball
+	std::string exCommand = "tar xf " + name + ".ptgz.tar " + name + ".ptgz.idx";
+	if (verbose) {
+		std::cout << exCommand + "\n";
+	}
+	system(exCommand.c_str());
 
 	// Read in all tar.gz files form the ptgz.idx file
 	// Delete the ptgz.idx file
@@ -326,6 +326,13 @@ void extraction(std::vector<std::string> *filePaths, std::string name, bool verb
 		std::cout << "ERROR: " + idxRmCommand + " could not be removed.\n";	
 	}
 	filePaths->pop_back();
+
+	// Extract compressed archives from ptgz.tar archive
+	#pragma omp parallel for schedule(dynamic)
+	for (uint64_t i = 0; i < filePaths->size(); ++i) {
+		std::string tarCommand = "tar xf " + name + ".ptgz.tar " + filePaths->at(i);
+		system(tarCommand.c_str());
+	}
 
 	// Sort tarballs by size descending
 	std::vector<std::pair<uint64_t, std::string>> *weights = new std::vector<std::pair<uint64_t, std::string>>(filePaths->size());
