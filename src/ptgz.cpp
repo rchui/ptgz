@@ -227,7 +227,7 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 			if (!levelSet) {
 				gzCommand = "tar -cz -T " + std::to_string(i) + "." + name + ".ptgz.tmp | gzip -1 > " + std::to_string(i) + "." + name + ".tar.gz";
 			} else {
-				gzCommand = "tar -cz -T " + std::to_string(i) + "." + name + ".ptgz.tmp | gzip -" + level + " > " + std::to_string(i) + "." + name + ".tar.gz";
+				gzCommand = "tar -cz -T " + std::to_string(i) + "." + name + ".ptgz.tmp | gzip -" + std::to_string(level) + " > " + std::to_string(i) + "." + name + ".tar.gz";
 			}
 			for (uint64_t j = start; j < std::min(start + blockSize, filePathSize); ++j) {
 				tmp << filePaths->at(j) + "\n";
