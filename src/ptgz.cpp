@@ -112,6 +112,7 @@ void getSettings(int argc, char *argv[], Settings *instance) {
 			(*instance).levelSet = true;
 			settings.pop();
 			int64_t level = std::stoi(settings.front());
+			std::cout << level << std::endl;
 			if (level >= 1 && level <= 9) {
 				(*instance).level = level;
 			} else {
