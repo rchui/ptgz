@@ -28,7 +28,7 @@ struct Settings {
 				output(),
 				verify(),
 				name() {}
-	int level;
+	int64_t level;
 	bool levelSet;
 	bool extract;
 	bool compress;
@@ -201,7 +201,7 @@ void getPaths(std::vector<std::string> *filePaths, const char *cwd, std::string 
 // 			   name (std::string) user given name for storage file.
 // 			   verbose (bool) user option for verbose output.
 //			   verify (bool) user option for tar archive verification.
-void compression(std::vector<std::string> *filePaths, std::string name, bool verbose, bool verify) {
+void compression(std::vector<std::string> *filePaths, std::string name, bool verbose, bool verify, bool levelSet, int64_t level) {
 	std::random_shuffle(filePaths->begin(), filePaths->end());
 	uint64_t filePathSize = filePaths->size();
 	uint64_t blockSize = (filePathSize / (omp_get_max_threads() * 10)) + 1;
