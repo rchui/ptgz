@@ -198,7 +198,7 @@ void getPaths(std::vector<std::string> *filePaths, const char *cwd, std::string 
 // 			   name (std::string) user given name for storage file.
 // 			   verbose (bool) user option for verbose output.
 //			   verify (bool) user option for tar archive verification.
-void compression(std::vector<std::string> *filePaths, std::string name, bool verbose, bool verify, bool levelSet, int64_t level) {
+void compression(std::vector<std::string> *filePaths, std::string name, bool verbose, bool verify) {
 	std::random_shuffle(filePaths->begin(), filePaths->end());
 	uint64_t filePathSize = filePaths->size();
 	uint64_t blockSize = (filePathSize / (omp_get_max_threads() * 10)) + 1;
@@ -422,7 +422,7 @@ int main(int argc, char *argv[]) {
 	if ((*instance).compress) {
 		findAll(numFiles, cwd);
 		getPaths(filePaths, cwd, "");
-		compression(filePaths, (*instance).name, (*instance).verbose, (*instance).verify, (*instance).levelSet, (*instance).level);
+		compression(filePaths, (*instance).name, (*instance).verbose, (*instance).verify);
 	} else {
 		extraction(filePaths, (*instance).name, (*instance).verbose, (*instance).keep);
 	}
