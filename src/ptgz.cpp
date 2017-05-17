@@ -23,8 +23,8 @@ struct Settings {
 				compress(),
    				verbose(),
 				keep(),
-				verify(),
 				output(),
+				verify(),
 				name() {}
 	bool extract;
 	bool compress;
