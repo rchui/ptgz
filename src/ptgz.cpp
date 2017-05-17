@@ -220,11 +220,12 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 			// Store the name of each file for a block owned by each thread.
 			// Each thread will use the file to tar and gzip compress their block.
 			std::ofstream tmp;
+			std::string gzCommand;
 			tmp.open(std::to_string(i) + "." + name + ".ptgz.tmp", std::ios_base::app);
 			if (!levelSet) {
-				std::string gzCommand = "GZIP=-1 tar -cz -T " + std::to_string(i) + "." + name + ".ptgz.tmp -f " + std::to_string(i) + "." + name + ".tar.gz";
+				gzCommand = "GZIP=-1 tar -cz -T " + std::to_string(i) + "." + name + ".ptgz.tmp -f " + std::to_string(i) + "." + name + ".tar.gz";
 			} else {
-				std::string gzCommand = "GZIP=" + std::to_string(level) + " tar -cz -T " + std::to_string(i) + "." + name + ".ptgz.tmp -f " + std::to_string(i) + "." + name + ".tar.gz";
+				gzCommand = "GZIP=" + std::to_string(level) + " tar -cz -T " + std::to_string(i) + "." + name + ".ptgz.tmp -f " + std::to_string(i) + "." + name + ".tar.gz";
 			}
 			for (uint64_t j = start; j < std::min(start + blockSize, filePathSize); ++j) {
 				tmp << filePaths->at(j) + "\n";
