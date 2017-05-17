@@ -22,12 +22,16 @@
 //	    name (std::string) name of archive to make or extract.
 struct Settings {
 	Settings(): extract(),
+				levelSet(),
+				extract(),
 				compress(),
-   				verbose(),
+				verbose(),
 				keep(),
 				output(),
 				verify(),
 				name() {}
+	int64_t level;
+	bool levelSet;
 	bool extract;
 	bool compress;
 	bool verbose;
@@ -39,7 +43,7 @@ struct Settings {
 
 // Checks if the user asks for help.
 // Provides usage information to the user.
-// Parameters: argc (int64_t) number of cli arguments.
+// Parameters: argc (int) number of cli arguments.
 // 			   argv (char *[]) user provided arguments.
 void helpCheck(int argc, char *argv[]) {
 	if (argc == 1) {
@@ -72,7 +76,7 @@ void helpCheck(int argc, char *argv[]) {
 }
 
 // Gets the parameters passed by the user and stores them.
-// Parameters: argc (int64_t) number of cli arguments.
+// Parameters: argc (int) number of cli arguments.
 // 			   argv (char *[]) user provided arguments.
 // 			   instance (Settings *) user argument storage.
 void getSettings(int argc, char *argv[], Settings *instance) {
@@ -106,6 +110,16 @@ void getSettings(int argc, char *argv[], Settings *instance) {
 			(*instance).keep = true;
 		} else if (arg == "-W") {
 			(*instance).verify = true;
+		} else if (arg == "-l") { 
+			(*instance).levelSet = true;
+			settings.pop();
+			int64_t level = std::stoi(settings.front());
+			if (level >= 1 && level <= 9) {
+				(*instance).level = level;
+			} else {
+				std::cout << "ERROR: level must be set from 1 to 9." << std::endl;
+				exit(0);
+			}
 		} else {
 			if (settings.size() > 1) {
 				std::cout << "ERROR: ptgz was called incorrectly. \"ptgz -h\" for help." << std::endl;
@@ -163,7 +177,7 @@ void getPaths(std::vector<std::string> *filePaths, const char *cwd, std::string 
 // 			   name (std::string) user given name for storage file.
 // 			   verbose (bool) user option for verbose output.
 //			   verify (bool) user option for tar archive verification.
-void compression(std::vector<std::string> *filePaths, std::string name, bool verbose, bool verify) {
+void compression(std::vector<std::string> *filePaths, std::string name, bool verbose, bool verify, bool levelSet, int64_t level) {
 	std::random_shuffle(filePaths->begin(), filePaths->end());
 
 	int root = 0;
@@ -239,7 +253,12 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 	// Build tar archives for each block
 	#pragma omp parallel for schedule(dynamic)
 	for (int64_t i = localSize[0]; i < localSize[0] + localSize[1]; ++i) {
-		std::string gzCommand = "GZIP=-1 tar -cz -T " + std::to_string(i) + "." + name + ".ptgz.tmp -f " + std::to_string(i) + "." + name + ".tar.gz";
+		std::string gzCommand;
+		if (!levelset) {
+			gzCommand = "tar -c -T " + std::to_string(i) + "." + name + ".ptgz.tmp | gzip -1 > " + std::to_string(i) + "." + name + ".tar.gz";
+		} else {
+			gzCommand = "tar -c -T " + std::to_string(i) + "." + name + ".ptgz.tmp | gzip -" + std::to_string(level) + " > " + std::to_string(i) + "." + name + ".tar.gz";
+		}
 		if (verbose) {
 			std::cout << gzCommand + "\n";
 		}
@@ -481,7 +500,7 @@ int main(int argc, char *argv[]) {
 	if ((*instance).compress) {
 		std::vector<std::string> *filePaths = new std::vector<std::string>();
 		getPaths(filePaths, cwd, "");
-		compression(filePaths, (*instance).name, (*instance).verbose, (*instance).verify);
+		compression(filePaths, (*instance).name, (*instance).verbose, (*instance).verify, (*instance).levelSet, (*instance).level);
 	} else {
 		extraction((*instance).name, (*instance).verbose, (*instance).keep);
 	}
