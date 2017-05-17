@@ -19,13 +19,17 @@
 //	    verify (bool) whether ptgz should verify the compressed archive.
 //	    name (std::string) name of archive to make or extract.
 struct Settings {
-	Settings(): extract(),
+	Settings(): level(),
+				levelSet(),
+				extract(),
 				compress(),
    				verbose(),
 				keep(),
 				output(),
 				verify(),
 				name() {}
+	int64_t level;
+	bool levelSet;
 	bool extract;
 	bool compress;
 	bool verbose;
@@ -105,10 +109,11 @@ void getSettings(int argc, char *argv[], Settings *instance) {
 		} else if (arg == "-W") {
 			(*instance).verify = true;
 		} else if (arg == "-l") {
+			(*instance).levelSet = true;
 			settings.pop();
 			int64_t level = std::stoi(settings.front());
 			if (level >= 1 && level <= 9) {
-				system(("export GZIP=-" + std::to_string(level)).c_str());
+				(*instance).level = level;
 			} else {
 				std::cout << "ERROR: level must be set from 1 to 9." << std::endl;
 				exit(0);
@@ -198,7 +203,7 @@ void getPaths(std::vector<std::string> *filePaths, const char *cwd, std::string 
 // 			   name (std::string) user given name for storage file.
 // 			   verbose (bool) user option for verbose output.
 //			   verify (bool) user option for tar archive verification.
-void compression(std::vector<std::string> *filePaths, std::string name, bool verbose, bool verify) {
+void compression(std::vector<std::string> *filePaths, std::string name, bool verbose, bool verify, bool levelSet, int64_t level) {
 	std::random_shuffle(filePaths->begin(), filePaths->end());
 	uint64_t filePathSize = filePaths->size();
 	uint64_t blockSize = (filePathSize / (omp_get_max_threads() * 10)) + 1;
@@ -219,7 +224,11 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 			std::ofstream tmp;
 			std::string gzCommand;
 			tmp.open(std::to_string(i) + "." + name + ".ptgz.tmp", std::ios_base::app);
-			gzCommand = "tar -cz -T " + std::to_string(i) + "." + name + ".ptgz.tmp -f " + std::to_string(i) + "." + name + ".tar.gz";
+			if (!levelSet) {
+				gzCommand = "tar -cz -T " + std::to_string(i) + "." + name + ".ptgz.tmp | gzip -1 > " + std::to_string(i) + "." + name + ".tar.gz";
+			} else {
+				gzCommand = "tar -cz -T " + std::to_string(i) + "." + name + ".ptgz.tmp | gzip -" + level + " > " + std::to_string(i) + "." + name + ".tar.gz";
+			}
 			for (uint64_t j = start; j < std::min(start + blockSize, filePathSize); ++j) {
 				tmp << filePaths->at(j) + "\n";
 			}
@@ -422,7 +431,7 @@ int main(int argc, char *argv[]) {
 	if ((*instance).compress) {
 		findAll(numFiles, cwd);
 		getPaths(filePaths, cwd, "");
-		compression(filePaths, (*instance).name, (*instance).verbose, (*instance).verify);
+		compression(filePaths, (*instance).name, (*instance).verbose, (*instance).verify, (*instance).levelSet, (*instance).level);
 	} else {
 		extraction(filePaths, (*instance).name, (*instance).verbose, (*instance).keep);
 	}
