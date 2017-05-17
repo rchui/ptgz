@@ -111,7 +111,7 @@ void getSettings(int argc, char *argv[], Settings *instance) {
 		} else if (arg == "-l") {
 			(*instance).levelSet = true;
 			settings.pop();
-			arg = settings.front();
+			arg = std::stoi(settings.front());
 			if (arg >= 1 || arg <= 9) {
 				(*instance).level = arg;
 			} else {
