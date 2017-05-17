@@ -117,6 +117,7 @@ void getSettings(int argc, char *argv[], Settings *instance) {
 				(*instance).level = level;
 			} else {
 				std::cout << "ERROR: level must be set from 1 to 9." << std::endl;
+				exit(0);
 			}
 		} else {
 			if (settings.size() > 1) {
