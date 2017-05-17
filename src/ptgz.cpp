@@ -221,7 +221,11 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 			// Each thread will use the file to tar and gzip compress their block.
 			std::ofstream tmp;
 			tmp.open(std::to_string(i) + "." + name + ".ptgz.tmp", std::ios_base::app);
-			std::string gzCommand = "GZIP=-1 tar -cz -T " + std::to_string(i) + "." + name + ".ptgz.tmp -f " + std::to_string(i) + "." + name + ".tar.gz";
+			if (!levelSet) {
+				std::string gzCommand = "GZIP=-1 tar -cz -T " + std::to_string(i) + "." + name + ".ptgz.tmp -f " + std::to_string(i) + "." + name + ".tar.gz";
+			} else {
+				std::string gzCommand = "GZIP=" + std::to_string(level) + " tar -cz -T " + std::to_string(i) + "." + name + ".ptgz.tmp -f " + std::to_string(i) + "." + name + ".tar.gz";
+			}
 			for (uint64_t j = start; j < std::min(start + blockSize, filePathSize); ++j) {
 				tmp << filePaths->at(j) + "\n";
 			}
@@ -420,8 +424,6 @@ int main(int argc, char *argv[]) {
 	helpCheck(argc, argv);
 	getSettings(argc, argv, instance);
 	getcwd(cwd, PATH_MAX);
-	std::cout << (*instance).level << std::endl;
-	std::cout << (*instance).levelSet << std::endl;
 
 	if ((*instance).compress) {
 		findAll(numFiles, cwd);
