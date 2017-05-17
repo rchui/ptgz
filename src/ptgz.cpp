@@ -19,17 +19,13 @@
 //	    verify (bool) whether ptgz should verify the compressed archive.
 //	    name (std::string) name of archive to make or extract.
 struct Settings {
-	Settings(): level(),
-				levelSet(),
-				extract(),
+	Settings(): extract(),
 				compress(),
    				verbose(),
 				keep(),
 				output(),
 				verify(),
 				name() {}
-	int64_t level;
-	bool levelSet;
 	bool extract;
 	bool compress;
 	bool verbose;
@@ -109,11 +105,10 @@ void getSettings(int argc, char *argv[], Settings *instance) {
 		} else if (arg == "-W") {
 			(*instance).verify = true;
 		} else if (arg == "-l") {
-			(*instance).levelSet = true;
 			settings.pop();
 			int64_t level = std::stoi(settings.front());
 			if (level >= 1 && level <= 9) {
-				(*instance).level = level;
+				system(("export GZIP=-" + std::to_string(level)).c_str());
 			} else {
 				std::cout << "ERROR: level must be set from 1 to 9." << std::endl;
 				exit(0);
@@ -224,11 +219,7 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 			std::ofstream tmp;
 			std::string gzCommand;
 			tmp.open(std::to_string(i) + "." + name + ".ptgz.tmp", std::ios_base::app);
-			if (!levelSet) {
-				gzCommand = "tar -I 'gzip -1' -cz -T " + std::to_string(i) + "." + name + ".ptgz.tmp -f " + std::to_string(i) + "." + name + ".tar.gz";
-			} else {
-				gzCommand = "tar -I 'gzip -" + std::to_string(level) + "' -cz -T " + std::to_string(i) + "." + name + ".ptgz.tmp -f " + std::to_string(i) + "." + name + ".tar.gz";
-			}
+			gzCommand = "tar -cz -T " + std::to_string(i) + "." + name + ".ptgz.tmp -f " + std::to_string(i) + "." + name + ".tar.gz";
 			for (uint64_t j = start; j < std::min(start + blockSize, filePathSize); ++j) {
 				tmp << filePaths->at(j) + "\n";
 			}
