@@ -393,13 +393,13 @@ char cwd [PATH_MAX];
 // Either compresses the files or extracts the ptgz.tar archive.
 int main(int argc, char *argv[]) {
 	Settings *instance = new Settings;
+	std::vector<std::string> *filePaths = new std::vector<std::string>();
 	
 	helpCheck(argc, argv);
 	getSettings(argc, argv, instance);
 	getcwd(cwd, PATH_MAX);
 
 	if ((*instance).compress) {
-		std::vector<std::string> *filePaths = new std::vector<std::string>();
 		getPaths(filePaths, cwd, "");
 		compression(filePaths, (*instance).name, (*instance).verbose, (*instance).verify, (*instance).levelSet, (*instance).level);
 	} else {
