@@ -19,13 +19,17 @@
 //	    verify (bool) whether ptgz should verify the compressed archive.
 //	    name (std::string) name of archive to make or extract.
 struct Settings {
-	Settings(): extract(),
+	Settings(): level(),
+				levelSet(),
+				extract(),
 				compress(),
    				verbose(),
 				keep(),
 				output(),
 				verify(),
 				name() {}
+	int level;
+	bool levelSet;
 	bool extract;
 	bool compress;
 	bool verbose;
@@ -104,6 +108,15 @@ void getSettings(int argc, char *argv[], Settings *instance) {
 			(*instance).keep = true;
 		} else if (arg == "-W") {
 			(*instance).verify = true;
+		} else if (arg == "-l") {
+			(*instance).levelSet = true;
+			settings.pop();
+			arg = settings.front();
+			if (arg >= 1 || arg <= 9) {
+				(*instance).level = arg;
+			} else {
+				std::cout << "ERROR: level must be set from 1 to 9." << std::endl;
+			}
 		} else {
 			if (settings.size() > 1) {
 				std::cout << "ERROR: ptgz was called incorrectly. \"ptgz -h\" for help." << std::endl;
@@ -408,11 +421,13 @@ int main(int argc, char *argv[]) {
 	helpCheck(argc, argv);
 	getSettings(argc, argv, instance);
 	getcwd(cwd, PATH_MAX);
+	std::cout << (*instance).level << std::endl;
+	std::cout << (*instance).levelSet << std::endl;
 
 	if ((*instance).compress) {
 		findAll(numFiles, cwd);
 		getPaths(filePaths, cwd, "");
-		compression(filePaths, (*instance).name, (*instance).verbose, (*instance).verify);
+		compression(filePaths, (*instance).name, (*instance).verbose, (*instance).verify, (*instance).levelSet, (*instance).level);
 	} else {
 		extraction(filePaths, (*instance).name, (*instance).verbose, (*instance).keep);
 	}
