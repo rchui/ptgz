@@ -399,7 +399,7 @@ int main(int argc, char *argv[]) {
 	getcwd(cwd, PATH_MAX);
 
 	if ((*instance).compress) {
-	std::vector<std::string> *filePaths = new std::vector<std::string>();
+		std::vector<std::string> *filePaths = new std::vector<std::string>();
 		getPaths(filePaths, cwd, "");
 		compression(filePaths, (*instance).name, (*instance).verbose, (*instance).verify, (*instance).levelSet, (*instance).level);
 	} else {
