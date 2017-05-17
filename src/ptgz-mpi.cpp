@@ -25,8 +25,9 @@ struct Settings {
 				compress(),
    				verbose(),
 				keep(),
+				output(),
 				verify(),
-				output() {}
+				name() {}
 	bool extract;
 	bool compress;
 	bool verbose;
@@ -333,7 +334,7 @@ void extraction(std::string name, bool verbose, bool keep) {
 		name.pop_back();
 	}
 
-	// Unpack the 1st layer tar archive
+	// Unpack index from the 1st layer tar ball
 	std::string exCommand = "tar xf " + name + ".ptgz.tar " + name + ".ptgz.idx";
 	if (verbose) {
 		std::cout << exCommand + "\n";
