@@ -21,7 +21,7 @@
 //	    verify (bool) whether ptgz should verify the compressed archive.
 //	    name (std::string) name of archive to make or extract.
 struct Settings {
-	Settings(): extract(),
+	Settings(): level(),
 				levelSet(),
 				extract(),
 				compress(),
@@ -254,7 +254,7 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 	#pragma omp parallel for schedule(dynamic)
 	for (int64_t i = localSize[0]; i < localSize[0] + localSize[1]; ++i) {
 		std::string gzCommand;
-		if (!levelset) {
+		if (!levelSet) {
 			gzCommand = "tar -c -T " + std::to_string(i) + "." + name + ".ptgz.tmp | gzip -1 > " + std::to_string(i) + "." + name + ".tar.gz";
 		} else {
 			gzCommand = "tar -c -T " + std::to_string(i) + "." + name + ".ptgz.tmp | gzip -" + std::to_string(level) + " > " + std::to_string(i) + "." + name + ".tar.gz";
