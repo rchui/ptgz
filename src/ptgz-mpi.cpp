@@ -180,15 +180,8 @@ void getPaths(std::vector<std::string> *filePaths, const char *cwd, std::string 
 void compression(std::vector<std::string> *filePaths, std::string name, bool verbose, bool verify, bool levelSet, int64_t level) {
 	std::random_shuffle(filePaths->begin(), filePaths->end());
 
-	int root = 0;
-	int globalRank, globalSize;
 	uint64_t filePathSize = filePaths->size();
 	std::vector<std::string> *tarNames;
-
-	// Start message passing.
-	MPI_Init(NULL, NULL);
-	MPI_Comm_rank(MPI_COMM_WORLD, &globalRank);
-	MPI_Comm_size(MPI_COMM_WORLD, &globalSize);
 
 	int64_t numBlocks = omp_get_max_threads() * 10 * globalSize;
 	uint64_t blockSize;
@@ -210,7 +203,7 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 		tarNames = new std::vector<std::string>(filePathSize / blockSize + 1);
 	}
 
-	if (globalRank == 0) {
+	if (globalRank == root) {
 		// Write all files to text files.
 		#pragma omp parallel for schedule(static)
 		for (int64_t i = 0; i < numBlocks; ++i) {
@@ -265,7 +258,7 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 		system(gzCommand.c_str());
 	}
 
-	if (globalRank == 0) {
+	if (globalRank == root) {
 		// Combines gzipped blocks together int64_to a single tarball.
 		// Write tarball names int64_to an idx file for extraction.
 		std::ofstream idx, tmp;
@@ -314,7 +307,7 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 	delete(sendSizes);
 	delete(localSize);
 
-	if (globalRank == 0) {
+	if (globalRank == root) {
 		// Removes idx file.
 		std::string rmCommand;
 		if (verbose) {
@@ -352,43 +345,39 @@ void extraction(std::string name, bool verbose, bool keep) {
 	for (int64_t i = 0; i < 9; ++i) {
 		name.pop_back();
 	}
-
-	// Unpack index from the 1st layer tar ball
-	std::string exCommand = "tar xf " + name + ".ptgz.tar " + name + ".ptgz.idx";
-	if (verbose) {
-		std::cout << exCommand + "\n";
-	}
-	system(exCommand.c_str());
-
-	// Get number of archives and delete index.
-	std::ifstream idx;
-	std::string line;
-	int64_t numArchives = 0;
-	idx.open(name + ".ptgz.idx", std::ios_base::in);
-	while (std::getline(idx, line)) {
-		++numArchives;
-	}
-	--numArchives;
-	idx.close();
-	std::string idxRmCommand = name + ".ptgz.idx";
-	if (verbose) {
-		std::cout << "remove(" + idxRmCommand + ")\n";
-	}
-	if (remove(idxRmCommand.c_str())) {
-		std::cout << "ERROR: " + idxRmCommand + " could not be removed.\n";
-	}
 	
-	// Start message passsing
-	int root = 0;
-	int globalRank, globalSize;
-	MPI_Init(NULL, NULL);
-	MPI_Comm_rank(MPI_COMM_WORLD, &globalRank);
-	MPI_Comm_size(MPI_COMM_WORLD, &globalSize);
+	if (globalRank == root) {
+		// Unpack index from the 1st layer tar ball
+		std::string exCommand = "tar xf " + name + ".ptgz.tar " + name + ".ptgz.idx";
+		if (verbose) {
+			std::cout << exCommand + "\n";
+		}
+		system(exCommand.c_str());
+
+		// Get number of archives and delete index.
+		std::ifstream idx;
+		std::string line;
+		int64_t numArchives = 0;
+		idx.open(name + ".ptgz.idx", std::ios_base::in);
+		while (std::getline(idx, line)) {
+			++numArchives;
+		}
+		--numArchives;
+		idx.close();
+		std::string idxRmCommand = name + ".ptgz.idx";
+		if (verbose) {
+			std::cout << "remove(" + idxRmCommand + ")\n";
+		}
+		if (remove(idxRmCommand.c_str())) {
+			std::cout << "ERROR: " + idxRmCommand + " could not be removed.\n";
+		}
+	}
+
 	int64_t blockSize;
 	int64_t *sendBlocks = new int64_t[globalSize * 2];
 	int64_t *localBlock = new int64_t[2];
 
-	if (globalRank == 0) {
+	if (globalRank == root) {
 		// Define block size
 		if (numArchives % globalSize == 0) {
 			blockSize = numArchives / globalSize;
@@ -464,7 +453,7 @@ void extraction(std::string name, bool verbose, bool keep) {
 		}
 	}
 	
-	if (globalRank == 0) {
+	if (globalRank == root) {
 		// Decided whether or not to keep the ptgz.tar archive
 		if (!keep) {
 			std::string tarRmCommand = name + ".ptgz.tar";
@@ -484,6 +473,8 @@ void extraction(std::string name, bool verbose, bool keep) {
 }
 
 char cwd [PATH_MAX];
+int root = 0;
+int globalRank, globalSize;
 
 // Checks to see if the user asks for help.
 // Gathers the user provided settings for ptgz.
@@ -491,15 +482,23 @@ char cwd [PATH_MAX];
 // Gathers the file paths of all files to be stored.
 // Either compresses the files or extracts the ptgz.tar archive.
 int main(int argc, char *argv[]) {
+	// Start messsage passing
+	MPI_Init(NULL, NULL);
+	MPI_Comm_rank(MPI_COMM_WORLD, &globalRank);
+	MPI_Comm_size(MPI_COMM_WORLD, &globalSize);
 	Settings *instance = new Settings;
 	
-	helpCheck(argc, argv);
+	if (globalRank == root) {
+		helpCheck(argc, argv);
+	}
 	getSettings(argc, argv, instance);
 	getcwd(cwd, PATH_MAX);
 
 	if ((*instance).compress) {
 		std::vector<std::string> *filePaths = new std::vector<std::string>();
-		getPaths(filePaths, cwd, "");
+		if (globalRank == root) {
+			getPaths(filePaths, cwd, "");
+		}
 		compression(filePaths, (*instance).name, (*instance).verbose, (*instance).verify, (*instance).levelSet, (*instance).level);
 	} else {
 		extraction((*instance).name, (*instance).verbose, (*instance).keep);
