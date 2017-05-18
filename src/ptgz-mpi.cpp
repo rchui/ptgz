@@ -206,6 +206,10 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 		tarNames = new std::vector<std::string>(filePathSize / blockSize + 1);
 	}
 
+	std::cout << "numBlocks = " + std::to_string(numBlocks) + "\n";
+	std::cout << "blockSize = " + std::to_string(blockSize) + "\n";
+	std::cout << "globalSize = " + std::to_string(globalSize) + "\n";
+
 	if (globalRank == root) {
 		// Write all files to text files.
 		#pragma omp parallel for schedule(static)
