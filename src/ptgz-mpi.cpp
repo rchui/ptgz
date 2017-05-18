@@ -13,6 +13,9 @@
 #include "omp.h"
 #include "mpi.h"
 
+int root = 0;
+int globalRank, globalSize;
+
 // Contains the various options the user can pass ptgz.
 // Members: extract (bool) whether ptgz should be extracting.
 //	    compress (bool) whether ptgz should be compressing.
@@ -473,8 +476,6 @@ void extraction(std::string name, bool verbose, bool keep) {
 }
 
 char cwd [PATH_MAX];
-int root = 0;
-int globalRank, globalSize;
 
 // Checks to see if the user asks for help.
 // Gathers the user provided settings for ptgz.
