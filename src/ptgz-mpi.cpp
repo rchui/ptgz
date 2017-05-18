@@ -183,6 +183,7 @@ void getPaths(std::vector<std::string> *filePaths, const char *cwd, std::string 
 void compression(std::vector<std::string> *filePaths, std::string name, bool verbose, bool verify, bool levelSet, int64_t level) {
 	std::random_shuffle(filePaths->begin(), filePaths->end());
 
+	// Send the total number of files to all ranks.
 	uint64_t filePathSize;
 	if (globalRank == root) {
 		filePathSize = filePaths->size();
@@ -197,8 +198,6 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 	int64_t tarBlock;
 	int64_t *localSize = new int64_t[2];
 
-	std::cout << "numBlocks = " + std::to_string(numBlocks) + "\n";
-
 	// Get blockSize and set tarName vector size.
 	if (filePathSize % numBlocks == 0) {
 		blockSize = (filePathSize / numBlocks);
@@ -206,15 +205,11 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 		blockSize = (filePathSize / numBlocks) + 1;
 	}
 
-	std::cout << "blockSize = " + std::to_string(blockSize) + "\n";
-
 	if (filePathSize % blockSize == 0) {
 		tarNames = new std::vector<std::string>(filePathSize / blockSize);
 	} else {
 		tarNames = new std::vector<std::string>(filePathSize / blockSize + 1);
 	}
-
-	std::cout << "globalSize = " + std::to_string(globalSize) + "\n";
 
 	if (globalRank == root) {
 		// Write all files to text files.
@@ -496,29 +491,23 @@ char cwd [PATH_MAX];
 // Either compresses the files or extracts the ptgz.tar archive.
 int main(int argc, char *argv[]) {
 	// Start messsage passing
-	printf("Message Passing\n");
 	MPI_Init(NULL, NULL);
 	MPI_Comm_rank(MPI_COMM_WORLD, &globalRank);
 	MPI_Comm_size(MPI_COMM_WORLD, &globalSize);
 	Settings *instance = new Settings;
 	
 	if (globalRank == root) {
-		printf("Help Check\n");
 		helpCheck(argc, argv);
 	}
-	printf("Get Settings\n");
 	getSettings(argc, argv, instance);
-	printf("Get CWD\n");
 	getcwd(cwd, PATH_MAX);
 
 	if ((*instance).compress) {
 		std::vector<std::string> *filePaths = new std::vector<std::string>();
 		if (globalRank == root) {
-			printf("Get Paths\n");
 			getPaths(filePaths, cwd, "");
 		}
 		MPI_Barrier(MPI_COMM_WORLD);
-		printf("Compression\n");
 		compression(filePaths, (*instance).name, (*instance).verbose, (*instance).verify, (*instance).levelSet, (*instance).level);
 	} else {
 		MPI_Barrier(MPI_COMM_WORLD);
