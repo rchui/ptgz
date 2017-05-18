@@ -348,7 +348,9 @@ void extraction(std::string name, bool verbose, bool keep) {
 	for (int64_t i = 0; i < 9; ++i) {
 		name.pop_back();
 	}
-	
+
+	int64_t numArchives;
+
 	if (globalRank == root) {
 		// Unpack index from the 1st layer tar ball
 		std::string exCommand = "tar xf " + name + ".ptgz.tar " + name + ".ptgz.idx";
@@ -360,7 +362,7 @@ void extraction(std::string name, bool verbose, bool keep) {
 		// Get number of archives and delete index.
 		std::ifstream idx;
 		std::string line;
-		int64_t numArchives = 0;
+		numArchives = 0;
 		idx.open(name + ".ptgz.idx", std::ios_base::in);
 		while (std::getline(idx, line)) {
 			++numArchives;
