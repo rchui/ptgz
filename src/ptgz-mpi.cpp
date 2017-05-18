@@ -503,7 +503,7 @@ int main(int argc, char *argv[]) {
 		helpCheck(argc, argv);
 	}
 	std::cout << "Get Settings\n";
-	getSettings(argc, argv, instance);S
+	getSettings(argc, argv, instance);
 	std::cout << "Get CWD\n";
 	getcwd(cwd, PATH_MAX);
 
