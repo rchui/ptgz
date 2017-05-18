@@ -193,6 +193,8 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 	int64_t tarBlock;
 	int64_t *localSize = new int64_t[2];
 
+	std::cout << "numBlocks = " + std::to_string(numBlocks) + "\n";
+
 	// Get blockSize and set tarName vector size.
 	if (filePathSize % numBlocks == 0) {
 		blockSize = (filePathSize / numBlocks);
@@ -200,14 +202,14 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 		blockSize = (filePathSize / numBlocks) + 1;
 	}
 
+	std::cout << "blockSize = " + std::to_string(blockSize) + "\n";
+
 	if (filePathSize % blockSize == 0) {
 		tarNames = new std::vector<std::string>(filePathSize / blockSize);
 	} else {
 		tarNames = new std::vector<std::string>(filePathSize / blockSize + 1);
 	}
 
-	std::cout << "numBlocks = " + std::to_string(numBlocks) + "\n";
-	std::cout << "blockSize = " + std::to_string(blockSize) + "\n";
 	std::cout << "globalSize = " + std::to_string(globalSize) + "\n";
 
 	if (globalRank == root) {
