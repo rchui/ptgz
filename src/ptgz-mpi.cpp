@@ -183,7 +183,10 @@ void getPaths(std::vector<std::string> *filePaths, const char *cwd, std::string 
 void compression(std::vector<std::string> *filePaths, std::string name, bool verbose, bool verify, bool levelSet, int64_t level) {
 	std::random_shuffle(filePaths->begin(), filePaths->end());
 
-	uint64_t filePathSize = filePaths->size();
+	uint64_t filePathSize;
+	if (globalRank == root) {
+		filePathSize = filePaths->size();
+	}
 	MPI_Bcast(&filePathSize, 1, MPI_UINT64_T, root, MPI_COMM_WORLD);
 	std::vector<std::string> *tarNames;
 
