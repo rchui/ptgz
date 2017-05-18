@@ -257,9 +257,9 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 	for (int64_t i = localSize[0]; i < localSize[0] + localSize[1]; ++i) {
 		std::string gzCommand;
 		if (!levelSet) {
-			gzCommand = "tar -c -T " + std::to_string(i) + "." + name + ".ptgz.tmp | gzip -1 > " + std::to_string(i) + "." + name + ".tar.gz";
+			gzCommand = std::tostring(globalRank) + " tar -c -T " + std::to_string(i) + "." + name + ".ptgz.tmp | gzip -1 > " + std::to_string(i) + "." + name + ".tar.gz";
 		} else {
-			gzCommand = "tar -c -T " + std::to_string(i) + "." + name + ".ptgz.tmp | gzip -" + std::to_string(level) + " > " + std::to_string(i) + "." + name + ".tar.gz";
+			gzCommand = std::tostring(globalRank) + " tar -c -T " + std::to_string(i) + "." + name + ".ptgz.tmp | gzip -" + std::to_string(level) + " > " + std::to_string(i) + "." + name + ".tar.gz";
 		}
 		if (verbose) {
 			std::cout << gzCommand + "\n";
