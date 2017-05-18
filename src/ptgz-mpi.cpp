@@ -492,29 +492,29 @@ char cwd [PATH_MAX];
 // Either compresses the files or extracts the ptgz.tar archive.
 int main(int argc, char *argv[]) {
 	// Start messsage passing
-	std::cout << "Message Passing\n";
+	printf("Message Passing\n");
 	MPI_Init(NULL, NULL);
 	MPI_Comm_rank(MPI_COMM_WORLD, &globalRank);
 	MPI_Comm_size(MPI_COMM_WORLD, &globalSize);
 	Settings *instance = new Settings;
 	
 	if (globalRank == root) {
-		std::cout << "Help Check\n";
+		printf("Help Check\n");
 		helpCheck(argc, argv);
 	}
-	std::cout << "Get Settings\n";
+	printf("Get Settings\n");
 	getSettings(argc, argv, instance);
-	std::cout << "Get CWD\n";
+	printf("Get CWD\n");
 	getcwd(cwd, PATH_MAX);
 
 	if ((*instance).compress) {
 		std::vector<std::string> *filePaths = new std::vector<std::string>();
 		if (globalRank == root) {
-			std::cout << "Get Paths\n";
+			printf("Get Paths\n");
 			getPaths(filePaths, cwd, "");
 		}
 		MPI_Barrier(MPI_COMM_WORLD);
-		std::cout << "Compression\n";
+		printf("Compression\n");
 		compression(filePaths, (*instance).name, (*instance).verbose, (*instance).verify, (*instance).levelSet, (*instance).level);
 	} else {
 		MPI_Barrier(MPI_COMM_WORLD);
