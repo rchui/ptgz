@@ -499,8 +499,10 @@ int main(int argc, char *argv[]) {
 		if (globalRank == root) {
 			getPaths(filePaths, cwd, "");
 		}
+		MPI_Barrier(MPI_COMM_WORLD);
 		compression(filePaths, (*instance).name, (*instance).verbose, (*instance).verify, (*instance).levelSet, (*instance).level);
 	} else {
+		MPI_Barrier(MPI_COMM_WORLD);
 		extraction((*instance).name, (*instance).verbose, (*instance).keep);
 	}
 
