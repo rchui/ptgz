@@ -17,10 +17,14 @@ int root = 0;
 int globalRank, globalSize;
 
 // Contains the various options the user can pass ptgz.
-// Members: extract (bool) whether ptgz should be extracting.
+// Members: 
+//	    level (int64_t) compression level ptgz shoudl use.
+//	    levelSet (bool) whether ptgz should use specific compression level.
+//	    extract (bool) whether ptgz should be extracting.
 //	    compress (bool) whether ptgz should be compressing.
 //	    verbose (bool) whether ptgz should output commands.
 //	    keep (bool) whether ptgz should keep the extracted arvhive.
+//	    output (bool) whether archive name has been given.
 //	    verify (bool) whether ptgz should verify the compressed archive.
 //	    name (std::string) name of archive to make or extract.
 struct Settings {
@@ -69,6 +73,8 @@ void helpCheck(int argc, char *argv[]) {
 		std::cout << "                                prefix of the ptgz archive created.\n" << std::endl;
 		std::cout << "    -k    Keep Archive          Dooes not delete the ptgz archive it has been passed to extract. \"-x\" must\n";
 		std::cout << "                                also be used to use this option.\n" << std::endl;
+		std::cout << "    -l    Set Level             Instruct ptgz to use a specific compression level. Value must be from 1 to 9;\n";
+		std::cout << "                                1 is low compression, fast speed and 9 is high compression, low speed.\n" << std::endl;
 		std::cout << "    -v    Enable Verbose        Will print the commands as they are called to STDOUT\n" << std::endl;
 		std::cout << "    -x    Extraction            Signals for file extraction from an archive. The passed ptgz archive will be\n";
 		std::cout << "                                unpacked and split int64_to its component files. <archive> should be the name of\n";
