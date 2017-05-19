@@ -19,7 +19,7 @@
 //	    compress (bool) whether ptgz should be compressing.
 //	    verbose (bool) whether ptgz should output commands.
 //	    keep (bool) whether ptgz should keep the extracted arvhive.
-//	    output(bool) name of the archive to be compressed or extracted.
+//	    output(bool) whether the name of the archive has been given.
 //	    verify (bool) whether ptgz should verify the compressed archive.
 //	    name (std::string) name of archive to make or extract.
 struct Settings {
