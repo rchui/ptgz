@@ -305,10 +305,8 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 			idx << tarNames->at(i) + "\n";
 		}
 		idx << name + ".ptgz.idx\n";
-
 		makeScript(name);
 		idx << name + ".sh";
-
 		idx.close();
 		
 		if (verbose) {
@@ -352,6 +350,9 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 		rmCommand = name + ".ptgz.idx";
 		if (remove(rmCommand.c_str())) {
 			std::cout << "ERROR: " + rmCommand + " could not be removed.\n";
+		}
+		if (remove((name + ".sh").c_str())) {
+			std::cout << "ERROR: " + name + ".sh could not be removed.\n";
 		}
 
 		tarNames->clear();
