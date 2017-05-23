@@ -275,6 +275,25 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 	// Send blocks to all ranks then build tar archives.
 	MPI_Scatter(sendSizes, 2, MPI_INT64_T, localSize, 2, MPI_INT64_T, root, MPI_COMM_WORLD);
 
+	for (int64_t i = 0; i < globalSize; ++i) {
+		if (globalRank == i) {
+			std::ofstream oFile(name + ".idx", std::ios::out | std::ios::app);
+			for (int64_t i = localSize[0]; i < lcoalSize[0] + localSize[1]; ++i) {
+				oFile << "---- " + std::to_string(i) + "." + name + ".ptgz.tmp ----\n";
+				std::ifstream iFile(std::to_string(i) + "." + name + ".ptgz.tmp", std::ios::in);
+				if (iFile.is_open()) {
+					oFile << iFile.rdbuf();
+				} else {
+					std::cout << "ERROR: Could not add block " + std::to_string(i) + "\n";
+				}
+				oFile << "\n";
+			}
+			oFile.close();
+		}
+		MPI_Barrier(MPI_COMM_WORLD);
+	}
+	exit(0);
+
 	// Build tar archives for each block
 	#pragma omp parallel for schedule(dynamic)
 	for (int64_t i = localSize[0]; i < localSize[0] + localSize[1]; ++i) {
