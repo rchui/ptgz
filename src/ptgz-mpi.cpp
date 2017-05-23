@@ -305,6 +305,10 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 			idx << tarNames->at(i) + "\n";
 		}
 		idx << name + ".ptgz.idx\n";
+
+		makeScript(name);
+		idx << name + ".sh";
+
 		idx.close();
 		
 		if (verbose) {
@@ -352,7 +356,6 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 
 		tarNames->clear();
 		delete(tarNames);
-		makeScript(name);
 	}
 	MPI_Finalize();
 }
