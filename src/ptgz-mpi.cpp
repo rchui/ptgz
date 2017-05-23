@@ -160,7 +160,11 @@ void getPaths(std::vector<std::string> *filePaths, const char *cwd, std::string 
 	// Check if cwd is a directory
 	if ((dir = opendir(cwd)) != NULL) {
 		// Get all file paths within directory.
+		int64_t num = 0;
 		while ((ent = readdir (dir)) != NULL) {
+			if (num == 0) {
+				++num;
+			}
 			std::string fileBuff = std::string(ent -> d_name);
 			if (fileBuff != "." && fileBuff != "..") {
 				DIR *dir2;
@@ -173,6 +177,9 @@ void getPaths(std::vector<std::string> *filePaths, const char *cwd, std::string 
 					filePaths->push_back(rootPath + fileBuff);
 				}
 			}
+		}
+		if (num == 0) {
+			filePaths->push_back(rootPath);
 		}
 		closedir(dir);
 	}
