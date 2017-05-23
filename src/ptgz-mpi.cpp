@@ -183,7 +183,7 @@ void makeScript(std::string name) {
 	if (script.is_open()) {
 		script << "#!/bin/bash\n";
 		script << "\n";
-		script << "for TARGZ in *.tar.gz\n";
+		script << "for TARGZ in *.ptgz.tar.gz\n";
 		script << "do\n";
 		script << "    tar xzf $TARGZ\n";
 		script << "    rm $TARGZ\n";
