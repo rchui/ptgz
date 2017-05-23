@@ -179,7 +179,7 @@ void getPaths(std::vector<std::string> *filePaths, const char *cwd, std::string 
 			}
 		}
 		if (num == 0) {
-			filePaths->push_back(rootPath);
+			filePaths->push_back(rootPath + "/");
 		}
 		closedir(dir);
 	}
