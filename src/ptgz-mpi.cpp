@@ -163,7 +163,7 @@ void getPaths(std::vector<std::string> *filePaths, const char *cwd, std::string 
 		int64_t num = 0;
 		while ((ent = readdir (dir)) != NULL) {
 			if (num == 0) {
-				++num;
+				num++;
 			}
 			std::string fileBuff = std::string(ent -> d_name);
 			if (fileBuff != "." && fileBuff != "..") {
