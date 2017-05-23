@@ -279,7 +279,7 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 		if (globalRank == i) {
 			std::ofstream oFile(name + ".idx", std::ios::out | std::ios::app);
 			for (int64_t i = localSize[0]; i < localSize[0] + localSize[1]; ++i) {
-				oFile << "---- " + std::to_string(i) + "." + name + ".ptgz.tar.gz ----\n";
+				oFile << "---- " + std::to_string(i) + "." + name + ".ptgz.tar.gz ----\n\n";
 				std::ifstream iFile(std::to_string(i) + "." + name + ".ptgz.tmp", std::ios::in);
 				if (iFile.is_open()) {
 					oFile << iFile.rdbuf();
@@ -325,7 +325,8 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 		}
 		idx << name + ".ptgz.idx\n";
 		makeScript(name);
-		idx << name + ".sh";
+		idx << name + ".sh\n";
+		idx << name + ".idx\n";
 		idx.close();
 		
 		if (verbose) {
@@ -372,6 +373,9 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 		}
 		if (remove((name + ".sh").c_str())) {
 			std::cout << "ERROR: " + name + ".sh could not be removed.\n";
+		}
+		if (remove((name + ".idx").c_str())) {
+			std::cout << "ERROR: " + name + ".idx could not be removed.\n";
 		}
 
 		tarNames->clear();
