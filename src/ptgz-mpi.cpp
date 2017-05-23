@@ -292,7 +292,6 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 		}
 		MPI_Barrier(MPI_COMM_WORLD);
 	}
-	exit(0);
 
 	// Build tar archives for each block
 	#pragma omp parallel for schedule(dynamic)
