@@ -278,7 +278,7 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 	for (int64_t i = 0; i < globalSize; ++i) {
 		if (globalRank == i) {
 			std::ofstream oFile(name + ".idx", std::ios::out | std::ios::app);
-			for (int64_t i = localSize[0]; i < lcoalSize[0] + localSize[1]; ++i) {
+			for (int64_t i = localSize[0]; i < localSize[0] + localSize[1]; ++i) {
 				oFile << "---- " + std::to_string(i) + "." + name + ".ptgz.tmp ----\n";
 				std::ifstream iFile(std::to_string(i) + "." + name + ".ptgz.tmp", std::ios::in);
 				if (iFile.is_open()) {
