@@ -178,6 +178,24 @@ void getPaths(std::vector<std::string> *filePaths, const char *cwd, std::string 
 	}
 }
 
+void makeScript(std::string name) {
+	std::ofstream script (name + ".sh");
+	if (script.is_open()) {
+		script << "#!/bin/bash\n";
+		script << "\n";
+		script << "for TARGZ in *.tar.gz\n";
+		script << "do\n";
+		script << "    tar xzf $TARGZ\n";
+		script << "    rm $TARGZ\n";
+		script << "done\n";
+		script << "\n";
+		script << "rm *.ptgz.idx\n";
+	} else {
+		std::cout << "ERROR: Could not make script file\n";
+		exit(0);
+	}
+}
+
 // Divides files int64_to blocks.
 // Compresses each block int64_to a single file.
 // Combines all compressed blocks int64_to a single file.
@@ -229,7 +247,7 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 					tmp << filePaths->at(j) + "\n";
 				}
 				tmp.close();
-				tarNames->at(i) = std::to_string(i) + "." + name + ".tar.gz";
+				tarNames->at(i) = std::to_string(i) + "." + name + ".ptgz.tar.gz";
 			}
 		}
 		filePaths->clear();
@@ -262,9 +280,9 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 	for (int64_t i = localSize[0]; i < localSize[0] + localSize[1]; ++i) {
 		std::string gzCommand;
 		if (!levelSet) {
-			gzCommand = "tar -c -T " + std::to_string(i) + "." + name + ".ptgz.tmp | gzip -1 > " + std::to_string(i) + "." + name + ".tar.gz";
+			gzCommand = "tar -c -T " + std::to_string(i) + "." + name + ".ptgz.tmp | gzip -1 > " + std::to_string(i) + "." + name + ".ptgz.tar.gz";
 		} else {
-			gzCommand = "tar -c -T " + std::to_string(i) + "." + name + ".ptgz.tmp | gzip -" + std::to_string(level) + " > " + std::to_string(i) + "." + name + ".tar.gz";
+			gzCommand = "tar -c -T " + std::to_string(i) + "." + name + ".ptgz.tmp | gzip -" + std::to_string(level) + " > " + std::to_string(i) + "." + name + ".ptgz.tar.gz";
 		}
 		if (verbose) {
 			std::cout << gzCommand + "\n";
@@ -301,7 +319,7 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 	// Removes all temporary blocks.
 	#pragma omp parallel for schedule(static)
 	for (uint64_t i = localSize[0]; i < localSize[0] + localSize[1]; ++i) {
-		std::string rmCommand = std::to_string(i) + "." + name + ".tar.gz";
+		std::string rmCommand = std::to_string(i) + "." + name + ".ptgz.tar.gz";
 		if (verbose) {
 			std::cout << "remove(" + rmCommand + ")\n";
 		}
@@ -334,6 +352,7 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 
 		tarNames->clear();
 		delete(tarNames);
+		makeScript(name);
 	}
 	MPI_Finalize();
 }
@@ -421,7 +440,7 @@ void extraction(std::string name, bool verbose, bool keep) {
 	// Extract compressed archives from ptgz.tar archive
 	#pragma omp parallel for schedule(dynamic)
 	for (uint64_t i = localBlock[0]; i < localBlock[0] + localBlock[1]; ++i) {
-		std::string tarCommand = "tar xf " + name + ".ptgz.tar " + std::to_string(i) + "." + name + ".tar.gz";
+		std::string tarCommand = "tar xf " + name + ".ptgz.tar " + std::to_string(i) + "." + name + ".ptgz.tar.gz";
 		system(tarCommand.c_str());
 	}
 
@@ -429,12 +448,12 @@ void extraction(std::string name, bool verbose, bool keep) {
 	std::vector<std::pair<uint64_t, std::string>> *weights = new std::vector<std::pair<uint64_t, std::string>>(localBlock[1]);
 	#pragma omp parallel for schedule(static)
 	for (uint64_t i = 0; i < localBlock[1]; ++i) {
-		std::string archiveName = std::to_string(i + localBlock[0]) + "." + name + ".tar.gz";
+		std::string archiveName = std::to_string(i + localBlock[0]) + "." + name + ".ptgz.tar.gz";
 		weights->at(i) = std::make_pair(GetFileSize(archiveName), archiveName);
 	}
 	std::sort(weights->rbegin(), weights->rend());
 
-	// Unpack each tar.gz file.
+	// Unpack each .ptgz.tar.gz file.
 	#pragma omp parallel for schedule(dynamic)
 	for (uint64_t i = 0; i < weights->size(); ++i) {
 		std::string gzCommand = "tar xzf " + weights->at(i).second;
@@ -457,7 +476,7 @@ void extraction(std::string name, bool verbose, bool keep) {
 	delete(sendBlocks);
 	delete(localBlock);
 
-	// Delete each tar.gz file
+	// Delete each .ptgz.tar.gz file
 	#pragma omp parallel for schedule(static)
 	for (uint64_t i = 0; i < weights->size(); ++i) {
 		std::string gzRmCommand = weights->at(i).second;
