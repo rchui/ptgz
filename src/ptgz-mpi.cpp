@@ -499,7 +499,7 @@ void extraction(std::string name, bool verbose, bool keep) {
 	// Double check unpacking.
 	#pragma omp parallel for schedule(dynamic)
 	for (uint64_t i = 0; i < weights->size(); ++i) {
-		std::string gzCommand = "tar xzf " + weights->at(i).second + " --skip-old-files";
+		std::string gzCommand = "tar xkzf " + weights->at(i).second;
 		if (verbose) {
 			std::cout << gzCommand + "\n";
 		}
