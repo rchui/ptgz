@@ -14,9 +14,9 @@ CC = g++
 ## GNU/Cray C++ Compiler Flags
 CFLAGS := -std=c++11 -fopenmp -O3
 ## Intel C++ Compiler Flags
-# CFLAGS := -std=c++11 -openmp -O3 -c
+# CFLAGS := -std=c++11 -openmp -O3
 
-all: ptgz
+all: clean ptgz
 
 clean:
 	rm -rf bin/
@@ -28,7 +28,7 @@ make-directory:
 ptgz: make-directory src/ptgz.o
 	$(CC) $(CFLAGS) -o $(executables) src/ptgz.o
 
-ptgz-mpi: make-directory src/ptgz.o
+ptgz-mpi: make-directory src/ptgz-mpi.o
 	$(CC) $(CFLAGS) -o $(executables) src/ptgz.o
 
 %.o: %.cpp
