@@ -1,20 +1,26 @@
 executables = bin/ptgz
 
 ### Choose an appropriate compiler
-## GNU C++ Compiler
-CC = g++
-## Intel C++ Compiler
-# CC = icc
-## MPI C++ Compiler
-# CC = mpic++
-## Cray C++ Compiler
-# CC = CC
-
 ### Choose appropriate compiler flags
-## GNU/Cray C++ Compiler Flags
+
+## GNU C++ Compiler and Flags
+CC = g++
 CFLAGS := -std=c++11 -fopenmp -O3
-## Intel C++ Compiler Flags
+
+## Intel C++ Compiler and Flags
+# CC = icc
 # CFLAGS := -std=c++11 -openmp -O3
+
+## MPI C++ Compiler and Flags
+## Use whichevcr flags are appropriate
+# CC = mpic++
+# CFLAGS := -std=c++11 -fopenmp -O3
+# CFLAGS := -std=c++11 -openmp -O3
+
+## Cray C++ Compiler and Flags
+# CC = CC
+# CFLAGS := -std=c++11 -fopenmp -O3
+
 
 all: clean ptgz
 
