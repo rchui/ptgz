@@ -1,27 +1,41 @@
-all: clean gcc
+executables = bin/ptgz
+
+### Choose an appropriate compiler
+## GNU C++ Compiler
+CC = g++
+## Intel C++ Compiler
+# CC = icc
+## MPI C++ Compiler
+# CC = mpic++
+## Cray C++ Compiler
+# CC = CC
+
+### Choose appropriate compiler flags
+## GNU/Cray C++ Compiler Flags
+CFLAGS := -std=c++11 -fopenmp -O3
+## Intel C++ Compiler Flags
+# CFLAGS := -std=c++11 -openmp -O3 -c
+
+all: ptgz
 
 clean:
 	rm -rf bin/
+	rm -rf src/*.o
 
-gcc:
-	mkdir bin/
-	g++ -std=c++11 -fopenmp -O3 -o bin/ptgz src/ptgz.cpp
+make-directory:
+	mkdir -p bin/
+
+ptgz: src/ptgz.o
+	$(CC) $(CFLAGS) -o $(executables) src/ptgz.o
+
+ptgz-mpi: src/ptgz.o
+	$(CC) $(CFLAGS) -o $(executables) src/ptgz.o
+
+%.o: %.cpp
+	$(CC) $(CFLAGS) -c -o %@ $<
+
+set-permissions:
 	chmod -R 751 bin/
 
-icc: clean
-	mkdir bin/
-	icc -std=c++11 -openmp -O3 -o bin/ptgz src/ptgz.cpp
-	chmod -R 751 bin/
-
-mpi: clean
-	mkdir bin/
-	mpic++ -std=c++11 -fopenmp -O3 -o bin/ptgz src/ptgz-mpi.cpp
-	chmod -R 751 bin/
-
-icc-mpi: clean
-	mkdir bin/
-	mpic++ -std=c++11 -openmp -O3 -o bin/ptgz src/ptgz-mpi.cpp
-	chmod -R 751 bin/
-
-install:
-	cp bin/ptgz /usr/bin/ptgz
+install: set-permissions
+	cp $(objects) /usr/$(objects)
