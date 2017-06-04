@@ -44,6 +44,9 @@ ptgz will not preserve symlinks or store empty directories in the ptgz.tar archi
 
     -k    Keep Archive          Does not delete the ptgz archive it has been passed to extract. This option 
                                 must be used with "-x".
+                                
+    -l    Set Level             Instruct ptgz to use a specific compression level. Value must be from 1 to 9
+                                1 is low compression, fast speed and 9 is high compression, low speed.
 
     -v    Enable Verbose        Will print the archive and removal commands as they are called to STDOUT.
 
