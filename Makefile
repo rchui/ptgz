@@ -25,10 +25,10 @@ clean:
 make-directory:
 	mkdir -p bin/
 
-ptgz: src/ptgz.o
+ptgz: make-directory src/ptgz.o
 	$(CC) $(CFLAGS) -o $(executables) src/ptgz.o
 
-ptgz-mpi: src/ptgz.o
+ptgz-mpi: make-directory src/ptgz.o
 	$(CC) $(CFLAGS) -o $(executables) src/ptgz.o
 
 %.o: %.cpp
