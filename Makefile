@@ -44,4 +44,4 @@ set-permissions:
 	chmod -R 751 bin/
 
 install: set-permissions
-	cp $(objects) /usr/$(objects)
+	cp $(executables) /usr/bin/ptgz
