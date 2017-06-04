@@ -29,7 +29,7 @@ ptgz: make-directory src/ptgz.o
 	$(CC) $(CFLAGS) -o $(executables) src/ptgz.o
 
 ptgz-mpi: make-directory src/ptgz-mpi.o
-	$(CC) $(CFLAGS) -o $(executables) src/ptgz.o
+	$(CC) $(CFLAGS) -o $(executables) src/ptgz-mpi.o
 
 %.o: %.cpp
 	$(CC) $(CFLAGS) -c -o $@ $<
