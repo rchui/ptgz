@@ -32,7 +32,7 @@ ptgz-mpi: src/ptgz.o
 	$(CC) $(CFLAGS) -o $(executables) src/ptgz.o
 
 %.o: %.cpp
-	$(CC) $(CFLAGS) -c -o %@ $<
+	$(CC) $(CFLAGS) -c -o $@ $<
 
 set-permissions:
 	chmod -R 751 bin/
