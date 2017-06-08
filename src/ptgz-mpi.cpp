@@ -285,13 +285,13 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 	for (int64_t i = 0; i < globalSize; ++i) {
 		if (globalRank == i) {
 			std::ofstream oFile(name + ".idx", std::ios::out | std::ios::app);
-			for (int64_t i = localSize[0]; i < localSize[0] + localSize[1]; ++i) {
-				oFile << "---- " + std::to_string(i) + "." + name + ".ptgz.tar.gz ----\n\n";
-				std::ifstream iFile(std::to_string(i) + "." + name + ".ptgz.tmp", std::ios::in);
+			for (int64_t j = localSize[0]; j < localSize[0] + localSize[1]; ++j) {
+				oFile << "---- " + std::to_string(j) + "." + name + ".ptgz.tar.gz ----\n\n";
+				std::ifstream iFile(std::to_string(j) + "." + name + ".ptgz.tmp", std::ios::in);
 				if (iFile.is_open()) {
 					oFile << iFile.rdbuf();
 				} else {
-					std::cout << "ERROR: Could not add block " + std::to_string(i) + "\n";
+					std::cout << "ERROR: Could not add block " + std::to_string(j) + "\n";
 				}
 				oFile << "\n";
 			}
