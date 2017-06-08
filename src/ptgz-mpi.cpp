@@ -315,6 +315,9 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 		system(gzCommand.c_str());
 	}
 
+	sync();
+	MPI_Barrier(MPI_COMM_WORLD);
+
 	if (globalRank == root) {
 		// Combines gzipped blocks together int64_to a single tarball.
 		// Write tarball names int64_to an idx file for extraction.
