@@ -489,6 +489,9 @@ void extraction(std::string name, bool verbose, bool keep) {
 	}
 	std::sort(weights->rbegin(), weights->rend());
 
+	sync();
+	MPI_Barrier(MPI_COMM_WORLD);
+
 	// Unpack each .ptgz.tar.gz file.
 	#pragma omp parallel for schedule(dynamic)
 	for (uint64_t i = 0; i < weights->size(); ++i) {
