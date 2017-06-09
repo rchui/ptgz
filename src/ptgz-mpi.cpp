@@ -131,12 +131,12 @@ void getSettings(int argc, char *argv[], Settings *instance) {
 					exit(1);
 				}
 			} else {
-				perror("ERROR: level must be set from 1 to 9.\n")
+				perror("ERROR: level must be set from 1 to 9.\n");
 				exit(1);
 			}
 		} else {
 			if (settings.size() > 1) {
-				perror("ERROR: ptgz was called incorrectly. \"ptgz -h\" for help.\n")
+				perror("ERROR: ptgz was called incorrectly. \"ptgz -h\" for help.\n");
 				exit(1);
 			}
 			(*instance).output = true;
