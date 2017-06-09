@@ -220,11 +220,7 @@ void execute(std::string command, bool verbose) {
 		perror("Fork failure.\n");
 		exit(1);
 	} else if (childPid == 0) {
-		if (verbose) { // Is child
-			std::cout << command + "\n";
-		}
-		execl("/bin/sh", ("-c '" + command + "'").c_str(), (char*) NULL);
-
+		execl("/bin/sh", ("-c '" + command + "'").c_str(), NULL);
 		perror(("execl() failure for command: " + command + "\n").c_str());
 		_exit(1);
 	} else { // Is parent
