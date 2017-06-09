@@ -127,7 +127,7 @@ void getSettings(int argc, char *argv[], Settings *instance) {
 			int64_t level = std::stoi(settings.front());
 			if (level >= 1 && level <= 9) {
 				if (setenv("GZIP", ("-" + settings.front()).c_str(), 1) < 0) {
-					perror("ERROR: GZIP could not be set.");
+					perror("ERROR: GZIP could not be set.\n");
 					exit(1);
 				}
 			} else {
@@ -214,10 +214,10 @@ void makeScript(std::string name) {
 // 			   verbose (bool) user option for verbose output.
 void execute(std::string command, bool verbose) {
 	std::cout << "Executing: " + command + "\n";
-	pid_t childPid = fork();
+	pid_t childPid;
 
-	if (childPid < 0) { // Failed fork
-		perror("Fork failure.");
+	if ((childPid = vfork()) < 0) { // Failed fork
+		perror("Fork failure.\n");
 		exit(1);
 	} else if (childPid == 0) {
 		if (verbose) { // Is child
