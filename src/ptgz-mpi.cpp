@@ -203,6 +203,29 @@ void makeScript(std::string name) {
 	}
 }
 
+// Spawns child process which executes a system command.
+// Parent waits until child dies.
+// Parameters: command (std::string) command to be executed.
+// 			   verbose (bool) user option for verbose output.
+void execute(std::string command, bool verbose) {
+	pid_t childPid = fork();
+
+	if (childPid < 0) { // Failed fork
+		perror("Fork failure.");
+		exit(1);
+	} else if (childPid == 0) {
+		if (verbose) { // Is child
+			std::cout << command + "\n";
+		}
+		execl("/bin/sh", "-c", command.c_str(), (char*) NULL);
+
+		perror("execl() failure for command: " + command.c_str() + "\n");
+		_exit(1);
+	} else { // Is parent
+		wait(NULL);
+	}
+}
+
 // Divides files int64_to blocks.
 // Compresses each block int64_to a single file.
 // Combines all compressed blocks int64_to a single file.
@@ -312,7 +335,7 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 		if (verbose) {
 			std::cout << gzCommand + "\n";
 		}
-		system(gzCommand.c_str());
+		execute(gzCommand, verbose);
 	}
 
 	sync();
@@ -342,7 +365,7 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 			std::cout << tarCommand + "\n";
 		}
 	
-		system(tarCommand.c_str());
+		execute(tarCommand, verbose);
 	}
 
 	MPI_Barrier(MPI_COMM_WORLD);
@@ -423,7 +446,7 @@ void extraction(std::string name, bool verbose, bool keep) {
 		if (verbose) {
 			std::cout << exCommand + "\n";
 		}
-		system(exCommand.c_str());
+		execute(exCommand, verbose);
 
 		// Get number of archives and delete index.
 		std::ifstream idx;
@@ -477,7 +500,7 @@ void extraction(std::string name, bool verbose, bool keep) {
 	#pragma omp parallel for schedule(dynamic)
 	for (uint64_t i = localBlock[0]; i < localBlock[0] + localBlock[1]; ++i) {
 		std::string tarCommand = "tar xf " + name + ".ptgz.tar " + std::to_string(i) + "." + name + ".ptgz.tar.gz";
-		system(tarCommand.c_str());
+		execute(tarCommand, verbose);
 	}
 
 	// Fill weights vector and sort by file size descending
@@ -499,7 +522,7 @@ void extraction(std::string name, bool verbose, bool keep) {
 		if (verbose) {
 			std::cout << gzCommand + "\n";
 		}
-		system(gzCommand.c_str());
+		execute(gzCommand, verbose);
 	}
 
 	// Double check unpacking.
@@ -509,7 +532,7 @@ void extraction(std::string name, bool verbose, bool keep) {
 		if (verbose) {
 			std::cout << gzCommand + "\n";
 		}
-		system(gzCommand.c_str());
+		execute(gzCommand, verbose);
 	}
 
 	delete(sendBlocks);
