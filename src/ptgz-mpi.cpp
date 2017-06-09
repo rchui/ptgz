@@ -6,6 +6,8 @@
 #include <vector>
 #include <unistd.h>
 #include <dirent.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 #include <fstream>
 #include <sstream>
 #include <queue>
@@ -219,7 +221,7 @@ void execute(std::string command, bool verbose) {
 		}
 		execl("/bin/sh", "-c", command.c_str(), (char*) NULL);
 
-		perror("execl() failure for command: " + command.c_str() + "\n");
+		perror(("execl() failure for command: " + command + "\n").c_str());
 		_exit(1);
 	} else { // Is parent
 		wait(NULL);
