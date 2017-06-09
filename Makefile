@@ -3,18 +3,13 @@ executables = bin/ptgz
 ### Choose an appropriate compiler
 ### Choose appropriate compiler flags
 
-## GNU C++ Compiler and Flags
-CC = g++
+## MPI C++ Compiler and Flags
+CC = mpic++
+
+## GCC
 CFLAGS := -std=c++11 -fopenmp -O3
 
-## Intel C++ Compiler and Flags
-# CC = icc
-# CFLAGS := -std=c++11 -openmp -O3
-
-## MPI C++ Compiler and Flags
-## Use whichevcr flags are appropriate
-# CC = mpic++
-# CFLAGS := -std=c++11 -fopenmp -O3
+## Intel
 # CFLAGS := -std=c++11 -openmp -O3
 
 ## Cray C++ Compiler and Flags
