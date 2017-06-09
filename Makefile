@@ -22,7 +22,7 @@ CFLAGS := -std=c++11 -fopenmp -O3
 # CFLAGS := -std=c++11 -fopenmp -O3
 
 
-all: clean ptgz
+all: ptgz
 
 clean:
 	rm -rf bin/
