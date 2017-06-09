@@ -223,7 +223,7 @@ void execute(std::string command, bool verbose) {
 		if (verbose) { // Is child
 			std::cout << command + "\n";
 		}
-		execl("/bin/sh", "-c", ("\"" + command + "\"").c_str(), (char*) NULL);
+		execl("/bin/sh", ("-c '" + command + "'").c_str(), (char*) NULL);
 
 		perror(("execl() failure for command: " + command + "\n").c_str());
 		_exit(1);
