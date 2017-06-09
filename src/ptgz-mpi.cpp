@@ -126,7 +126,7 @@ void getSettings(int argc, char *argv[], Settings *instance) {
 			settings.pop();
 			int64_t level = std::stoi(settings.front());
 			if (level >= 1 && level <= 9) {
-				if (setenv("GZIP", settings.front().c_str(), 1) < 0) {
+				if (setenv("GZIP", ("-" + settings.front()).c_str(), 1) < 0) {
 					perror("ERROR: GZIP could not be set.");
 					exit(1);
 				}
