@@ -213,6 +213,7 @@ void makeScript(std::string name) {
 // Parameters: command (std::string) command to be executed.
 // 			   verbose (bool) user option for verbose output.
 void execute(std::string command, bool verbose) {
+	std::cout << "Executing: " + command + "\n";
 	pid_t childPid = fork();
 
 	if (childPid < 0) { // Failed fork
