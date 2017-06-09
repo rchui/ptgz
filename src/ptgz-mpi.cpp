@@ -103,14 +103,14 @@ void getSettings(int argc, char *argv[], Settings *instance) {
 
 		if (arg == "-x") {
 			if ((*instance).compress) {
-				std::cout << "ERROR: ptgz cannot both compress and extract. \"ptgz -h\" for help." << std::endl;
-				exit(0);
+				perror("ERROR: ptgz cannot both compress and extract. \"ptgz -h\" for help.\n");
+				exit(1);
 			}
 			(*instance).extract = true;
 		} else if (arg == "-c") {
 			if ((*instance).extract) {
-				std::cout << "ERROR: ptgz cannot both compress and extract. \"ptgz -h\" for help." << std::endl;
-				exit(0);
+				perror("ERROR: ptgz cannot both compress and extract. \"ptgz -h\" for help.\n");
+				exit(1);
 			}
 			(*instance).compress = true;
 		} else if (arg == "-v"){
@@ -126,15 +126,18 @@ void getSettings(int argc, char *argv[], Settings *instance) {
 			settings.pop();
 			int64_t level = std::stoi(settings.front());
 			if (level >= 1 && level <= 9) {
-				setenv("GZIP", settings.front().c_str(), 1);
+				if (setenv("GZIP", settings.front().c_str(), 1) < 0) {
+					perror("ERROR: GZIP could not be set.");
+					exit(1);
+				}
 			} else {
-				std::cout << "ERROR: level must be set from 1 to 9." << std::endl;
-				exit(0);
+				perror("ERROR: level must be set from 1 to 9.\n")
+				exit(1);
 			}
 		} else {
 			if (settings.size() > 1) {
-				std::cout << "ERROR: ptgz was called incorrectly. \"ptgz -h\" for help." << std::endl;
-				exit(0);
+				perror("ERROR: ptgz was called incorrectly. \"ptgz -h\" for help.\n")
+				exit(1);
 			}
 			(*instance).output = true;
 			(*instance).name = arg;
@@ -144,10 +147,10 @@ void getSettings(int argc, char *argv[], Settings *instance) {
 	}
 
 	if (!(*instance).output) {
-		std::cout << "ERROR: No output file name given. \"ptgz -h\" for help." << std::endl;
-		exit(0);
+		perror("ERROR: No output file name given. \"ptgz -h\" for help.\n");
+		exit(1);
 	} else if ((*instance).keep && !(*instance).extract) {
-		std::cout << "ERROR: Can't use keep option without extract. \"ptgz -h\" for help." << std::endl;
+		perror("ERROR: Can't use keep option without extract. \"ptgz -h\" for help.\n");
 	}
 }
 
