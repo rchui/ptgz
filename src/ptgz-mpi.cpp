@@ -349,11 +349,7 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 		std::ofstream idx, tmp;
 		idx.open(name + ".ptgz.idx", std::ios_base::app);
 		std::string tarCommand;
-		if (!verify) {
-			tarCommand = "tar -c -T " + name + ".ptgz.idx -f " + name + ".ptgz.tar";	
-		} else {
-			tarCommand = "tar -c -W -T " + name + ".ptgz.idx -f " + name + ".ptgz.tar";
-		}
+		tarCommand = "mpirun -np " + std::to_string(globalSize) + " -bind-to none mpitar -c -f " + name + ".ptgz.tar -T " + name + ".ptgz.idx";
 		for (uint64_t i = 0; i < tarNames->size(); ++i) {
 			idx << tarNames->at(i) + "\n";
 		}
