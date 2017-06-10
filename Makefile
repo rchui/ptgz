@@ -24,7 +24,7 @@ all: ptgz
 clean:
 	rm -rf bin/ obj/
 
-ptgz: $(sources) $(objects) | bin mpitar
+ptgz: $(sources) $(objects) mpitar | bin
 	$(CC) $(CFLAGS) -o $(executables) $(objects)
 
 mpitar:
