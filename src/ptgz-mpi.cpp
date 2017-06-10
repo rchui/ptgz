@@ -370,6 +370,7 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 		execute(tarCommand.c_str(), verbose);
 	}
 
+	sync();
 	MPI_Barrier(MPI_COMM_WORLD);
 
 	// Removes all temporary blocks.
@@ -458,7 +459,7 @@ void extraction(std::string name, bool verbose, bool keep) {
 		while (std::getline(idx, line)) {
 			++numArchives;
 		}
-		--numArchives;
+		numArchives -= 3; // There are three extra files in the index file.
 		idx.close();
 		std::string idxRmCommand = name + ".ptgz.idx";
 		if (verbose) {
@@ -505,6 +506,9 @@ void extraction(std::string name, bool verbose, bool keep) {
 		execute(tarCommand.c_str(), verbose);
 	}
 
+	sync();
+	MPI_Barrier(MPI_COMM_WORLD);
+
 	// Fill weights vector and sort by file size descending
 	std::vector<std::pair<uint64_t, std::string>> *weights = new std::vector<std::pair<uint64_t, std::string>>(localBlock[1]);
 	#pragma omp parallel for schedule(static)
@@ -514,13 +518,10 @@ void extraction(std::string name, bool verbose, bool keep) {
 	}
 	std::sort(weights->rbegin(), weights->rend());
 
-	sync();
-	MPI_Barrier(MPI_COMM_WORLD);
-
 	// Unpack each .ptgz.tar.gz file.
 	#pragma omp parallel for schedule(dynamic)
 	for (uint64_t i = 0; i < weights->size(); ++i) {
-		std::string gzCommand = "tar xzf " + weights->at(i).second;
+		std::string gzCommand = "tar -x -z --null -f " + weights->at(i).second;
 		if (verbose) {
 			std::cout << gzCommand + "\n";
 		}
@@ -530,7 +531,7 @@ void extraction(std::string name, bool verbose, bool keep) {
 	// Double check unpacking.
 	#pragma omp parallel for schedule(dynamic)
 	for (uint64_t i = 0; i < weights->size(); ++i) {
-		std::string gzCommand = "tar xkzf " + weights->at(i).second;
+		std::string gzCommand = "tar -x -k -z --null -f " + weights->at(i).second;
 		if (verbose) {
 			std::cout << gzCommand + "\n";
 		}
