@@ -220,7 +220,7 @@ void execute(std::string command, bool verbose) {
 		exit(1);
 	} else if (childPid == 0) { // Successful fork. Running command.
 		execl("/bin/sh", "sh", "-c", command.c_str(), (char *) 0);
-		perror("ERROR: Could not run command: " + command.c_str() + "\n");
+		perror(("ERROR: Could not run command: " + command + "\n").c_str());
 		_exit(1);
 	} else { // Parent. Wait for child to die.
 		wait(NULL);
