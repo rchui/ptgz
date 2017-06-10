@@ -1,4 +1,5 @@
 executables = bin/ptgz
+objects = bin/ptgz-mpi.o
 
 ### Choose an appropriate compiler
 ### Choose appropriate compiler flags
@@ -23,14 +24,14 @@ clean:
 	rm -rf bin/
 	rm -rf src/*.o
 
-make-directory:
-	mkdir -p bin/
+ptgz: src/ptgz-mpi.cpp $(objects)
+	$(CC) $(CFLAGS) -o $(executables) $(objects)
 
-ptgz: src/ptgz-mpi.cpp src/ptgz-mpi.o make-directory
-	$(CC) $(CFLAGS) -o $(executables) src/ptgz-mpi.o
-
-%.o: %.cpp
+bin/%.o: src/%.cpp | bin
 	$(CC) $(CFLAGS) -c -o $@ $<
+
+bin:
+	mkdir -p %@
 
 set-permissions:
 	chmod -R 751 bin/
