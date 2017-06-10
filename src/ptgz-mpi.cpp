@@ -216,9 +216,14 @@ void execute(std::string command, bool verbose) {
 	std::cout << "Executing: " + command + "\n";
 	pid_t childPid;
 
-	if ((childPid = vfork()) == 0) { // Successful fork, running command
-		execl("/bin/sh", ("-c '" + command + "'").c_str(), NULL);
+	if ((childPid = fork()) < 0) { // Failed fork. Exiting.
+		exit(1);
+	} else if (childPid == 0) { // Successful fork. Running command.
+		execl("/bin/sh", "sh", "-c", command.c_str(), (char *) 0);
+		perror("ERROR: Could not run command: " + command.c_str() + "\n");
 		_exit(1);
+	} else { // Parent. Wait for child to die.
+		wait(NULL);
 	}
 }
 
