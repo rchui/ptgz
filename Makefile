@@ -31,7 +31,7 @@ bin/%.o: src/%.cpp | bin
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 bin:
-	mkdir -p %@
+	mkdir -p $@
 
 set-permissions:
 	chmod -R 751 bin/
