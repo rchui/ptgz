@@ -1,0 +1,3 @@
+[submodule "mpitar"]
+	path = mpitar
+	url = https://rchui2@git.ncsa.illinois.edu/rhaas/mpitar.git
