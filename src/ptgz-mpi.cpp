@@ -214,7 +214,6 @@ void makeScript(std::string name) {
 // Parameters: command (std::string) command to be executed.
 // 			   verbose (bool) user option for verbose output.
 int execute(const char *command, bool verbose) {
-	std::cout << "Executing: " + command + "\n";
 	int status;
 	pid_t childPid;
 
