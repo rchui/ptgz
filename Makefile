@@ -26,7 +26,7 @@ clean:
 ptgz: src/ptgz-mpi.cpp $(objects) | bin
 	$(CC) $(CFLAGS) -o $(executables) $(objects)
 
-%.o: src/%.cpp | obj
+obj/%.o: src/%.cpp | obj
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 obj:
