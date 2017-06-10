@@ -22,7 +22,7 @@ CFLAGS := -std=c++11 -fopenmp -O3
 all: ptgz
 
 clean:
-	rm -rf bin/ obj/
+	rm -rf bin/ obj/ mpitar/mpitar
 
 ptgz: $(sources) $(objects) | bin bin/mpitar
 	$(CC) $(CFLAGS) -o $(executables) $(objects)
