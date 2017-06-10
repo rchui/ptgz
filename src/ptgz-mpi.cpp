@@ -184,6 +184,8 @@ void getPaths(std::vector<std::string> *filePaths, const char *cwd, std::string 
 	}
 }
 
+// Makes manual extraction script.
+// Parameters: name (std::string) name of the ptgz archive.
 void makeScript(std::string name) {
 	std::ofstream script (name + ".sh");
 	if (script.is_open()) {
