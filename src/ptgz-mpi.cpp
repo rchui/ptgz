@@ -8,6 +8,7 @@
 #include <dirent.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <errno.h>
 #include <fstream>
 #include <sstream>
 #include <queue>
@@ -212,19 +213,28 @@ void makeScript(std::string name) {
 // Parent waits until child dies.
 // Parameters: command (std::string) command to be executed.
 // 			   verbose (bool) user option for verbose output.
-void execute(std::string command, bool verbose) {
+int execute(const char *command, bool verbose) {
 	std::cout << "Executing: " + command + "\n";
+	int status;
 	pid_t childPid;
 
-	if ((childPid = fork()) < 0) { // Failed fork. Exiting.
-		exit(1);
-	} else if (childPid == 0) { // Successful fork. Running command.
-		execl("/bin/sh", "sh", "-c", command.c_str(), (char *) 0);
-		perror(("ERROR: Could not run command: " + command + "\n").c_str());
-		_exit(1);
-	} else { // Parent. Wait for child to die.
-		wait(NULL);
+	switch (childPid = fork()) {
+		case -1:
+			status = -1;
+			break;
+		case 0:
+			execl("/bin/sh", "sh", "-c", command, (char *) NULL);
+			_exit(1);
+		default:
+			while (waitpid(childPid, &status, 0) == -1) {
+				if (errno != EINTR) {
+					status = -1;
+					break;
+				}
+			}
 	}
+
+	return status;
 }
 
 // Divides files int64_to blocks.
@@ -332,7 +342,8 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 		if (verbose) {
 			std::cout << gzCommand + "\n";
 		}
-		execute(gzCommand, verbose);
+		execute(gzCommand.c_str(), verbose);
+
 	}
 
 	sync();
@@ -362,7 +373,7 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 			std::cout << tarCommand + "\n";
 		}
 	
-		execute(tarCommand, verbose);
+		execute(tarCommand.c_str(), verbose);
 	}
 
 	MPI_Barrier(MPI_COMM_WORLD);
@@ -443,7 +454,7 @@ void extraction(std::string name, bool verbose, bool keep) {
 		if (verbose) {
 			std::cout << exCommand + "\n";
 		}
-		execute(exCommand, verbose);
+		execute(exCommand.c_str(), verbose);
 
 		// Get number of archives and delete index.
 		std::ifstream idx;
@@ -497,7 +508,7 @@ void extraction(std::string name, bool verbose, bool keep) {
 	#pragma omp parallel for schedule(dynamic)
 	for (uint64_t i = localBlock[0]; i < localBlock[0] + localBlock[1]; ++i) {
 		std::string tarCommand = "tar xf " + name + ".ptgz.tar " + std::to_string(i) + "." + name + ".ptgz.tar.gz";
-		execute(tarCommand, verbose);
+		execute(tarCommand.c_str(), verbose);
 	}
 
 	// Fill weights vector and sort by file size descending
@@ -519,7 +530,7 @@ void extraction(std::string name, bool verbose, bool keep) {
 		if (verbose) {
 			std::cout << gzCommand + "\n";
 		}
-		execute(gzCommand, verbose);
+		execute(gzCommand.c_str(), verbose);
 	}
 
 	// Double check unpacking.
@@ -529,7 +540,7 @@ void extraction(std::string name, bool verbose, bool keep) {
 		if (verbose) {
 			std::cout << gzCommand + "\n";
 		}
-		execute(gzCommand, verbose);
+		execute(gzCommand.c_str(), verbose);
 	}
 
 	delete(sendBlocks);
