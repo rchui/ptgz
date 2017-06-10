@@ -1,5 +1,6 @@
 executables = bin/ptgz
 objects = obj/ptgz-mpi.o
+sources = src/ptgz-mpi.cpp
 
 ### Choose an appropriate compiler
 ### Choose appropriate compiler flags
@@ -23,7 +24,7 @@ all: ptgz
 clean:
 	rm -rf bin/ obj/*.o
 
-ptgz: src/ptgz-mpi.cpp $(objects) | bin
+ptgz: $(sources) $(objects) | bin
 	$(CC) $(CFLAGS) -o $(executables) $(objects)
 
 obj/%.o: src/%.cpp | obj
