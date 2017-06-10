@@ -21,8 +21,6 @@ int globalRank, globalSize;
 
 // Contains the various options the user can pass ptgz.
 // Members: 
-//	    level (int64_t) compression level ptgz shoudl use.
-//	    levelSet (bool) whether ptgz should use specific compression level.
 //	    extract (bool) whether ptgz should be extracting.
 //	    compress (bool) whether ptgz should be compressing.
 //	    verbose (bool) whether ptgz should output commands.
@@ -31,17 +29,13 @@ int globalRank, globalSize;
 //	    verify (bool) whether ptgz should verify the compressed archive.
 //	    name (std::string) name of archive to make or extract.
 struct Settings {
-	Settings(): level(),
-				levelSet(),
-				extract(),
+	Settings(): extract(),
 				compress(),
 				verbose(),
 				keep(),
 				output(),
 				verify(),
 				name() {}
-	int64_t level;
-	bool levelSet;
 	bool extract;
 	bool compress;
 	bool verbose;
@@ -123,7 +117,6 @@ void getSettings(int argc, char *argv[], Settings *instance) {
 		} else if (arg == "-W") {
 			(*instance).verify = true;
 		} else if (arg == "-l") { 
-			(*instance).levelSet = true;
 			settings.pop();
 			int64_t level = std::stoi(settings.front());
 			if (level >= 1 && level <= 9) {
@@ -211,7 +204,7 @@ void makeScript(std::string name) {
 
 // Spawns child process which executes a system command.
 // Parent waits until child dies.
-// Parameters: command (std::string) command to be executed.
+// Parameters: command (const char *) command to be executed.
 // 			   verbose (bool) user option for verbose output.
 int execute(const char *command, bool verbose) {
 	int status;
@@ -236,15 +229,15 @@ int execute(const char *command, bool verbose) {
 	return status;
 }
 
-// Divides files int64_to blocks.
-// Compresses each block int64_to a single file.
-// Combines all compressed blocks int64_to a single file.
+// Divides files into blocks.
+// Compresses each block into a single file.
+// Combines all compressed blocks into a single file.
 // Removes temporary blocks and header files.
 // Parameters: filePaths (std::vector<std::string> *) holder for all file paths.
 // 			   name (std::string) user given name for storage file.
 // 			   verbose (bool) user option for verbose output.
 //			   verify (bool) user option for tar archive verification.
-void compression(std::vector<std::string> *filePaths, std::string name, bool verbose, bool verify, bool levelSet, int64_t level) {
+void compression(std::vector<std::string> *filePaths, std::string name, bool verbose, bool verify) {
 	std::random_shuffle(filePaths->begin(), filePaths->end());
 
 	// Send the total number of files to all ranks.
@@ -312,7 +305,7 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 		}
 	}
 
-	// Send blocks to all ranks then build tar archives.
+	// Send blocks to all ranks and writes tar archive index
 	MPI_Scatter(sendSizes, 2, MPI_INT64_T, localSize, 2, MPI_INT64_T, root, MPI_COMM_WORLD);
 
 	for (int64_t i = 0; i < globalSize; ++i) {
@@ -349,8 +342,8 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 	MPI_Barrier(MPI_COMM_WORLD);
 
 	if (globalRank == root) {
-		// Combines gzipped blocks together int64_to a single tarball.
-		// Write tarball names int64_to an idx file for extraction.
+		// Combines gzipped blocks together into a single tarball.
+		// Write tarball names into an idx file for extraction.
 		std::ofstream idx, tmp;
 		idx.open(name + ".ptgz.idx", std::ios_base::app);
 		std::string tarCommand;
@@ -602,7 +595,7 @@ int main(int argc, char *argv[]) {
 			getPaths(filePaths, cwd, "");
 		}
 		MPI_Barrier(MPI_COMM_WORLD);
-		compression(filePaths, (*instance).name, (*instance).verbose, (*instance).verify, (*instance).levelSet, (*instance).level);
+		compression(filePaths, (*instance).name, (*instance).verbose, (*instance).verify);
 	} else {
 		MPI_Barrier(MPI_COMM_WORLD);
 		extraction((*instance).name, (*instance).verbose, (*instance).keep);
