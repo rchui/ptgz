@@ -1,5 +1,5 @@
 executables = bin/ptgz
-objects = bin/ptgz-mpi.o
+objects = obj/ptgz-mpi.o
 
 ### Choose an appropriate compiler
 ### Choose appropriate compiler flags
@@ -21,14 +21,16 @@ CFLAGS := -std=c++11 -fopenmp -O3
 all: ptgz
 
 clean:
-	rm -rf bin/
-	rm -rf src/*.o
+	rm -rf bin/ obj/*.o
 
-ptgz: src/ptgz-mpi.cpp $(objects)
+ptgz: src/ptgz-mpi.cpp $(objects) | bin
 	$(CC) $(CFLAGS) -o $(executables) $(objects)
 
-bin/%.o: src/%.cpp | bin
+%.o: src/%.cpp | obj
 	$(CC) $(CFLAGS) -c -o $@ $<
+
+obj:
+	mkdir -p $@
 
 bin:
 	mkdir -p $@
@@ -37,4 +39,4 @@ set-permissions:
 	chmod -R 751 bin/
 
 install: set-permissions
-	cp $(executables) /usr/bin/ptgz
+	cp $(executables) /bin/ptgz
