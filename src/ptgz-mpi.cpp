@@ -408,6 +408,9 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 		if (remove((name + ".idx").c_str())) {
 			std::cout << "ERROR: " + name + ".idx could not be removed.\n";
 		}
+		if (remove((name + ".ptgz.tar.idx").c_str())) {
+			std::cout << "ERROR: " + name + ".ptgz.tar.idx could not be removed\n";
+		}
 
 		tarNames->clear();
 		delete(tarNames);
