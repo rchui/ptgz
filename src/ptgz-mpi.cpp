@@ -205,7 +205,8 @@ void makeScript(std::string name) {
 }
 
 char* strToChar(std::string input) {
-	return &input[0u];
+	char *tmp = &input[0u];
+	return tmp;
 }
 
 // Spawns child process which executes a system command.
