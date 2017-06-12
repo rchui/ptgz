@@ -205,8 +205,8 @@ void makeScript(std::string name) {
 }
 
 char* strToChar(std::string input) {
-	char *tmp = new char[input.length() + 1]
-	tmp = &input[0u];
+	char *tmp = new char[input.length() + 1];
+	std::strcpy(tmp, input.c_str());
 	return tmp;
 }
 
