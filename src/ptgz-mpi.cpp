@@ -205,6 +205,12 @@ void makeScript(std::string name) {
 	}
 }
 
+void clean(char *const input) {
+	for (i = 0; i < count; ++i) {
+		
+	}
+}
+
 char* strToChar(std::string input) {
 	char *tmp = new char[input.length() + 1];
 	strcpy(tmp, input.c_str());
@@ -214,7 +220,7 @@ char* strToChar(std::string input) {
 // Spawns child process which executes a system command.
 // Parent waits until child dies.
 // Parameters: command (const char *) command to be executed.
-int execute(char *const command[0]) {
+int execute(char *const command) {
 	int status;
 	pid_t childPid;
 
