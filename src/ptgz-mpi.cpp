@@ -349,7 +349,7 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 									strToChar(std::to_string(i) + "." + name + ".ptgz.tar.gz"),
 									(char *) NULL
 								};
-		for (int i = 0; i < 8; ++i) {
+		for (int i = 0; i < 7; ++i) {
 			printf("%s\n", gzCommand[i]);
 		}
 		if (verbose) {
