@@ -343,10 +343,8 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 									"tar",
 									"-c",
 									"-z",
-									"-T",
-									strToChar(std::to_string(i) + "." + name + ".ptgz.tmp"),
-									"-f",
-									strToChar(std::to_string(i) + "." + name + ".ptgz.tar.gz"),
+									strToChar("-T " + std::to_string(i) + "." + name + ".ptgz.tmp"),
+									strToChar("-f " + std::to_string(i) + "." + name + ".ptgz.tar.gz"),
 									(char *) NULL
 								};
 		if (verbose) {
