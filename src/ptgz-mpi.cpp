@@ -350,7 +350,7 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 									(char *) NULL
 								};
 		for (int i = 0; i < 7; ++i) {
-			printf("%s\n", gzCommand[i]);
+			printf("%s %s %s %s %s %s %s\n", gzCommand[0], gzCommand[1], gzCommand[2], gzCommand[3], gzCommand[4], gzCommand[5], gzCommand[6]);
 		}
 		if (verbose) {
 			// std::cout << gzCommand + "\n";
