@@ -542,7 +542,7 @@ void extraction(std::string name, bool verbose, bool keep) {
 									"-x",
 									"-f",
 									strToChar(name + ".ptgz.tar"),
-									strToChar(std::to_string(i) + "." + name + ".ptgz.idx"),
+									strToChar(std::to_string(i) + "." + name + ".ptgz.tar.gz"),
 									(char *) NULL
 								};
 		execute(tarCommand);
@@ -588,7 +588,7 @@ void extraction(std::string name, bool verbose, bool keep) {
 									"-x",
 									"-k",
 									"-z",
-									"---null",
+									"--null",
 									"-f",
 									strToChar(weights->at(i).second),
 									(char *) NULL
