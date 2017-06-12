@@ -361,6 +361,7 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 			// std::cout << gzCommand + "\n";
 		}
 		execute(gzCommand);
+		clean(gzCommand);
 	}
 
 	sync();
@@ -399,6 +400,7 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 		}
 	
 		execute(tarCommand);
+		clean(tarCommand);
 	}
 
 	sync();
@@ -492,6 +494,7 @@ void extraction(std::string name, bool verbose, bool keep) {
 			// std::cout << exCommand + "\n";
 		}
 		execute(exCommand);
+		clean(exCommand);
 
 		// Get number of archives and delete index.
 		std::ifstream idx;
@@ -554,6 +557,7 @@ void extraction(std::string name, bool verbose, bool keep) {
 									(char *) NULL
 								};
 		execute(tarCommand);
+		clean(tarCommand);
 	}
 
 	sync();
@@ -585,6 +589,7 @@ void extraction(std::string name, bool verbose, bool keep) {
 			// std::cout << gzCommand + "\n";
 		}
 		execute(gzCommand);
+		clean(gzCommand);
 	}
 
 	// Double check unpacking.
@@ -605,6 +610,7 @@ void extraction(std::string name, bool verbose, bool keep) {
 			// std::cout << gzCommand + "\n";
 		}
 		execute(gzCommand);
+		clean(gzCommand);
 	}
 
 	delete(sendBlocks);
