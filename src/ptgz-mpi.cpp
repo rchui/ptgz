@@ -206,7 +206,7 @@ void makeScript(std::string name) {
 }
 
 void clean(char *const input[]) {
-	size_t count = sizeof(input) / sizeof(input[0])
+	size_t count = sizeof(input) / sizeof(input[0]);
 	for (int i = 0; i < count; ++i) {
 		delete input[i];
 	}
