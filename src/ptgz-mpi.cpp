@@ -364,7 +364,6 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 		// Write tarball names into an idx file for extraction.
 		std::ofstream idx, tmp;
 		idx.open(name + ".ptgz.idx", std::ios_base::app);
-		std::string tarCommand;
 		// tarCommand = "mpirun -np " + std::to_string(omp_get_max_threads() * globalSize - globalSize) 
 			// + " mpitar -c -f " + name + ".ptgz.tar -T " + name + ".ptgz.idx";
 		char* const tarCommand[] = {
