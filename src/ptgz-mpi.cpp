@@ -217,7 +217,7 @@ int execute(char *const command) {
 			status = -1;
 			break;
 		case 0:
-			execvp(command[0], &command);
+			execvp(static_cast<const char*>(command[0]), &command);
 			// execl("/bin/sh", "sh", "-c", command, (char *) NULL);
 			_exit(1);
 		default:
