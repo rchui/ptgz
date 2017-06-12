@@ -217,7 +217,8 @@ int execute(const char *command, bool verbose) {
 			status = -1;
 			break;
 		case 0:
-			execl("/bin/sh", "sh", "-c", command, (char *) NULL);
+			execvp(command);
+			// execl("/bin/sh", "sh", "-c", command, (char *) NULL);
 			_exit(1);
 		default:
 			while (waitpid(childPid, &status, 0) == -1) {
@@ -331,12 +332,23 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 	// Build tar archives for each block
 	#pragma omp parallel for schedule(dynamic)
 	for (int64_t i = localSize[0]; i < localSize[0] + localSize[1]; ++i) {
-		std::string gzCommand;
-		gzCommand = "tar -c -z -T " + std::to_string(i) + "." + name + ".ptgz.tmp -f " + std::to_string(i) + "." + name + ".ptgz.tar.gz";
+		// std::string gzCommand;
+		// gzCommand = "tar -c -z -T " + std::to_string(i) + "." + name + ".ptgz.tmp -f " + std::to_string(i) + "." + name + ".ptgz.tar.gz";
+		char* const gzCommand = {
+									"tar",
+									"-c",
+									"-z",
+									"-T",
+									(std::to_string(i) + "." + name + ".ptgz.tmp").c_str(),
+									"-f",
+									(std::to_string(i) + "." + name + ".ptgz.tar.gz").c_str(),
+									(char *) NULL
+								};
 		if (verbose) {
-			std::cout << gzCommand + "\n";
+			// std::cout << gzCommand + "\n";
 		}
-		execute(gzCommand.c_str(), verbose);
+		execute(gzCommand);
+		// execute(gzCommand.c_str(), verbose);
 
 	}
 
@@ -363,7 +375,7 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 			std::cout << tarCommand + "\n";
 		}
 	
-		execute(tarCommand.c_str(), verbose);
+		// execute(tarCommand.c_str(), verbose);
 	}
 
 	sync();
@@ -448,7 +460,7 @@ void extraction(std::string name, bool verbose, bool keep) {
 		if (verbose) {
 			std::cout << exCommand + "\n";
 		}
-		execute(exCommand.c_str(), verbose);
+		// execute(exCommand.c_str(), verbose);
 
 		// Get number of archives and delete index.
 		std::ifstream idx;
@@ -502,7 +514,7 @@ void extraction(std::string name, bool verbose, bool keep) {
 	#pragma omp parallel for schedule(dynamic)
 	for (uint64_t i = localBlock[0]; i < localBlock[0] + localBlock[1]; ++i) {
 		std::string tarCommand = "tar xf " + name + ".ptgz.tar " + std::to_string(i) + "." + name + ".ptgz.tar.gz";
-		execute(tarCommand.c_str(), verbose);
+		// execute(tarCommand.c_str(), verbose);
 	}
 
 	sync();
@@ -524,7 +536,7 @@ void extraction(std::string name, bool verbose, bool keep) {
 		if (verbose) {
 			std::cout << gzCommand + "\n";
 		}
-		execute(gzCommand.c_str(), verbose);
+		// execute(gzCommand.c_str(), verbose);
 	}
 
 	// Double check unpacking.
@@ -534,7 +546,7 @@ void extraction(std::string name, bool verbose, bool keep) {
 		if (verbose) {
 			std::cout << gzCommand + "\n";
 		}
-		execute(gzCommand.c_str(), verbose);
+		// execute(gzCommand.c_str(), verbose);
 	}
 
 	delete(sendBlocks);
