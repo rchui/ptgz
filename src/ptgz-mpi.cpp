@@ -205,6 +205,8 @@ void makeScript(std::string name) {
 	}
 }
 
+// Converts strings to char* for C functions.
+// Parameters: input (std::string) string to be converted.
 char* strToChar(std::string input) {
 	char *tmp = new char[input.length() + 1];
 	strcpy(tmp, input.c_str());
@@ -452,11 +454,17 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 
 // Gets and returns the size of a file
 // Parameters: filename (std::string) name of the file whose size to find.
-uint64_t GetFileSize(std::string filename)
-	{
-		struct stat stat_buf;
-		uint64_t rc = stat(filename.c_str(), &stat_buf);
-		return rc == 0 ? stat_buf.st_size : -1;
+uint64_t getFileSize(std::string filename) {
+		try {
+			const char *filePtr = fileName.c_str();
+			struct stat st;
+			if (stat(filePtr, &st) != 0) {
+				return 0;
+			}
+			return static_cast<uint64_t>(st.st_size);
+		} catch(...) {
+			return 0;
+		}
 	}
 
 // Unpacks the archive.
@@ -565,7 +573,7 @@ void extraction(std::string name, bool verbose, bool keep) {
 	#pragma omp parallel for schedule(static)
 	for (uint64_t i = 0; i < localBlock[1]; ++i) {
 		std::string archiveName = std::to_string(i + localBlock[0]) + "." + name + ".ptgz.tar.gz";
-		weights->at(i) = std::make_pair(GetFileSize(archiveName), archiveName);
+		weights->at(i) = std::make_pair(getFileSize(archiveName), archiveName);
 	}
 	std::sort(weights->rbegin(), weights->rend());
 
