@@ -472,11 +472,19 @@ void extraction(std::string name, bool verbose, bool keep) {
 
 	if (globalRank == root) {
 		// Unpack index from the 1st layer tar ball
-		std::string exCommand = "tar xf " + name + ".ptgz.tar " + name + ".ptgz.idx";
+		// std::string exCommand = "tar xf " + name + ".ptgz.tar " + name + ".ptgz.idx";
+		char* const exCommand[] = {
+									"tar",
+									"-x",
+									"-f",
+									strToChar(name + ".ptgz.tar"),
+									strToChar(name + ".ptgz.idx"),
+									(char *) NULL
+								};
 		if (verbose) {
-			std::cout << exCommand + "\n";
+			// std::cout << exCommand + "\n";
 		}
-		// execute(exCommand.c_str(), verbose);
+		execute(exCommand);
 
 		// Get number of archives and delete index.
 		std::ifstream idx;
