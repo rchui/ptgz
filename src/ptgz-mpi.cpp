@@ -210,7 +210,6 @@ void clean(char *const input[]) {
 	for (int i = 0; i < count; ++i) {
 		delete[] input[i];
 	}
-	delete[] input;
 }
 
 char* strToChar(std::string input) {
