@@ -343,10 +343,15 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 									"tar",
 									"-c",
 									"-z",
-									strToChar("-T " + std::to_string(i) + "." + name + ".ptgz.tmp"),
-									strToChar("-f " + std::to_string(i) + "." + name + ".ptgz.tar.gz"),
+									"-T",
+									strToChar(std::to_string(i) + "." + name + ".ptgz.tmp"),
+									"-f",
+									strToChar(std::to_string(i) + "." + name + ".ptgz.tar.gz"),
 									(char *) NULL
 								};
+		for (int i = 0; i < 8; ++i) {
+			std::cout << gzCommand[i];
+		}
 		if (verbose) {
 			// std::cout << gzCommand + "\n";
 		}
