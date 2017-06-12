@@ -208,7 +208,7 @@ void makeScript(std::string name) {
 // Parent waits until child dies.
 // Parameters: command (const char *) command to be executed.
 // 			   verbose (bool) user option for verbose output.
-int execute(char *const command) {
+int execute(char *const command[0]) {
 	int status;
 	pid_t childPid;
 
@@ -217,7 +217,8 @@ int execute(char *const command) {
 			status = -1;
 			break;
 		case 0:
-			execvp(reinterpret_cast<const char*>(command[0]), &command);
+			execvp(command[0], &command);
+			// execvp(reinterpret_cast<const char*>(command[0]), &command);
 			// execl("/bin/sh", "sh", "-c", command, (char *) NULL);
 			_exit(1);
 		default:
@@ -334,7 +335,7 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 	for (int64_t i = localSize[0]; i < localSize[0] + localSize[1]; ++i) {
 		// std::string gzCommand;
 		// gzCommand = "tar -c -z -T " + std::to_string(i) + "." + name + ".ptgz.tmp -f " + std::to_string(i) + "." + name + ".ptgz.tar.gz";
-		char* const gzCommand = {
+		char* const gzCommand[] = {
 									"tar",
 									"-c",
 									"-z",
