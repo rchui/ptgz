@@ -361,7 +361,9 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 			// std::cout << gzCommand + "\n";
 		}
 		execute(gzCommand);
+		std::cout << "Before";
 		clean(gzCommand);
+		std::cout << "After";
 	}
 
 	sync();
