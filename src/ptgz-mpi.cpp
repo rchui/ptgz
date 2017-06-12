@@ -537,8 +537,16 @@ void extraction(std::string name, bool verbose, bool keep) {
 	// Extract compressed archives from ptgz.tar archive
 	#pragma omp parallel for schedule(dynamic)
 	for (uint64_t i = localBlock[0]; i < localBlock[0] + localBlock[1]; ++i) {
-		std::string tarCommand = "tar xf " + name + ".ptgz.tar " + std::to_string(i) + "." + name + ".ptgz.tar.gz";
-		// execute(tarCommand.c_str(), verbose);
+		// std::string tarCommand = "tar xf " + name + ".ptgz.tar " + std::to_string(i) + "." + name + ".ptgz.tar.gz";
+		char* const tarCommand[] = {
+									"tar",
+									"-x",
+									"-f",
+									strToChar(name + ".ptgz.tar"),
+									strToChar(std::to_string(i) + "." + name + ".ptgz.idx"),
+									(char *) NULL
+								};
+		execute(tarCommand);
 	}
 
 	sync();
@@ -556,21 +564,40 @@ void extraction(std::string name, bool verbose, bool keep) {
 	// Unpack each .ptgz.tar.gz file.
 	#pragma omp parallel for schedule(dynamic)
 	for (uint64_t i = 0; i < weights->size(); ++i) {
-		std::string gzCommand = "tar -x -z --null -f " + weights->at(i).second;
+		// std::string gzCommand = "tar -x -z --null -f " + weights->at(i).second;
+		char* const gzCommand[] = {
+									"tar",
+									"-x",
+									"-z",
+									"--null",
+									"-f",
+									strToChar(weights->at(i).second),
+									(char *) NULL
+								};
 		if (verbose) {
-			std::cout << gzCommand + "\n";
+			// std::cout << gzCommand + "\n";
 		}
-		// execute(gzCommand.c_str(), verbose);
+		execute(gzCommand);
 	}
 
 	// Double check unpacking.
 	#pragma omp parallel for schedule(dynamic)
 	for (uint64_t i = 0; i < weights->size(); ++i) {
 		std::string gzCommand = "tar -x -k -z --null -f " + weights->at(i).second;
+		char* const tarCommand[] = {
+									"tar",
+									"-x",
+									"-k",
+									"-z",
+									"---null",
+									"-f",
+									strToChar(weights->at(i).second),
+									(char *) NULL
+								};
 		if (verbose) {
-			std::cout << gzCommand + "\n";
+			// std::cout << gzCommand + "\n";
 		}
-		// execute(gzCommand.c_str(), verbose);
+		execute(gzCommand);
 	}
 
 	delete(sendBlocks);
