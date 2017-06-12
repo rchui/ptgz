@@ -204,6 +204,10 @@ void makeScript(std::string name) {
 	}
 }
 
+char* strToChar(std::string input) {
+	return &input[0u];
+}
+
 // Spawns child process which executes a system command.
 // Parent waits until child dies.
 // Parameters: command (const char *) command to be executed.
@@ -217,7 +221,7 @@ int execute(char *const command[0]) {
 			status = -1;
 			break;
 		case 0:
-			execvp(command[0], &command);
+			execvp(command[0], command);
 			// execvp(reinterpret_cast<const char*>(command[0]), &command);
 			// execl("/bin/sh", "sh", "-c", command, (char *) NULL);
 			_exit(1);
@@ -340,9 +344,9 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 									"-c",
 									"-z",
 									"-T",
-									(std::to_string(i) + "." + name + ".ptgz.tmp").c_str(),
+									strToChar(std::to_string(i) + "." + name + ".ptgz.tmp"),
 									"-f",
-									(std::to_string(i) + "." + name + ".ptgz.tar.gz").c_str(),
+									strToChar(std::to_string(i) + "." + name + ".ptgz.tar.gz"),
 									(char *) NULL
 								};
 		if (verbose) {
