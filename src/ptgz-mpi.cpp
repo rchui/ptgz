@@ -354,8 +354,8 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 		}
 		execute(gzCommand);
 		// execute(gzCommand.c_str(), verbose);
-
 	}
+	exit(0);
 
 	sync();
 	MPI_Barrier(MPI_COMM_WORLD);
