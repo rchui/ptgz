@@ -208,7 +208,7 @@ void makeScript(std::string name) {
 // Parent waits until child dies.
 // Parameters: command (const char *) command to be executed.
 // 			   verbose (bool) user option for verbose output.
-int execute(const char *command) {
+int execute(char *const command) {
 	int status;
 	pid_t childPid;
 
