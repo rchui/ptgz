@@ -205,10 +205,12 @@ void makeScript(std::string name) {
 	}
 }
 
-void clean(char *const input) {
-	for (i = 0; i < count; ++i) {
-		
+void clean(char *const input[]) {
+	size_t count = sizeof(input) / sizeof(input[0])
+	for (int i = 0; i < count; ++i) {
+		delete input[i];
 	}
+	delete [] input;
 }
 
 char* strToChar(std::string input) {
