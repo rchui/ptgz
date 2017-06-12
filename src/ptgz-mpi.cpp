@@ -205,13 +205,6 @@ void makeScript(std::string name) {
 	}
 }
 
-void clean(char *const input[]) {
-	size_t count = sizeof(input) / sizeof(input[0]);
-	for (int i = 0; i < count; ++i) {
-		delete[] input[i];
-	}
-}
-
 char* strToChar(std::string input) {
 	char *tmp = new char[input.length() + 1];
 	strcpy(tmp, input.c_str());
@@ -360,9 +353,8 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 			// std::cout << gzCommand + "\n";
 		}
 		execute(gzCommand);
-		std::cout << "Before";
-		clean(gzCommand);
-		std::cout << "After";
+		delete[] gzCommand[4];
+		delete[] gzCommand[6];
 	}
 
 	sync();
@@ -401,7 +393,9 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 		}
 	
 		execute(tarCommand);
-		clean(tarCommand);
+		delete[] tarCommand[2];
+		delete[] tarCommand[6];
+		delete[] tarCommand[8];
 	}
 
 	sync();
@@ -495,7 +489,8 @@ void extraction(std::string name, bool verbose, bool keep) {
 			// std::cout << exCommand + "\n";
 		}
 		execute(exCommand);
-		clean(exCommand);
+		delete[] exCommand[3];
+		delete[] exCommand[4];
 
 		// Get number of archives and delete index.
 		std::ifstream idx;
@@ -558,7 +553,8 @@ void extraction(std::string name, bool verbose, bool keep) {
 									(char *) NULL
 								};
 		execute(tarCommand);
-		clean(tarCommand);
+		delete[] tarCommand[3];
+		delete[] tarCommand[4];
 	}
 
 	sync();
@@ -590,7 +586,7 @@ void extraction(std::string name, bool verbose, bool keep) {
 			// std::cout << gzCommand + "\n";
 		}
 		execute(gzCommand);
-		clean(gzCommand);
+		delete[] gzCommand[5];
 	}
 
 	// Double check unpacking.
@@ -611,7 +607,7 @@ void extraction(std::string name, bool verbose, bool keep) {
 			// std::cout << gzCommand + "\n";
 		}
 		execute(gzCommand);
-		clean(gzCommand);
+		delete[] gzCommand[6];
 	}
 
 	delete(sendBlocks);
