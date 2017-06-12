@@ -454,7 +454,7 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 
 // Gets and returns the size of a file
 // Parameters: filename (std::string) name of the file whose size to find.
-uint64_t getFileSize(std::string filename) {
+uint64_t getFileSize(std::string fileName) {
 		try {
 			const char *filePtr = fileName.c_str();
 			struct stat st;
