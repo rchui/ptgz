@@ -214,7 +214,6 @@ char* strToChar(std::string input) {
 // Spawns child process which executes a system command.
 // Parent waits until child dies.
 // Parameters: command (const char *) command to be executed.
-// 			   verbose (bool) user option for verbose output.
 int execute(char *const command[0]) {
 	int status;
 	pid_t childPid;
@@ -340,8 +339,6 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 	// Build tar archives for each block
 	#pragma omp parallel for schedule(dynamic)
 	for (int64_t i = localSize[0]; i < localSize[0] + localSize[1]; ++i) {
-		// std::string gzCommand;
-		// gzCommand = "tar -c -z -T " + std::to_string(i) + "." + name + ".ptgz.tmp -f " + std::to_string(i) + "." + name + ".ptgz.tar.gz";
 		char* const gzCommand[] = {
 									"tar",
 									"-c",
@@ -352,12 +349,10 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 									strToChar(std::to_string(i) + "." + name + ".ptgz.tar.gz"),
 									(char *) NULL
 								};
-		printf("%s %s %s %s %s %s %s\n", gzCommand[0], gzCommand[1], gzCommand[2], gzCommand[3], gzCommand[4], gzCommand[5], gzCommand[6]);
 		if (verbose) {
 			// std::cout << gzCommand + "\n";
 		}
 		execute(gzCommand);
-		// execute(gzCommand.c_str(), verbose);
 	}
 	exit(0);
 
@@ -370,7 +365,20 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 		std::ofstream idx, tmp;
 		idx.open(name + ".ptgz.idx", std::ios_base::app);
 		std::string tarCommand;
-		tarCommand = "mpirun -np " + std::to_string(omp_get_max_threads() * globalSize - globalSize) + " mpitar -c -f " + name + ".ptgz.tar -T " + name + ".ptgz.idx";
+		// tarCommand = "mpirun -np " + std::to_string(omp_get_max_threads() * globalSize - globalSize) 
+			// + " mpitar -c -f " + name + ".ptgz.tar -T " + name + ".ptgz.idx";
+		char* const tarCommand[] = {
+									"mpirun",
+									"-np",
+									strToChar(std::to_string(omp_get_max_threads() * globalSize - globalSize)),
+									"mpitar",
+									"-c",
+									"-f",
+									strToChar(name + ".ptgz.tar"),
+									"-T",
+									strToChar(name + ".ptgz.idx"),
+									(char *) NULL
+								};
 		for (uint64_t i = 0; i < tarNames->size(); ++i) {
 			idx << tarNames->at(i) + "\n";
 		}
@@ -381,10 +389,10 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 		idx.close();
 		
 		if (verbose) {
-			std::cout << tarCommand + "\n";
+			// std::cout << tarCommand + "\n";
 		}
 	
-		// execute(tarCommand.c_str(), verbose);
+		execute(tarCommand);
 	}
 
 	sync();
