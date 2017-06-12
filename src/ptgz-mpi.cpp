@@ -220,7 +220,7 @@ char* strToChar(std::string input) {
 // Spawns child process which executes a system command.
 // Parent waits until child dies.
 // Parameters: command (const char *) command to be executed.
-int execute(char *const command) {
+int execute(char *const command[]) {
 	int status;
 	pid_t childPid;
 
