@@ -583,7 +583,7 @@ void extraction(std::string name, bool verbose, bool keep) {
 	// Double check unpacking.
 	#pragma omp parallel for schedule(dynamic)
 	for (uint64_t i = 0; i < weights->size(); ++i) {
-		std::string gzCommand = "tar -x -k -z --null -f " + weights->at(i).second;
+		// std::string gzCommand = "tar -x -k -z --null -f " + weights->at(i).second;
 		char* const tarCommand[] = {
 									"tar",
 									"-x",
