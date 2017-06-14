@@ -205,6 +205,17 @@ void makeScript(std::string name) {
 	}
 }
 
+// Prints the command to be executed.
+// Parameters: ocmmand (char *const[]) command to be executed.
+//             length (int) number of elements in the command.
+void printCommand(char *const command[], int length) {
+	std::string output = command[0];
+	for (int i = 1; i < length; ++i) {
+		output += " " + std::string(command[i]);
+	}
+	std::cout << output + "\n";
+}
+
 // Converts strings to char* for C functions.
 // Parameters: input (std::string) string to be converted.
 char* strToChar(std::string input) {
@@ -240,6 +251,21 @@ int execute(char *const command[]) {
 
 	return status;
 }
+
+// Gets and returns the size of a file
+// Parameters: filename (std::string) name of the file whose size to find.
+uint64_t getFileSize(std::string fileName) {
+		try {
+			const char *filePtr = fileName.c_str();
+			struct stat st;
+			if (stat(filePtr, &st) != 0) {
+				return 0;
+			}
+			return static_cast<uint64_t>(st.st_size);
+		} catch(...) {
+			return 0;
+		}
+	}
 
 // Divides files into blocks.
 // Compresses each block into a single file.
@@ -338,29 +364,50 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 		MPI_Barrier(MPI_COMM_WORLD);
 	}
 
-	// Build tar archives for each block
-	#pragma omp parallel for schedule(dynamic)
+	// Finds the size of each archive and sorts themm from largest to smallest.
+	std::vector<std::pair<uint64_t, std::string>> *weights = new std::vector<std::pair<uint64_t, std::string>>(localSize[1]);
+	#pragma omp parallel for schedule(static)
 	for (int64_t i = localSize[0]; i < localSize[0] + localSize[1]; ++i) {
+		std::ifstream tmp;
+		std::string line;
+		uint64_t archiveSize = 0;
+
+		tmp.open(std::to_string(i) + "." + name + ".ptgz.tmp", std::ios_base::in);
+		while (std::getline(tmp, line)) {
+			archiveSize += getFileSize(line);
+		}
+		tmp.close();
+
+		weights->at(i) = std::make_pair(archiveSize, std::to_string(i));
+	}
+
+	// Build tar archives for each block; largest to smallest.
+	#pragma omp parallel for schedule(dynamic)
+	for (int64_t i = 0; i < weights->size(); ++i) {
 		char* const gzCommand[] = {
 									"tar",
 									"-c",
 									"-z",
 									"-T",
-									strToChar(std::to_string(i) + "." + name + ".ptgz.tmp"),
+									strToChar(weights->at(i).second + "." + name + ".ptgz.tmp"),
 									"-f",
-									strToChar(std::to_string(i) + "." + name + ".ptgz.tar.gz"),
+									strToChar(weights->at(i).second + "." + name + ".ptgz.tar.gz"),
 									(char *) NULL
 								};
 		if (verbose) {
-			// std::cout << gzCommand + "\n";
+			printCommand(gzCommand, 7);
 		}
 		execute(gzCommand);
 		delete[] gzCommand[4];
 		delete[] gzCommand[6];
 	}
 
+	weights->clear();
+	delete weights;
+
 	sync();
 	MPI_Barrier(MPI_COMM_WORLD);
+
 
 	if (globalRank == root) {
 		// Combines gzipped blocks together into a single tarball.
@@ -391,7 +438,7 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 		idx.close();
 		
 		if (verbose) {
-			// std::cout << tarCommand + "\n";
+			printCommand(tarCommand, 9);
 		}
 	
 		execute(tarCommand);
@@ -452,21 +499,6 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 	MPI_Finalize();
 }
 
-// Gets and returns the size of a file
-// Parameters: filename (std::string) name of the file whose size to find.
-uint64_t getFileSize(std::string fileName) {
-		try {
-			const char *filePtr = fileName.c_str();
-			struct stat st;
-			if (stat(filePtr, &st) != 0) {
-				return 0;
-			}
-			return static_cast<uint64_t>(st.st_size);
-		} catch(...) {
-			return 0;
-		}
-	}
-
 // Unpacks the archive.
 // Reads in all the files from the index file.
 // Unpacks each file.
@@ -494,7 +526,7 @@ void extraction(std::string name, bool verbose, bool keep) {
 									(char *) NULL
 								};
 		if (verbose) {
-			// std::cout << exCommand + "\n";
+			printCommand(exCommand, 5);
 		}
 		execute(exCommand);
 		delete[] exCommand[3];
@@ -591,7 +623,7 @@ void extraction(std::string name, bool verbose, bool keep) {
 									(char *) NULL
 								};
 		if (verbose) {
-			// std::cout << gzCommand + "\n";
+			printCommand(gzCommand, 6);
 		}
 		execute(gzCommand);
 		delete[] gzCommand[5];
@@ -612,7 +644,7 @@ void extraction(std::string name, bool verbose, bool keep) {
 									(char *) NULL
 								};
 		if (verbose) {
-			// std::cout << gzCommand + "\n";
+			printCommand(gzCommand, 7);
 		}
 		execute(gzCommand);
 		delete[] gzCommand[6];
