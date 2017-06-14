@@ -8,18 +8,7 @@ Compiler must have C++11 support.
 
 Requires MPI if desired but can be compiled without.
 
-## Installation - OpenMP
-Specific compilation commands can be found in the Makefile.
-
-### GNU C Compiler
-    make
-    make install
-
-### Intel C Compiler
-    make icc
-    make install
-
-## Installation - OpenMP + MPI
+## Installation
 ### GNU C Compiler
     make mpi
     make install
@@ -55,3 +44,21 @@ ptgz will not preserve symlinks or store empty directories in the ptgz.tar archi
                                 the archive to extract.
 
     -W    Verify Archive        Attempts to verify the archive after writing it.
+
+## How it Works
+### Compression
+1) Single node, single threaded recursive traversal from the parent directory to build a record of all files.
+2) The list of files are shuffled into random indexes in order to balance each compressed archive.
+3) Single node, multi-threaded write to \*.ptgz.tmp files, which lists the files to be included in each \*.ptgz.tar.gz archive.
+4) Multi-node, multi-threaded use of tar with level 1 (40% of original file size) gzip compression into \*.ptgz.tar.gz archives. 
+5) Multi-node, maximum multi-rank per node use of mpitar to package all \*.ptgz.tar.gz archives into a single \*.ptgz.tar.
+
+The compression process also includes in the \*.ptgz.tar archive:
+  1) \*.sh: A tar-compatible single-threaded unpacking shell script if ptgz is not available.
+  2) \*.idx: An index file of files contained within the \*.ptgz.tar archive. Each file is indexed by its \*.ptgz.tar.gz archive location.
+  3) \*.ptgz.tar.idx: An index file from mpitar which lists all of the \*.ptgz.tar.gz archives included in the \*.ptgz.tar archive.
+
+### Extraction
+1) Single node, single threaded extraction \*.ptgz.idx file from \*.ptgz.tar archive.
+2) Multi-node, multi-threaded extraction of \*.ptgz.tar.gz archives from \*.ptgz.tar archive using information from \*.ptgz.idx file.
+3) Multi-node, multi-threaded extraction of all files in all \*.ptgz.tar.gz archives.
