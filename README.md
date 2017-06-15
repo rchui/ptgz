@@ -48,7 +48,7 @@ ptgz will not preserve symlinks or store empty directories in the ptgz.tar archi
 ## How it Works
 ### Compression
 1) Single node, single threaded recursive traversal from the parent directory to build a record of all files.
-2) The list of files are shuffled into random indexes in order to balance each compressed archive.
+2) The list of files is shuffled into random indexes in order to balance each compressed archive.
 3) Single node, multi-threaded write to \*.ptgz.tmp files, which lists the files to be included in each \*.ptgz.tar.gz archive.
 4) Multi-node, multi-threaded use of tar with level 1 (40% of original file size) gzip compression into \*.ptgz.tar.gz archives. 
 5) Multi-node, maximum multi-rank per node use of mpitar to package all \*.ptgz.tar.gz archives into a single \*.ptgz.tar.
