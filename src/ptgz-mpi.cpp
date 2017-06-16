@@ -275,7 +275,7 @@ uint64_t getFileSize(std::string fileName) {
 // 			   name (std::string) user given name for storage file.
 // 			   verbose (bool) user option for verbose output.
 //			   verify (bool) user option for tar archive verification.
-void compression(std::vector<std::string> *filePaths, std::string name, bool verbose, bool verify) {
+void compression(std::vector<std::string> *filePaths, std::string name, bool verbose, bool verify, int numThreads) {
 	std::random_shuffle(filePaths->begin(), filePaths->end());
 
 	// Send the total number of files to all ranks.
@@ -286,7 +286,7 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 	MPI_Bcast(&filePathSize, 1, MPI_UINT64_T, root, MPI_COMM_WORLD);
 	std::vector<std::string> *tarNames;
 
-	int64_t numBlocks = omp_get_max_threads() * 10 * globalSize;
+	int64_t numBlocks = numThreads * 10 * globalSize;
 	uint64_t blockSize;
 	int64_t *sendSizes = new int64_t[globalSize * 2];
 	int64_t reserved = 0;
@@ -419,7 +419,7 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 		char* const tarCommand[] = {
 									"mpirun",
 									"-np",
-									strToChar(std::to_string(omp_get_max_threads() * globalSize - globalSize)),
+									strToChar(std::to_string(numThreads * globalSize - globalSize)),
 									"mpitar",
 									"-c",
 									"-f",
@@ -506,7 +506,7 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 // Parameters: name (std::string) name of ptgz archive file.
 // 			   verbose (bool) user option for verbose output.
 // 			   keep (bool) user option for keeping ptgz archive.
-void extraction(std::string name, bool verbose, bool keep) {
+void extraction(std::string name, bool verbose, bool keep, int numThreads) {
 	// Get the name from the name of the 1st layer tarball
 	for (int64_t i = 0; i < 9; ++i) {
 		name.pop_back();
@@ -697,6 +697,8 @@ int main(int argc, char *argv[]) {
 	MPI_Comm_rank(MPI_COMM_WORLD, &globalRank);
 	MPI_Comm_size(MPI_COMM_WORLD, &globalSize);
 	Settings *instance = new Settings;
+	int numThreads = omp_get_max_threads();
+	omp_set_num_threads(numThreads);
 	
 	if (globalRank == root) {
 		helpCheck(argc, argv);
@@ -710,10 +712,10 @@ int main(int argc, char *argv[]) {
 			getPaths(filePaths, cwd, "");
 		}
 		MPI_Barrier(MPI_COMM_WORLD);
-		compression(filePaths, (*instance).name, (*instance).verbose, (*instance).verify);
+		compression(filePaths, (*instance).name, (*instance).verbose, (*instance).verify, numThreads);
 	} else {
 		MPI_Barrier(MPI_COMM_WORLD);
-		extraction((*instance).name, (*instance).verbose, (*instance).keep);
+		extraction((*instance).name, (*instance).verbose, (*instance).keep, numThreads);
 	}
 
 	delete(instance);
