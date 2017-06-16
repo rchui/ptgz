@@ -237,8 +237,6 @@ int execute(char *const command[]) {
 			break;
 		case 0:
 			execvp(command[0], command);
-			// execvp(reinterpret_cast<const char*>(command[0]), &command);
-			// execl("/bin/sh", "sh", "-c", command, (char *) NULL);
 			_exit(1);
 		default:
 			while (waitpid(childPid, &status, 0) == -1) {
@@ -414,8 +412,6 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 		// Write tarball names into an idx file for extraction.
 		std::ofstream idx, tmp;
 		idx.open(name + ".ptgz.idx", std::ios_base::app);
-		// tarCommand = "mpirun -np " + std::to_string(omp_get_max_threads() * globalSize - globalSize) 
-			// + " mpitar -c -f " + name + ".ptgz.tar -T " + name + ".ptgz.idx";
 		char* const tarCommand[] = {
 									"mpirun",
 									"-np",
@@ -516,7 +512,6 @@ void extraction(std::string name, bool verbose, bool keep, int numThreads) {
 
 	if (globalRank == root) {
 		// Unpack index from the 1st layer tar ball
-		// std::string exCommand = "tar xf " + name + ".ptgz.tar " + name + ".ptgz.idx";
 		char* const exCommand[] = {
 									"tar",
 									"-x",
@@ -583,7 +578,6 @@ void extraction(std::string name, bool verbose, bool keep, int numThreads) {
 	// Extract compressed archives from ptgz.tar archive
 	#pragma omp parallel for schedule(dynamic)
 	for (uint64_t i = localBlock[0]; i < localBlock[0] + localBlock[1]; ++i) {
-		// std::string tarCommand = "tar xf " + name + ".ptgz.tar " + std::to_string(i) + "." + name + ".ptgz.tar.gz";
 		char* const tarCommand[] = {
 									"tar",
 									"-x",
@@ -612,7 +606,6 @@ void extraction(std::string name, bool verbose, bool keep, int numThreads) {
 	// Unpack each .ptgz.tar.gz file.
 	#pragma omp parallel for schedule(dynamic)
 	for (uint64_t i = 0; i < weights->size(); ++i) {
-		// std::string gzCommand = "tar -x -z --null -f " + weights->at(i).second;
 		char* const gzCommand[] = {
 									"tar",
 									"-x",
