@@ -345,6 +345,7 @@ void compression(std::vector<std::pair<uint64_t, std::string>> *filePaths, std::
 	}
 
 	// Send blocks to all ranks
+	sync();
 	MPI_Scatter(sendSizes, 2, MPI_INT64_T, localSize, 2, MPI_INT64_T, root, MPI_COMM_WORLD);
 
 	// Write tar index file
