@@ -149,11 +149,27 @@ void getSettings(int argc, char *argv[], Settings *instance) {
 	}
 }
 
+// Gets and returns the size of a file
+// Parameters: filename (std::string) name of the file whose size to find.
+uint64_t getFileSize(std::string fileName) {
+		try {
+			const char *filePtr = fileName.c_str();
+			struct stat st;
+			if (stat(filePtr, &st) != 0) {
+				return 0;
+			}
+			return static_cast<uint64_t>(st.st_size);
+		} catch(...) {
+			return 0;
+		}
+	}
+
+
 // Gets the paths for all files in the space to store.
 // Parameters: filePaths (std::vector<std::string> *) holder for all file paths.
 // 			   cwd (const char *) current working directory.
 // 			   rootPath (std::string) path from the root of the directory to be stored.
-void getPaths(std::vector<std::string> *filePaths, const char *cwd, std::string rootPath) {
+void getPaths(std::vector<std::pair<uint64_t, std::string>> *filePaths, const char *cwd, std::string rootPath) {
 	DIR *dir;
 	struct dirent *ent;
 
@@ -174,12 +190,13 @@ void getPaths(std::vector<std::string> *filePaths, const char *cwd, std::string 
 					closedir(dir2);
 					getPaths(filePaths, filePath.c_str(), rootPath + fileBuff + "/");
 				} else {
-					filePaths->push_back(rootPath + fileBuff);
+					std::string fullPath = rootPath + fileBuff;
+					filePaths->push_back(std::make_pair(getFileSize(fullPath), fullPath));
 				}
 			}
 		}
 		if (num == 0) {
-			filePaths->push_back(rootPath);
+			filePaths->push_back(std::make_pair(0, rootPath));
 		}
 		closedir(dir);
 	}
@@ -250,21 +267,6 @@ int execute(char *const command[]) {
 	return status;
 }
 
-// Gets and returns the size of a file
-// Parameters: filename (std::string) name of the file whose size to find.
-uint64_t getFileSize(std::string fileName) {
-		try {
-			const char *filePtr = fileName.c_str();
-			struct stat st;
-			if (stat(filePtr, &st) != 0) {
-				return 0;
-			}
-			return static_cast<uint64_t>(st.st_size);
-		} catch(...) {
-			return 0;
-		}
-	}
-
 // Divides files into blocks.
 // Compresses each block into a single file.
 // Combines all compressed blocks into a single file.
@@ -273,8 +275,10 @@ uint64_t getFileSize(std::string fileName) {
 // 			   name (std::string) user given name for storage file.
 // 			   verbose (bool) user option for verbose output.
 //			   verify (bool) user option for tar archive verification.
-void compression(std::vector<std::string> *filePaths, std::string name, bool verbose, bool verify, int numThreads) {
-	std::random_shuffle(filePaths->begin(), filePaths->end());
+void compression(std::vector<std::pair<uint64_t, std::string>> *filePaths, std::string name, bool verbose, bool verify, int numThreads) {
+	if (globalRank == root) {
+		std::sort(filePaths->rbegin(), filePaths->rend());
+	}
 
 	// Send the total number of files to all ranks.
 	uint64_t filePathSize;
@@ -307,13 +311,12 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 	if (globalRank == root) {
 		// Write all files to text files.
 		#pragma omp parallel for schedule(static)
-		for (int64_t i = 0; i < numBlocks; ++i) {
-			uint64_t start = blockSize * i;
-			if (start < filePathSize) {
+		for (uint64_t i = 0; i < tarNames->size(); ++i) {
+			if (i < filePaths->size()) {
 				std::ofstream tmp;
 				tmp.open(std::to_string(i) + "." + name + ".ptgz.tmp", std::ios_base::app);
-				for (uint64_t j = start; j < std::min(start + blockSize, filePathSize); ++j) {
-					tmp << filePaths->at(j) + "\n";
+				for (uint64_t j = i; j < filePaths->size(); j += tarNames->size()) {
+					tmp << filePaths->at(j).second + "\n";
 				}
 				tmp.close();
 				tarNames->at(i) = std::to_string(i) + "." + name + ".ptgz.tar.gz";
@@ -341,9 +344,10 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 		}
 	}
 
-	// Send blocks to all ranks and writes tar archive index
+	// Send blocks to all ranks
 	MPI_Scatter(sendSizes, 2, MPI_INT64_T, localSize, 2, MPI_INT64_T, root, MPI_COMM_WORLD);
 
+	// Write tar index file
 	for (int64_t i = 0; i < globalSize; ++i) {
 		if (globalRank == i) {
 			std::ofstream oFile(name + ".idx", std::ios::out | std::ios::app);
@@ -362,50 +366,36 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 		MPI_Barrier(MPI_COMM_WORLD);
 	}
 
-	// Finds the size of each archive and sorts themm from largest to smallest.
-	std::vector<std::pair<uint64_t, std::string>> *weights = new std::vector<std::pair<uint64_t, std::string>>(localSize[1]);
-	#pragma omp parallel for schedule(static)
-	for (int64_t i = localSize[0]; i < localSize[0] + localSize[1]; ++i) {
-		std::ifstream tmp;
-		std::string line;
-		uint64_t archiveSize = 0;
-
-		tmp.open(std::to_string(i) + "." + name + ".ptgz.tmp", std::ios_base::in);
-		while (std::getline(tmp, line)) {
-			archiveSize += getFileSize(line);
-		}
-		tmp.close();
-
-		weights->at(i) = std::make_pair(archiveSize, std::to_string(i));
-	}
-
 	// Build tar archives for each block; largest to smallest.
 	#pragma omp parallel for schedule(dynamic)
-	for (int64_t i = 0; i < weights->size(); ++i) {
-		char* const gzCommand[] = {
-									"tar",
-									"-c",
-									"-z",
-									"-T",
-									strToChar(weights->at(i).second + "." + name + ".ptgz.tmp"),
-									"-f",
-									strToChar(weights->at(i).second + "." + name + ".ptgz.tar.gz"),
-									(char *) NULL
-								};
-		if (verbose) {
-			printCommand(gzCommand, 7);
+	for (int64_t i = 0; i < localSize[1] + 1; ++i) {
+		if (i % 2) {
+			int64_t archiveNum = (globalSize - (globalRank + 1)) + globalSize * i;
+		} else {
+			int64_t archiveNum = globalRank + globalSize * i;
 		}
-		execute(gzCommand);
-		delete[] gzCommand[4];
-		delete[] gzCommand[6];
+		if (archiveNum < tarNames->size()) {
+			char* const gzCommand[] = {
+				"tar",
+				"-c",
+				"-z",
+				"-T",
+				strToChar(std::to_string(archiveNum) + "." + name + ".ptgz.tmp"),
+				"-f",
+				strToChar(std::to_string(archiveNum) + "." + name + ".ptgz.tar.gz"),
+				(char *) NULL
+			};
+			if (verbose) {
+				printCommand(gzCommand, 7);
+			}
+			execute(gzCommand);
+			delete[] gzCommand[4];
+			delete[] gzCommand[6];
+		}
 	}
-
-	weights->clear();
-	delete weights;
 
 	sync();
 	MPI_Barrier(MPI_COMM_WORLD);
-
 
 	if (globalRank == root) {
 		// Combines gzipped blocks together into a single tarball.
@@ -413,17 +403,17 @@ void compression(std::vector<std::string> *filePaths, std::string name, bool ver
 		std::ofstream idx, tmp;
 		idx.open(name + ".ptgz.idx", std::ios_base::app);
 		char* const tarCommand[] = {
-									"mpirun",
-									"-np",
-									strToChar(std::to_string(numThreads * globalSize - globalSize)),
-									"mpitar",
-									"-c",
-									"-f",
-									strToChar(name + ".ptgz.tar"),
-									"-T",
-									strToChar(name + ".ptgz.idx"),
-									(char *) NULL
-								};
+			"mpirun",
+			"-np",
+			strToChar(std::to_string(numThreads * globalSize - globalSize)),
+			"mpitar",
+			"-c",
+			"-f",
+			strToChar(name + ".ptgz.tar"),
+			"-T",
+			strToChar(name + ".ptgz.idx"),
+			(char *) NULL
+		};
 		for (uint64_t i = 0; i < tarNames->size(); ++i) {
 			idx << tarNames->at(i) + "\n";
 		}
@@ -513,13 +503,13 @@ void extraction(std::string name, bool verbose, bool keep, int numThreads) {
 	if (globalRank == root) {
 		// Unpack index from the 1st layer tar ball
 		char* const exCommand[] = {
-									"tar",
-									"-x",
-									"-f",
-									strToChar(name + ".ptgz.tar"),
-									strToChar(name + ".ptgz.idx"),
-									(char *) NULL
-								};
+			"tar",
+			"-x",
+			"-f",
+			strToChar(name + ".ptgz.tar"),
+			strToChar(name + ".ptgz.idx"),
+			(char *) NULL
+		};
 		if (verbose) {
 			printCommand(exCommand, 5);
 		}
@@ -579,13 +569,13 @@ void extraction(std::string name, bool verbose, bool keep, int numThreads) {
 	#pragma omp parallel for schedule(dynamic)
 	for (uint64_t i = localBlock[0]; i < localBlock[0] + localBlock[1]; ++i) {
 		char* const tarCommand[] = {
-									"tar",
-									"-x",
-									"-f",
-									strToChar(name + ".ptgz.tar"),
-									strToChar(std::to_string(i) + "." + name + ".ptgz.tar.gz"),
-									(char *) NULL
-								};
+			"tar",
+			"-x",
+			"-f",
+			strToChar(name + ".ptgz.tar"),
+			strToChar(std::to_string(i) + "." + name + ".ptgz.tar.gz"),
+			(char *) NULL
+		};
 		execute(tarCommand);
 		delete[] tarCommand[3];
 		delete[] tarCommand[4];
@@ -607,14 +597,14 @@ void extraction(std::string name, bool verbose, bool keep, int numThreads) {
 	#pragma omp parallel for schedule(dynamic)
 	for (uint64_t i = 0; i < weights->size(); ++i) {
 		char* const gzCommand[] = {
-									"tar",
-									"-x",
-									"-z",
-									"--null",
-									"-f",
-									strToChar(weights->at(i).second),
-									(char *) NULL
-								};
+			"tar",
+			"-x",
+			"-z",
+			"--null",
+			"-f",
+			strToChar(weights->at(i).second),
+			(char *) NULL
+		};
 		if (verbose) {
 			printCommand(gzCommand, 6);
 		}
@@ -627,15 +617,15 @@ void extraction(std::string name, bool verbose, bool keep, int numThreads) {
 	for (uint64_t i = 0; i < weights->size(); ++i) {
 		// std::string gzCommand = "tar -x -k -z --null -f " + weights->at(i).second;
 		char* const gzCommand[] = {
-									"tar",
-									"-x",
-									"-k",
-									"-z",
-									"--null",
-									"-f",
-									strToChar(weights->at(i).second),
-									(char *) NULL
-								};
+			"tar",
+			"-x",
+			"-k",
+			"-z",
+			"--null",
+			"-f",
+			strToChar(weights->at(i).second),
+			(char *) NULL
+		};
 		if (verbose) {
 			printCommand(gzCommand, 7);
 		}
@@ -700,7 +690,7 @@ int main(int argc, char *argv[]) {
 	getcwd(cwd, PATH_MAX);
 
 	if ((*instance).compress) {
-		std::vector<std::string> *filePaths = new std::vector<std::string>();
+		std::vector<std::pair<uint64_t, std::string>> *filePaths = new std::vector<std::pair<uint64_t, std::string>>();
 		if (globalRank == root) {
 			getPaths(filePaths, cwd, "");
 		}

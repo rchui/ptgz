@@ -56,7 +56,8 @@ ptgz will not preserve symlinks or store empty directories in the ptgz.tar archi
 The compression process also includes in the \*.ptgz.tar archive:
   1) \*.sh: A tar-compatible single-threaded unpacking shell script if ptgz is not available.
   2) \*.idx: An index file of files contained within the \*.ptgz.tar archive. Each file is indexed by its \*.ptgz.tar.gz archive location.
-  3) \*.ptgz.tar.idx: An index file from mpitar which lists all of the \*.ptgz.tar.gz archives included in the \*.ptgz.tar archive.
+  3) \*.ptgz.idx: An index of all \*.ptgz.tar.gz archives included that is used for \*.ptgz.tar archive extraction.
+  4) \*.ptgz.tar.idx: An index file from mpitar which lists all of the \*.ptgz.tar.gz archives included in the \*.ptgz.tar archive and their starting byte location.
 
 ### Extraction
 1) Single node, single threaded extraction \*.ptgz.idx file from \*.ptgz.tar archive.
