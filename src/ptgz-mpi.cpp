@@ -369,10 +369,11 @@ void compression(std::vector<std::pair<uint64_t, std::string>> *filePaths, std::
 	// Build tar archives for each block; largest to smallest.
 	#pragma omp parallel for schedule(dynamic)
 	for (int64_t i = 0; i < localSize[1] + 1; ++i) {
+		int64_t archiveNum;
 		if (i % 2) {
-			int64_t archiveNum = (globalSize - (globalRank + 1)) + globalSize * i;
+			archiveNum = (globalSize - (globalRank + 1)) + globalSize * i;
 		} else {
-			int64_t archiveNum = globalRank + globalSize * i;
+			archiveNum = globalRank + globalSize * i;
 		}
 		if (archiveNum < tarNames->size()) {
 			char* const gzCommand[] = {
