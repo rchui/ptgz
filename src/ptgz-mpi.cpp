@@ -149,6 +149,19 @@ void getSettings(int argc, char *argv[], Settings *instance) {
 	}
 }
 
+bool isLink(std::string fileName) {
+	struct stat buf;
+	int x;
+	const char* filePtr = fileName.c_str();
+
+	x = lstat (filePtr, &buf);
+	if (S_ISLNK(buf.st_mode)) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
 // Gets and returns the size of a file
 // Parameters: filename (std::string) name of the file whose size to find.
 uint64_t getFileSize(std::string fileName) {
