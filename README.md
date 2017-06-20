@@ -20,7 +20,7 @@ Requires MPI if desired but can be compiled without.
 ## Usage
 If you are compressing, your current working directory should be the parent directory of all directories you want to archive. If you are extracting, your current working directory should be the same as your archive.
 
-ptgz will not preserve symlinks or store empty directories in the ptgz.tar archive. Instead, all symlinked files/directory will be replaced by copies of the symlinked file/directory. Archives for directories with a lot of symlinks can turn out to be a lot bigger than expected.
+ptgz will not preserve symlinks in the ptgz.tar archive. Instead, all symlinks will be replaced by copies of what is being symlinked to. Archives for directories with a lot of symlinks can turn out to be a lot bigger than expected.
 
 ### Command Syntax:
     ptgz [-c | -k | -v | -x | -W] <archive>
