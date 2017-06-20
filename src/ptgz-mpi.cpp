@@ -14,6 +14,7 @@
 #include <sstream>
 #include <queue>
 #include <utility>
+#include <limits>
 #include "omp.h"
 #include "mpi.h"
 
@@ -177,7 +178,6 @@ uint64_t getFileSize(std::string fileName) {
 		}
 	}
 
-
 // Gets the paths for all files in the space to store.
 // Parameters: filePaths (std::vector<std::string> *) holder for all file paths.
 // 			   cwd (const char *) current working directory.
@@ -201,7 +201,11 @@ void getPaths(std::vector<std::pair<uint64_t, std::string>> *filePaths, const ch
 				// Check if file path is a directory.
 				if ((dir2 = opendir(filePath.c_str())) != NULL) {
 					closedir(dir2);
-					getPaths(filePaths, filePath.c_str(), rootPath + fileBuff + "/");
+					if (isLink(filePath)) {
+						filePaths->push_back(std::make_pair(0, rootPath + fileBuff));
+					} else {
+						getPaths(filePaths, filePath.c_str(), rootPath + fileBuff + "/");
+					}
 				} else {
 					std::string fullPath = rootPath + fileBuff;
 					filePaths->push_back(std::make_pair(getFileSize(fullPath), fullPath));
