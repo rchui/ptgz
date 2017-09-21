@@ -16,7 +16,7 @@
 #include <utility>
 #include <limits>
 
-#include "./mpitar/mpitar.hh"
+#include "mpitar.hh"
 
 #include "omp.h"
 #include "mpi.h"
