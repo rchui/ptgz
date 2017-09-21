@@ -1,6 +1,6 @@
 executables = bin/ptgz
-objects = obj/ptgz-mpi.o
-sources = src/ptgz-mpi.cpp
+objects = obj/ptgz-mpi.o obj/mpitar.o obj/timer.o obj/tarentry.o
+sources = src/ptgz-mpi.cpp src/mpitar.cc src/timer.hh src/tarentry.cc
 
 ### Choose an appropriate compiler
 ### Choose appropriate compiler flags
@@ -26,9 +26,6 @@ clean:
 
 ptgz: $(sources) $(objects) | bin bin/mpitar
 	$(CC) $(CFLAGS) -o $(executables) $(objects)
-
-bin/mpitar:
-	cd mpitar/ && make CC=$(CC) && cp mpitar ../bin
 
 obj/%.o: src/%.cpp | obj
 	$(CC) $(CFLAGS) -c -o $@ $<

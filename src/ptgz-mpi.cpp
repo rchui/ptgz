@@ -15,6 +15,9 @@
 #include <queue>
 #include <utility>
 #include <limits>
+
+#include "./mpitar/mpitar.hh"
+
 #include "omp.h"
 #include "mpi.h"
 
