@@ -451,7 +451,7 @@ void compression(std::vector<std::pair<uint64_t, std::string>> *filePaths, std::
 	
 		// TODO:
 		char ** mpitarArray = new char * [6];
-		mpitarArray[0] = {"mpitar"}
+		mpitarArray[0] = {"mpitar"};
 		// ;, "-c", "-f", strToChar(name + ".ptgz.tar"), "-T", strToChar(name + ".ptgz.tar")};
 
 		mpitar(6, &mpitarArray);
