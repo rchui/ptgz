@@ -449,7 +449,11 @@ void compression(std::vector<std::pair<uint64_t, std::string>> *filePaths, std::
 			printCommand(tarCommand, 9);
 		}
 	
-		execute(tarCommand);
+		// TODO:
+		char *mpitarArray[] = ["mpitar", "-c", "-f", strToChar(name + ".ptgz.tar"), "-T", strToChar(name + ".ptgz.tar")];
+
+		mpitar(6, &mpitarArray);
+		// execute(tarCommand);
 		delete[] tarCommand[2];
 		delete[] tarCommand[6];
 		delete[] tarCommand[8];
