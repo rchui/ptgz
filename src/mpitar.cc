@@ -95,11 +95,9 @@ size_t show_progress(size_t total, size_t chunksize, int show_percent);
 void master(const char *out_fn, fileentries& entries);
 void worker(const char *out_fn);
 
-int main(int argc, char **argv)
+int mpitar(int argc, char **argv)
 {
   int rc = -1;
-
-  MPI_Init(&argc, &argv);
   timer_all.start(__LINE__);
 
   int size;
@@ -142,8 +140,6 @@ int main(int argc, char **argv)
 
   if(rc == 0)
     timer::print_timers();
-
-  MPI_Finalize();
 
   return rc;
 }

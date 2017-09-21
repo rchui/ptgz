@@ -63,3 +63,8 @@ The compression process also includes in the \*.ptgz.tar archive:
 1) Single node, single threaded extraction \*.ptgz.idx file from \*.ptgz.tar archive.
 2) Multi-node, multi-threaded extraction of \*.ptgz.tar.gz archives from \*.ptgz.tar archive using information from \*.ptgz.idx file.
 3) Multi-node, multi-threaded extraction of all files in all \*.ptgz.tar.gz archives.
+
+### TODO
+1. Combine Makefiles
+2. Convert mpitar.cc (remove INIT and change main to function)
+3. Finish mpitar.hh
