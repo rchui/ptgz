@@ -1,6 +1,6 @@
 executables = bin/ptgz
-objects = obj/timer.o obj/tarentry.o obj/mpitar.o obj/ptgz-mpi.o
-sources = src/timer.cpp src/tarentry.cpp src/mpitar.cpp src/ptgz-mpi.cpp
+objects = obj/cmdline.o obj/tarentry.o obj/mpitar.o obj/ptgz-mpi.o
+sources = src/cmdline.cpp src/tarentry.cpp src/mpitar.cpp src/ptgz-mpi.cpp
 
 ### Choose an appropriate compiler
 ### Choose appropriate compiler flags
