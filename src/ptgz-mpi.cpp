@@ -105,8 +105,6 @@ void getSettings(int argc, char *argv[], Settings *instance) {
 	// Continue to check until there are no more passed arguments.
 	while (!settings.empty()) {
 		std::string arg = settings.front();
-		std::cout << arg + "\n";
-		std::cout << settings.size();
 
 		if (arg == "-x") {
 			if ((*instance).compress) {
