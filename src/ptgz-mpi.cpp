@@ -448,17 +448,25 @@ void compression(std::vector<std::pair<uint64_t, std::string>> *filePaths, std::
 		if (verbose) {
 			printCommand(tarCommand, 9);
 		}
-	
-		// TODO:
-		char ** mpitarArray = new char * [6];
-		mpitarArray[0] = "mpitar";
-		mpitarArray[1] = "-c";
-		mpitarArray[2] = "-f";
-		mpitarArray[3] = strToChar(name + ".ptgz.tar");
-		mpitarArray[4] = "-T";
-		mpitarArray[5] = strToChar(name + ".ptgz.tar");
+	}
 
-		mpitar(6, mpitarArray);
+	MPI_Barrier(MPI_COMM_WORLD);
+	// TODO:
+	char ** mpitarArray = new char * [6];
+	mpitarArray[0] = "mpitar";
+	mpitarArray[1] = "-c";
+	mpitarArray[2] = "-f";
+	mpitarArray[3] = strToChar(name + ".ptgz.tar");
+	mpitarArray[4] = "-T";
+	mpitarArray[5] = strToChar(name + ".ptgz.tar");
+
+	mpitar(6, mpitarArray);
+	MPI_Barrier(MPI_COMM_WORLD);
+	
+	delete[] mpitarArray[3];
+	delete[] mpitarArray[5];
+
+	if (globalRank == root) {
 		// execute(tarCommand);
 		delete[] tarCommand[2];
 		delete[] tarCommand[6];

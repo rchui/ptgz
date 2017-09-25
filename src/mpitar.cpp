@@ -97,6 +97,8 @@ void worker(const char *out_fn);
 
 int mpitar(int argc, char **argv)
 {
+  MPI_Barrier(MPI_COMM_WORLD);
+  
   int rc = -1;
   timer_all.start(__LINE__);
 
