@@ -751,7 +751,6 @@ int main(int argc, char *argv[]) {
 			for (uint64_t i = 0; i < (*filePaths).size(); i++) {
 				std::cout << (*filePaths).at(i).second + "\n";
 			}
-			exit(0);
 		}
 		MPI_Barrier(MPI_COMM_WORLD);
 		compression(filePaths, (*instance).name, (*instance).verbose, (*instance).verify, numThreads);
