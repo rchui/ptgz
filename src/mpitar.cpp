@@ -141,6 +141,7 @@ int mpitar(int argc, char **argv)
   if(rc == 0)
     timer::print_timers();
 
+  MPI_Barrier(MPI_COMM_WORLD);
   return rc;
 }
 
