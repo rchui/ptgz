@@ -130,7 +130,7 @@ void getSettings(int argc, char *argv[], Settings *instance) {
 			(*instance).verify = true;
 		} else if (arg == "-d") {
 			(*instance).remote = true;
-			settings.pop()
+			settings.pop();
 			(*instance).directory = settings.front();
 		} else if (arg == "-l") { 
 			settings.pop();
