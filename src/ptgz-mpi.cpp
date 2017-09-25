@@ -731,7 +731,7 @@ int main(int argc, char *argv[]) {
 		if (globalRank == root) {
 			getPaths(filePaths, cwd, "");
 			for (uint64_t i = 0; i < (*filePaths).size; i++) {
-				std::cout << (*filePaths).at(i) + "\n";
+				std::cout << (*filePaths).at(i).second + "\n";
 			}
 			exit(0);
 		}
