@@ -31,6 +31,8 @@ int globalRank, globalSize;
 //	    verbose (bool) whether ptgz should output commands.
 //	    keep (bool) whether ptgz should keep the extracted arvhive.
 //	    output (bool) whether archive name has been given.
+//      remote (bool) whether the directory is cwd.
+//      directory (std::string) name of the remote directory.
 //	    verify (bool) whether ptgz should verify the compressed archive.
 //	    name (std::string) name of archive to make or extract.
 struct Settings {
@@ -40,12 +42,15 @@ struct Settings {
 				keep(),
 				output(),
 				verify(),
+				remote(),
 				name() {}
 	bool extract;
 	bool compress;
 	bool verbose;
 	bool keep;
 	bool output;
+	bool remote;
+	std::string directory;
 	bool verify;
 	std::string name;
 };
@@ -121,6 +126,10 @@ void getSettings(int argc, char *argv[], Settings *instance) {
 			(*instance).keep = true;
 		} else if (arg == "-W") {
 			(*instance).verify = true;
+		} else if (arg == "-d") {
+			(*instance).remote = true;
+			settings.pop()
+			(*instance).directory = settings.front();
 		} else if (arg == "-l") { 
 			settings.pop();
 			int64_t level = std::stoi(settings.front());
@@ -724,12 +733,21 @@ int main(int argc, char *argv[]) {
 		helpCheck(argc, argv);
 	}
 	getSettings(argc, argv, instance);
-	getcwd(cwd, PATH_MAX);
+	
+	if ((*instance).remote) {
+		strcpy(cwd, (*instance).directory.c_str());
+	} else {
+		getcwd(cwd, PATH_MAX);
+	}
 
 	if ((*instance).compress) {
 		std::vector<std::pair<uint64_t, std::string>> *filePaths = new std::vector<std::pair<uint64_t, std::string>>();
 		if (globalRank == root) {
-			getPaths(filePaths, cwd, "");
+			if ((*instance).remote) {
+				getPaths(filePaths, cwd, cwd);
+			} else {
+				getPaths(filePaths, cwd, "");
+			}
 			for (uint64_t i = 0; i < (*filePaths).size(); i++) {
 				std::cout << (*filePaths).at(i).second + "\n";
 			}
