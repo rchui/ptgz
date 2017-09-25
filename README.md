@@ -4,18 +4,14 @@ The tar command line utility was first introduced in 1979 as a method of collect
 ## Requirements
 Need at least either GNU C Compiler (4.9+) with OpenMP or Intel C Compiler with OpenMP
 
-Compiler must have C++11 support.
-
-Requires MPI if desired but can be compiled without.
+Compiler must have C++11 support. Requires MPI.
 
 ## Installation
 ### GNU C Compiler
-    make mpi
+    make
     make install
 
-### Intel C Compiler
-    make icc-mpi
-    make install
+Other compilers and flags can be used if desired. Simply set CC and CFLAGS when calling make.
 
 ## Usage
 If you are compressing, your current working directory should be the parent directory of all directories you want to archive. If you are extracting, your current working directory should be the same as your archive.
