@@ -129,7 +129,7 @@ void getSettings(int argc, char *argv[], Settings *instance) {
 		} else if (arg == "-d") {
 			(*instance).remote = true;
 			settings.pop();
-			(*instance).directory = settings.front();
+			(*instance).directory = settings.front() + "/";
 		} else if (arg == "-l") { 
 			settings.pop();
 			int64_t level = std::stoi(settings.front());
