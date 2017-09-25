@@ -750,8 +750,10 @@ int main(int argc, char *argv[]) {
 			} else {
 				getPaths(filePaths, cwd, "");
 			}
-			for (uint64_t i = 0; i < (*filePaths).size(); i++) {
-				std::cout << (*filePaths).at(i).second + "\n";
+			if ((*instance).verbose) {
+				for (uint64_t i = 0; i < (*filePaths).size(); i++) {
+					std::cout << (*filePaths).at(i).second + "\n";
+				}
 			}
 		}
 		MPI_Barrier(MPI_COMM_WORLD);
