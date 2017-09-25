@@ -4,18 +4,14 @@ The tar command line utility was first introduced in 1979 as a method of collect
 ## Requirements
 Need at least either GNU C Compiler (4.9+) with OpenMP or Intel C Compiler with OpenMP
 
-Compiler must have C++11 support.
-
-Requires MPI if desired but can be compiled without.
+Compiler must have C++11 support. Requires MPI.
 
 ## Installation
 ### GNU C Compiler
-    make mpi
+    make
     make install
 
-### Intel C Compiler
-    make icc-mpi
-    make install
+Other compilers and flags can be used if desired. Simply set CC and CFLAGS when calling make.
 
 ## Usage
 If you are compressing, your current working directory should be the parent directory of all directories you want to archive. If you are extracting, your current working directory should be the same as your archive.
@@ -23,13 +19,15 @@ If you are compressing, your current working directory should be the parent dire
 ptgz will not preserve symlinks in the ptgz.tar archive. Instead, all symlinks will be replaced by copies of what is being symlinked to. Archives for directories with a lot of symlinks can turn out to be a lot bigger than expected.
 
 ### Command Syntax:
-    ptgz [-c | -k | -v | -x | -W] <archive>
+    ptgz [-c | -d </path/to/directory> | -k | -v | -x | -W] <archive>
 
 ### Modes:
 
     -c    Compression           Will perform file compression. The current directory and all of it's
                                 children will be archived and added to a single tarball. <archive> will be 
                                 prefix of the ptgz archive created.
+
+    -d    Remote Directory     	ptgz will compress and bundle a specified directory from a provided path.
 
     -k    Keep Archive          Does not delete the ptgz archive it has been passed to extract. This option 
                                 must be used with "-x".

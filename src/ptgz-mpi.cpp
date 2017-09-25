@@ -31,6 +31,8 @@ int globalRank, globalSize;
 //	    verbose (bool) whether ptgz should output commands.
 //	    keep (bool) whether ptgz should keep the extracted arvhive.
 //	    output (bool) whether archive name has been given.
+//      remote (bool) whether the directory is cwd.
+//      directory (std::string) name of the remote directory.
 //	    verify (bool) whether ptgz should verify the compressed archive.
 //	    name (std::string) name of archive to make or extract.
 struct Settings {
@@ -40,12 +42,15 @@ struct Settings {
 				keep(),
 				output(),
 				verify(),
+				remote(),
 				name() {}
 	bool extract;
 	bool compress;
 	bool verbose;
 	bool keep;
 	bool output;
+	bool remote;
+	std::string directory;
 	bool verify;
 	std::string name;
 };
@@ -67,13 +72,15 @@ void helpCheck(int argc, char *argv[]) {
 		std::cout << "    Supercomputing Applications.\n" << std::endl;
 		std::cout << "    Usage:\n";
 		std::cout << "    If you are compressing, your current working directory should be parent directory of all directories you\n";
-		std::cout << "    want to archive. If you are extracting, your current working directory should be the same as your archive.\n" << std::endl;
-		std::cout << "    ptgz [-c|-k|-v|-x|-W] <archive>\n" << std::endl;
+		std::cout << "    want to archive unless the (-d) flag is enabled. If you are extracting, your current working directory\n";
+		std::cout << "    should be the same as your archive." << std::endl;
+		std::cout << "    ptgz [-c|-d </path/to/directory>|-k|-v|-x|-W] <archive>\n" << std::endl;
 		std::cout << "    Modes:\n";
 		std::cout << "    -c    Compression           Will perform file compression. The current directory and all of it's\n";
 		std::cout << "                                children will be archived and added to a single tarball. <archive> will be \n";
 		std::cout << "                                prefix of the ptgz archive created.\n" << std::endl;
-		std::cout << "    -k    Keep Archive          Dooes not delete the ptgz archive it has been passed to extract. \"-x\" must\n";
+		std::cout << "    -d    Remote Directory      ptgz will compress and bundle a specified directory from a provided path.\n" << std::endl;
+		std::cout << "    -k    Keep Archive          Does not delete the ptgz archive it has been passed to extract. (-x) must\n";
 		std::cout << "                                also be used to use this option.\n" << std::endl;
 		std::cout << "    -l    Set Level             Instruct ptgz to use a specific compression level. Value must be from 1 to 9;\n";
 		std::cout << "                                1 is low compression, fast speed and 9 is high compression, low speed.\n" << std::endl;
@@ -121,6 +128,10 @@ void getSettings(int argc, char *argv[], Settings *instance) {
 			(*instance).keep = true;
 		} else if (arg == "-W") {
 			(*instance).verify = true;
+		} else if (arg == "-d") {
+			(*instance).remote = true;
+			settings.pop();
+			(*instance).directory = settings.front() + "/";
 		} else if (arg == "-l") { 
 			settings.pop();
 			int64_t level = std::stoi(settings.front());
@@ -724,12 +735,24 @@ int main(int argc, char *argv[]) {
 		helpCheck(argc, argv);
 	}
 	getSettings(argc, argv, instance);
-	getcwd(cwd, PATH_MAX);
+	
+	if ((*instance).remote) {
+		strcpy(cwd, (*instance).directory.c_str());
+	} else {
+		getcwd(cwd, PATH_MAX);
+	}
 
 	if ((*instance).compress) {
 		std::vector<std::pair<uint64_t, std::string>> *filePaths = new std::vector<std::pair<uint64_t, std::string>>();
 		if (globalRank == root) {
-			getPaths(filePaths, cwd, "");
+			if ((*instance).remote) {
+				getPaths(filePaths, cwd, cwd);
+			} else {
+				getPaths(filePaths, cwd, "");
+			}
+			for (uint64_t i = 0; i < (*filePaths).size(); i++) {
+				std::cout << (*filePaths).at(i).second + "\n";
+			}
 		}
 		MPI_Barrier(MPI_COMM_WORLD);
 		compression(filePaths, (*instance).name, (*instance).verbose, (*instance).verify, numThreads);
