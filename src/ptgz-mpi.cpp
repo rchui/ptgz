@@ -79,7 +79,7 @@ void helpCheck(int argc, char *argv[]) {
 		std::cout << "    -c    Compression           Will perform file compression. The current directory and all of it's\n";
 		std::cout << "                                children will be archived and added to a single tarball. <archive> will be \n";
 		std::cout << "                                prefix of the ptgz archive created.\n" << std::endl;
-		std::cout << "    -d    Directory             ptgz will compress and bundle a specified directory from a provided path.\n";<< std::endl;
+		std::cout << "    -d    Remote Directory      ptgz will compress and bundle a specified directory from a provided path.\n" << std::endl;
 		std::cout << "    -k    Keep Archive          Does not delete the ptgz archive it has been passed to extract. (-x) must\n";
 		std::cout << "                                also be used to use this option.\n" << std::endl;
 		std::cout << "    -l    Set Level             Instruct ptgz to use a specific compression level. Value must be from 1 to 9;\n";
