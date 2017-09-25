@@ -730,7 +730,7 @@ int main(int argc, char *argv[]) {
 		std::vector<std::pair<uint64_t, std::string>> *filePaths = new std::vector<std::pair<uint64_t, std::string>>();
 		if (globalRank == root) {
 			getPaths(filePaths, cwd, "");
-			for (int_64_t i = 0; i < (*filePaths).size; i++) {
+			for (uint64_t i = 0; i < (*filePaths).size; i++) {
 				std::cout << (*filePaths).at(i) + "\n";
 			}
 			exit(0);
