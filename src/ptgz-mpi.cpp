@@ -459,7 +459,6 @@ void compression(std::vector<std::pair<uint64_t, std::string>> *filePaths, std::
 		mpitarArray[5] = strToChar(name + ".ptgz.tar");
 
 		mpitar(6, mpitarArray);
-		MPI_Barrier(MPI_COMM_WORLD);
 		// execute(tarCommand);
 		delete[] tarCommand[2];
 		delete[] tarCommand[6];
