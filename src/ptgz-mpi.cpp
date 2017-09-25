@@ -481,6 +481,7 @@ void compression(std::vector<std::pair<uint64_t, std::string>> *filePaths, std::
 
 	sync();
 	MPI_Barrier(MPI_COMM_WORLD);
+	exit();
 
 	// Removes all temporary blocks.
 	#pragma omp parallel for schedule(static)
