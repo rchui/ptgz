@@ -72,13 +72,15 @@ void helpCheck(int argc, char *argv[]) {
 		std::cout << "    Supercomputing Applications.\n" << std::endl;
 		std::cout << "    Usage:\n";
 		std::cout << "    If you are compressing, your current working directory should be parent directory of all directories you\n";
-		std::cout << "    want to archive. If you are extracting, your current working directory should be the same as your archive.\n" << std::endl;
-		std::cout << "    ptgz [-c|-k|-v|-x|-W] <archive>\n" << std::endl;
+		std::cout << "    want to archive unless the (-d) flag is enabled. If you are extracting, your current working directory\n";
+		std::cout << "    should be the same as your archive." << std::endl;
+		std::cout << "    ptgz [-c|-d </path/to/directory>|-k|-v|-x|-W] <archive>\n" << std::endl;
 		std::cout << "    Modes:\n";
 		std::cout << "    -c    Compression           Will perform file compression. The current directory and all of it's\n";
 		std::cout << "                                children will be archived and added to a single tarball. <archive> will be \n";
 		std::cout << "                                prefix of the ptgz archive created.\n" << std::endl;
-		std::cout << "    -k    Keep Archive          Dooes not delete the ptgz archive it has been passed to extract. \"-x\" must\n";
+		std::cout << "    -d    Directory             ptgz will compress and bundle a specified directory from a provided path.\n";<< std::endl;
+		std::cout << "    -k    Keep Archive          Does not delete the ptgz archive it has been passed to extract. (-x) must\n";
 		std::cout << "                                also be used to use this option.\n" << std::endl;
 		std::cout << "    -l    Set Level             Instruct ptgz to use a specific compression level. Value must be from 1 to 9;\n";
 		std::cout << "                                1 is low compression, fast speed and 9 is high compression, low speed.\n" << std::endl;
@@ -481,7 +483,6 @@ void compression(std::vector<std::pair<uint64_t, std::string>> *filePaths, std::
 
 	sync();
 	MPI_Barrier(MPI_COMM_WORLD);
-	exit(0);
 
 	// Removes all temporary blocks.
 	#pragma omp parallel for schedule(static)
