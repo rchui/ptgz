@@ -2,9 +2,9 @@
 The tar command line utility was first introduced in 1979 as a method of collecting many files into one archive file for distrbution and backup purposes. With the penetration of big data into every facet of the computing space datasets have grown exponentially in size. The single-threaded tar implementation is too slow to effectively archive terrabyte sized directories with millions of files. We introduce ptgz, a custom multi-threaded C++ file archiving utility to quickly compress, bundle files into an archive file, developed at the National Center for Supercomputing Applications.
 
 ## Requirements
-Need at least either GNU C Compiler (4.9+) with OpenMP or Intel C Compiler with OpenMP
-
-Compiler must have C++11 support. Requires MPI.
+    - C compiler with C++11 support.
+    - OpenMP
+    - MPI
 
 ## Installation
 ### GNU C Compiler
@@ -27,7 +27,7 @@ ptgz will not preserve symlinks in the ptgz.tar archive. Instead, all symlinks w
                                 children will be archived and added to a single tarball. <archive> will be 
                                 prefix of the ptgz archive created.
 
-    -d    Remote Directory     	ptgz will compress and bundle a specified directory from a provided path.
+    -d    Remote Directory      ptgz will compress and bundle a specified directory from a provided path.
 
     -k    Keep Archive          Does not delete the ptgz archive it has been passed to extract. This option 
                                 must be used with "-x".
