@@ -467,13 +467,14 @@ void compression(std::vector<std::pair<uint64_t, std::string>> *filePaths, std::
 
 	MPI_Barrier(MPI_COMM_WORLD);
 	// TODO:
-	char ** mpitarArray = new char * [6];
+	char ** mpitarArray = new char * [7];
 	mpitarArray[0] = "mpitar";
 	mpitarArray[1] = "-c";
 	mpitarArray[2] = "-f";
 	mpitarArray[3] = strToChar(name + ".ptgz.tar");
 	mpitarArray[4] = "-T";
 	mpitarArray[5] = strToChar(name + ".ptgz.idx");
+	mpitarArray[6] = (char *) NULL;
 
 	mpitar(6, mpitarArray);
 	MPI_Barrier(MPI_COMM_WORLD);
