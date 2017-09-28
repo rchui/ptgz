@@ -470,9 +470,9 @@ void compression(std::vector<std::pair<uint64_t, std::string>> *filePaths, std::
 	char arg0[] = "mpitar";
 	char arg1[] = "-c";
 	char arg2[] = "-f";
-	char arg3[] = strToChar(name + ".ptgz.tar");
+	char arg3[] = name + ".ptgz.tar";
 	char arg4[] = "-T";
-	char arg5[] = strToChar(name + ".ptgz.idx");
+	char arg5[] = name + ".ptgz.idx";
 	char *mpitarCommand[] = { &arg0, &arg1, &arg2, &arg3, &arg4, &arg5, NULL };
 	// char *mpitarCommand[] = {"mpitar", 
 	// 						 "-c", 
