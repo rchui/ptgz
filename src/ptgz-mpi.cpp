@@ -467,20 +467,13 @@ void compression(std::vector<std::pair<uint64_t, std::string>> *filePaths, std::
 
 	MPI_Barrier(MPI_COMM_WORLD);
 	// TODO:
-	char arg0[] = "mpitar";
-	char arg1[] = "-c";
-	char arg2[] = "-f";
-	char arg3[] = { strToChar(name + ".ptgz.tar") };
-	char arg4[] = "-T";
-	char arg5[] = { strToChar(name + ".ptgz.idx") };
-	char *mpitarCommand[] = { &arg0, &arg1, &arg2, &arg3, &arg4, &arg5, NULL };
-	// char *mpitarCommand[] = {"mpitar", 
-	// 						 "-c", 
-	// 						 "-f", 
-	// 						 strToChar(name + ".ptgz.tar"), 
-	// 						 "-T", 
-	// 						 strToChar(name + ".ptgz.idx"), 
-	// 						 NULL};
+	char *mpitarCommand[] = {"mpitar", 
+							 "-c", 
+							 "-f", 
+							 strToChar(name + ".ptgz.tar"), 
+							 "-T", 
+							 strToChar(name + ".ptgz.idx"), 
+							 NULL};
 	// char ** mpitarArray = new char * [7];
 	// mpitarArray[0] = "mpitar";
 	// mpitarArray[1] = "-c";
@@ -490,7 +483,7 @@ void compression(std::vector<std::pair<uint64_t, std::string>> *filePaths, std::
 	// mpitarArray[5] = strToChar(name + ".ptgz.idx");
 	// mpitarArray[6] = (char *) NULL;
 
-	mpitar(6, &mpitarCommand[0]);
+	mpitar(6, mpitarCommand);
 	MPI_Barrier(MPI_COMM_WORLD);
 
 	delete[] mpitarCommand[3];
