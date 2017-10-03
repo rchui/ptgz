@@ -400,7 +400,7 @@ void compression(std::vector<std::pair<uint64_t, std::string>> *filePaths, std::
 
 	// Build tar archives for each block; largest to smallest.
 	#pragma omp parallel for schedule(dynamic)
-	for (int64_t i = 0; i < localSize[1] + 1; ++i) {
+	for (int64_t i = 0; i < localSize[1] + 2; ++i) {
 		int64_t archiveNum;
 		if (i % 2) {
 			archiveNum = (globalSize - (globalRank + 1)) + globalSize * i;
@@ -465,6 +465,7 @@ void compression(std::vector<std::pair<uint64_t, std::string>> *filePaths, std::
 		delete[] tarCommand[8];
 	}
 
+	sync();
 	MPI_Barrier(MPI_COMM_WORLD);
 
 	char *mpitarCommand[] = {"mpitar", 
